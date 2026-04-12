@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mindmap</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --border: #30363d;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --accent: #58a6ff;
+    --green: #3fb950;
+    --yellow: #d29922;
+    --red: #f85149;
+    --orange: #db6d28;
+    --purple: #bc8cff;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  h1 {
+    font-size: 1.8rem;
+    margin-bottom: 0.25rem;
+    color: var(--accent);
+  }
+  h2 {
+    font-size: 1.3rem;
+    margin: 2rem 0 1rem;
+    color: var(--text);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0.5rem;
+  }
+  h3 {
+    font-size: 1.1rem;
+    margin: 1.5rem 0 0.5rem;
+    color: var(--muted);
+  }
+  .timestamp {
+    color: var(--muted);
+    font-size: 0.85rem;
+    margin-bottom: 2rem;
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 1rem;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0.5rem 0;
+    font-size: 0.9rem;
+  }
+  th, td {
+    padding: 0.5rem 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  th {
+    color: var(--muted);
+    font-weight: 600;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  tr:last-child td { border-bottom: none; }
+  .badge {
+    display: inline-block;
+    padding: 0.15rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+  .badge-green { background: rgba(63,185,80,0.15); color: var(--green); }
+  .badge-yellow { background: rgba(210,153,34,0.15); color: var(--yellow); }
+  .badge-red { background: rgba(248,81,73,0.15); color: var(--red); }
+  .badge-blue { background: rgba(88,166,255,0.15); color: var(--accent); }
+  .badge-muted { background: rgba(139,148,158,0.15); color: var(--muted); }
+  .progress-bar {
+    height: 8px;
+    background: var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+    margin: 0.5rem 0;
+  }
+  .progress-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.3s;
+  }
+  .stat {
+    text-align: center;
+    padding: 1rem;
+  }
+  .stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--accent);
+  }
+  .stat-label {
+    font-size: 0.8rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  blockquote {
+    border-left: 3px solid var(--accent);
+    padding: 0.5rem 1rem;
+    margin: 0.75rem 0;
+    color: var(--muted);
+    background: rgba(88,166,255,0.05);
+    border-radius: 0 6px 6px 0;
+  }
+  .challenge {
+    border-left-color: var(--orange);
+    background: rgba(219,109,40,0.05);
+  }
+  .response {
+    border-left-color: var(--green);
+    background: rgba(63,185,80,0.05);
+  }
+  .empty {
+    color: var(--muted);
+    font-style: italic;
+  }
+  ul { padding-left: 1.5rem; }
+  li { margin: 0.25rem 0; }
+  .tag {
+    display: inline-block;
+    padding: 0.1rem 0.4rem;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-right: 0.25rem;
+  }
+  .tag-viability { background: rgba(248,81,73,0.15); color: var(--red); }
+  .tag-technical { background: rgba(88,166,255,0.15); color: var(--accent); }
+  .tag-business { background: rgba(210,153,34,0.15); color: var(--yellow); }
+  .tag-user { background: rgba(188,140,255,0.15); color: var(--purple); }
+  .tag-team { background: rgba(63,185,80,0.15); color: var(--green); }
+  .tag-contextual { background: rgba(219,109,40,0.15); color: var(--orange); }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .nav {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+  }
+  .nav a {
+    padding: 0.4rem 0.8rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 0.85rem;
+  }
+  .nav a:hover {
+    border-color: var(--accent);
+    text-decoration: none;
+  }
+  .nav a.active {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(88,166,255,0.1);
+  }
+  code {
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+    font-size: 0.85em;
+    background: rgba(139,148,158,0.1);
+    padding: 0.15rem 0.35rem;
+    border-radius: 4px;
+  }
+</style>
+<style>
+  #mindmap-wrap {
+    background: linear-gradient(145deg, #0f1318 0%, #141a22 100%);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    margin: 1rem 0;
+    position: relative;
+  }
+  #mindmap-svg {
+    width: 100%;
+    height: 72vh;
+    min-height: 400px;
+    display: block;
+    cursor: grab;
+  }
+  #mindmap-svg:active { cursor: grabbing; }
+  #mindmap-svg .mm-node { cursor: move; }
+  #mindmap-svg .mm-node:hover rect { filter: url(#sh); }
+  #mindmap-svg .mm-node.dragging { opacity: 0.85; }
+  #color-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin: 0.75rem 0;
+    align-items: center;
+  }
+  .swatch {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.15rem 0.45rem;
+    border-radius: 10px;
+    font-size: 0.72rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--muted);
+  }
+  .swatch .dot {
+    width: 9px; height: 9px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+  #controls {
+    display: flex; gap: 0.5rem;
+    align-items: center;
+    margin-bottom: 0.5rem;
+  }
+  #controls button {
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0.3rem 0.7rem;
+    font-size: 0.8rem;
+    cursor: pointer;
+  }
+  #controls button:hover { border-color: var(--accent); }
+  .zoom-hint {
+    color: var(--muted);
+    font-size: 0.72rem;
+    margin-left: 0.5rem;
+  }
+</style>
+</head>
+<body>
+<nav class="nav">
+  <a href="dashboard.html" >Dashboard</a>
+  <a href="session.html" >Session</a>
+  <a href="mindmap.html" class='active'>Mindmap</a>
+  <a href="redteam.html" >Red Team</a>
+</nav>
+<h1>Mindmap</h1>
+<div class="timestamp">Generated 2026-04-12 17:21</div>
+<p style="color:var(--muted);font-size:0.85rem">Source: MINDMAP.md</p>
+<div id="color-legend"><span style="color:var(--muted);font-size:0.8rem;margin-right:0.25rem">Colours</span><span class="swatch"><span class="dot" style="background:#2a9d8f"></span>teal</span><span class="swatch"><span class="dot" style="background:#e07a5f"></span>coral</span><span class="swatch"><span class="dot" style="background:#5c6bc0"></span>indigo</span><span class="swatch"><span class="dot" style="background:#d4a03c"></span>amber</span><span class="swatch"><span class="dot" style="background:#6a9a5b"></span>sage</span><span class="swatch"><span class="dot" style="background:#5c7a99"></span>slate</span><span class="swatch"><span class="dot" style="background:#c06c84"></span>rose</span><span class="swatch"><span class="dot" style="background:#5ba4cf"></span>sky</span><span class="swatch"><span class="dot" style="background:#9b8ec4"></span>lavender</span><span class="swatch"><span class="dot" style="background:#a0785a"></span>earth</span><span class="swatch"><span class="dot" style="background:#4db6ac"></span>mint</span><span class="swatch"><span class="dot" style="background:#8e4585"></span>plum</span><span style="color:var(--muted);font-size:0.7rem;margin-left:0.5rem">add {name} to any line in your .md</span></div>
+<div id="controls"><button id="fit-btn">Fit to view</button><button id="zin-btn">Zoom +</button><button id="zout-btn">Zoom −</button><button id="reset-btn">Reset layout</button><span class="zoom-hint">scroll to zoom · drag canvas to pan · drag node to move</span></div>
+<div id="mindmap-wrap"></div>
+<script>
+window._MM_TREE = {"label": "ReceiptAI", "color": null, "children": [{"label": "Receipt Capture", "color": "#2a9d8f", "children": [{"label": "Photo capture (mobile camera)", "color": null, "children": [{"label": "Auto-crop detection", "color": null, "children": []}, {"label": "Batch mode (multiple receipts)", "color": null, "children": []}]}, {"label": "Email forwarding", "color": null, "children": [{"label": "Unique alias per user", "color": null, "children": []}, {"label": "Auto-parse purchase confirmations", "color": null, "children": []}]}, {"label": "WhatsApp bot \u2014 added by Alex", "color": null, "children": [{"label": "Send photo via chat", "color": null, "children": []}, {"label": "Zero app install needed", "color": null, "children": []}]}]}, {"label": "Bank Integration", "color": "#5c6bc0", "children": [{"label": "Open Banking (TrueLayer)", "color": null, "children": [{"label": "Real-time transaction feed", "color": null, "children": []}, {"label": "Balance checks", "color": null, "children": []}]}, {"label": "Manual fallback", "color": null, "children": [{"label": "CSV upload", "color": null, "children": []}, {"label": "Screenshot OCR \u2014 added by Alex", "color": null, "children": []}]}]}, {"label": "AI Matching Engine", "color": "#e07a5f", "children": [{"label": "Receipt parsing (GPT-4o)", "color": null, "children": [{"label": "Amount extraction", "color": null, "children": []}, {"label": "Vendor identification", "color": null, "children": []}, {"label": "Date extraction", "color": null, "children": []}, {"label": "Category inference", "color": null, "children": []}]}, {"label": "Transaction matching", "color": null, "children": [{"label": "Fuzzy match on amount + date", "color": null, "children": []}, {"label": "Confidence scoring", "color": null, "children": []}, {"label": "User confirmation flow", "color": null, "children": []}]}, {"label": "Learning loop", "color": null, "children": [{"label": "Corrections improve model", "color": null, "children": []}, {"label": "Per-user patterns", "color": null, "children": []}]}]}, {"label": "User Experience", "color": "#6a9a5b", "children": [{"label": "Transaction feed", "color": null, "children": [{"label": "Swipe to confirm/reject matches", "color": null, "children": []}, {"label": "Unmatched items flagged", "color": null, "children": []}]}, {"label": "Tax dashboard", "color": null, "children": [{"label": "Category totals by quarter", "color": null, "children": []}, {"label": "Readiness score", "color": null, "children": []}, {"label": "HMRC deadlines", "color": null, "children": []}]}, {"label": "Accountant sharing", "color": null, "children": [{"label": "Read-only link", "color": null, "children": []}, {"label": "Export to CSV/PDF", "color": null, "children": []}]}]}, {"label": "Business", "color": "#d4a03c", "children": [{"label": "Freemium (50 tx/month)", "color": null, "children": []}, {"label": "Pro \u00a39.99/month", "color": null, "children": []}, {"label": "Business \u00a324.99/month", "color": null, "children": []}, {"label": "\u274c Enterprise tier \u2014 Jordan: too early, don't distract ourselves", "color": null, "children": []}]}]};
+window._MM_AUTO = ["#2a9d8f", "#e07a5f", "#5c6bc0", "#d4a03c", "#6a9a5b", "#5c7a99", "#c06c84", "#5ba4cf", "#9b8ec4", "#a0785a", "#4db6ac", "#8e4585"];
+</script>
+<script>
+(function() {
+  const SVG_NS = 'http://www.w3.org/2000/svg';
+  const data   = window._MM_TREE;
+  const autoCols = window._MM_AUTO;
+
+  const FONT = "-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif";
+  const FS   = [20, 15, 13, 12, 11];
+  const HGAP = 55;
+  const VGAP = 5;
+  const PX   = 14, PY = 7;
+  const MINW = 36;
+
+  /* ── text measurement ── */
+  const mCtx = document.createElement('canvas').getContext('2d');
+  function tw(t, s) { mCtx.font = s + 'px ' + FONT; return mCtx.measureText(t).width; }
+
+  /* ── colour helpers ── */
+  function hex2rgb(h) {
+    h = h.replace('#','');
+    if (h.length === 3) h = h[0]+h[0]+h[1]+h[1]+h[2]+h[2];
+    return [parseInt(h.substr(0,2),16), parseInt(h.substr(2,2),16), parseInt(h.substr(4,2),16)];
+  }
+  function rgb2hex(r,g,b) {
+    return '#' + [r,g,b].map(v => Math.round(v).toString(16).padStart(2,'0')).join('');
+  }
+  function lighten(h, a) {
+    const [r,g,b] = hex2rgb(h);
+    return rgb2hex(r+(255-r)*a, g+(255-g)*a, b+(255-b)*a);
+  }
+  function textCol(bg) {
+    const [r,g,b] = hex2rgb(bg);
+    return (0.299*r + 0.587*g + 0.114*b) / 255 > 0.55 ? '#1a1a2e' : '#f0f0f5';
+  }
+
+  /* ── assign colours ── */
+  function assignColors(node, parent, idx) {
+    if (!node.color) {
+      if (parent) node.color = parent.color;
+      else        node.color = autoCols[idx % autoCols.length];
+    }
+    node.children.forEach((c, i) => assignColors(c, node, parent ? idx : i));
+  }
+  data.color = data.color || '#4a5568';
+  data.children.forEach((c, i) => assignColors(c, null, i));
+
+  /* ── build flat lookup + parent refs ── */
+  let _uid = 0;
+  function stamp(n, par) {
+    n._id = _uid++;
+    n._parent = par || null;
+    n.children.forEach(c => stamp(c, n));
+  }
+  stamp(data, null);
+
+  /* ── compute sizes ── */
+  function sizes(n, d) {
+    const fs = FS[Math.min(d, FS.length - 1)];
+    n.w  = Math.max(tw(n.label, fs) + PX * 2, MINW);
+    n.h  = fs + PY * 2;
+    n.fs = fs;
+    n.d  = d;
+    if (!n.children.length) { n.sh = n.h; return; }
+    n.children.forEach(c => sizes(c, d + 1));
+    n.sh = n.children.reduce((s, c) => s + c.sh, 0) + (n.children.length - 1) * VGAP;
+  }
+
+  /* ── initial layout ── */
+  function lay(n, x, y, dir) {
+    n.x = x; n.y = y; n.dir = dir;
+    if (!n.children.length) return;
+    const cx = x + dir * (n.w / 2 + HGAP);
+    let sy = y - n.sh / 2;
+    for (const c of n.children) {
+      lay(c, cx, sy + c.sh / 2, dir);
+      sy += c.sh + VGAP;
+    }
+  }
+
+  sizes(data, 0);
+  data.x = 0; data.y = 0; data.dir = 0;
+
+  const mid = Math.ceil(data.children.length / 2);
+  function side(arr, dir) {
+    if (!arr.length) return;
+    const th = arr.reduce((s, c) => s + c.sh, 0) + (arr.length - 1) * VGAP;
+    let sy = -th / 2;
+    for (const c of arr) { lay(c, dir * (data.w / 2 + HGAP), sy + c.sh / 2, dir); sy += c.sh + VGAP; }
+  }
+  side(data.children.slice(0, mid), 1);
+  side(data.children.slice(mid), -1);
+
+  /* ── create SVG ── */
+  const wrap = document.getElementById('mindmap-wrap');
+  const svg  = document.createElementNS(SVG_NS, 'svg');
+  svg.id = 'mindmap-svg';
+  wrap.appendChild(svg);
+
+  const defs = document.createElementNS(SVG_NS, 'defs');
+  defs.innerHTML = '<filter id="sh" x="-15%" y="-15%" width="140%" height="140%">' +
+    '<feDropShadow dx="0" dy="1.5" stdDeviation="2.5" flood-color="#000" flood-opacity="0.22"/></filter>' +
+    '<filter id="glow" x="-25%" y="-25%" width="150%" height="150%">' +
+    '<feDropShadow dx="0" dy="0" stdDeviation="4" flood-color="#58a6ff" flood-opacity="0.35"/></filter>';
+  svg.appendChild(defs);
+
+  const edgeG = document.createElementNS(SVG_NS, 'g');
+  const nodeG = document.createElementNS(SVG_NS, 'g');
+  svg.appendChild(edgeG);
+  svg.appendChild(nodeG);
+
+  /* ── edge: draw and return path element ── */
+  function makeEdgePath(p, c) {
+    const dir = c.x > p.x ? 1 : (c.x < p.x ? -1 : (c.dir || 1));
+    const x1 = p.x + dir * p.w / 2, y1 = p.y;
+    const x2 = c.x - dir * c.w / 2, y2 = c.y;
+    const dx = x2 - x1;
+    return 'M' + x1 + ' ' + y1 +
+      ' C' + (x1 + dx * 0.45) + ' ' + y1 + ',' +
+             (x2 - dx * 0.45) + ' ' + y2 + ',' +
+              x2 + ' ' + y2;
+  }
+
+  function drawEdge(p, c) {
+    const path = document.createElementNS(SVG_NS, 'path');
+    path.setAttribute('d', makeEdgePath(p, c));
+    path.setAttribute('stroke', lighten(c.color || '#4a5568', 0.15));
+    path.setAttribute('stroke-width', Math.max(1.2, 2.6 - (c.d || 1) * 0.35));
+    path.setAttribute('fill', 'none');
+    path.setAttribute('stroke-linecap', 'round');
+    path.setAttribute('opacity', '0.5');
+    edgeG.appendChild(path);
+    c._edge = path;   // store reference for updates
+  }
+
+  /* ── update a single edge path ── */
+  function updateEdge(c) {
+    if (!c._edge || !c._parent) return;
+    c._edge.setAttribute('d', makeEdgePath(c._parent, c));
+  }
+
+  /* ── node: draw and store refs ── */
+  function drawNode(n) {
+    const g = document.createElementNS(SVG_NS, 'g');
+    g.classList.add('mm-node');
+    const d    = n.d || 0;
+    const base = n.color || '#4a5568';
+    const fill = d === 0 ? base : lighten(base, Math.min(d * 0.1, 0.4));
+    const tc   = textCol(fill);
+
+    const r = document.createElementNS(SVG_NS, 'rect');
+    r.setAttribute('x', n.x - n.w / 2);
+    r.setAttribute('y', n.y - n.h / 2);
+    r.setAttribute('width', n.w);
+    r.setAttribute('height', n.h);
+    r.setAttribute('rx', n.h / 2);
+    r.setAttribute('fill', fill);
+    if (d === 0) r.setAttribute('filter', 'url(#sh)');
+
+    const t = document.createElementNS(SVG_NS, 'text');
+    t.setAttribute('x', n.x);
+    t.setAttribute('y', n.y);
+    t.setAttribute('text-anchor', 'middle');
+    t.setAttribute('dominant-baseline', 'central');
+    t.setAttribute('fill', tc);
+    t.setAttribute('font-size', n.fs);
+    t.setAttribute('font-family', FONT);
+    t.setAttribute('font-weight', d === 0 ? '700' : d === 1 ? '600' : '400');
+    t.setAttribute('pointer-events', 'none');
+    t.textContent = n.label;
+
+    g.appendChild(r);
+    g.appendChild(t);
+    nodeG.appendChild(g);
+
+    // Store refs on the data node for live updates
+    n._g = g;
+    n._rect = r;
+    n._text = t;
+  }
+
+  /* ── update node position in SVG ── */
+  function updateNodePos(n) {
+    n._rect.setAttribute('x', n.x - n.w / 2);
+    n._rect.setAttribute('y', n.y - n.h / 2);
+    n._text.setAttribute('x', n.x);
+    n._text.setAttribute('y', n.y);
+  }
+
+  /* ── move a node + its entire subtree by (dx,dy) ── */
+  function moveSubtree(n, dx, dy) {
+    n.x += dx;
+    n.y += dy;
+    updateNodePos(n);
+    updateEdge(n);                        // edge from parent → this node
+    for (const c of n.children) {
+      moveSubtree(c, dx, dy);
+    }
+  }
+
+  /* ── render everything ── */
+  function renderEdges(n) { for (const c of n.children) { drawEdge(n, c); renderEdges(c); } }
+  function renderNodes(n) { drawNode(n); for (const c of n.children) renderNodes(c); }
+  renderEdges(data);
+  renderNodes(data);
+
+  /* ── viewBox / fit ── */
+  function calcBounds(n) {
+    let x0 = n.x - n.w/2, x1 = n.x + n.w/2, y0 = n.y - n.h/2, y1 = n.y + n.h/2;
+    for (const c of n.children) {
+      const b = calcBounds(c);
+      x0 = Math.min(x0, b.x0); x1 = Math.max(x1, b.x1);
+      y0 = Math.min(y0, b.y0); y1 = Math.max(y1, b.y1);
+    }
+    return { x0, x1, y0, y1 };
+  }
+
+  function fitView() {
+    const b = calcBounds(data), pad = 50;
+    vb = { x: b.x0 - pad, y: b.y0 - pad, w: b.x1 - b.x0 + pad*2, h: b.y1 - b.y0 + pad*2 };
+    updVB();
+  }
+
+  let vb = { x: 0, y: 0, w: 100, h: 100 };
+  function updVB() { svg.setAttribute('viewBox', vb.x+' '+vb.y+' '+vb.w+' '+vb.h); }
+  fitView();
+
+  /* ── SVG coordinate helpers ── */
+  function clientToSVG(cx, cy) {
+    const rc = svg.getBoundingClientRect();
+    return {
+      x: (cx - rc.left) / rc.width  * vb.w + vb.x,
+      y: (cy - rc.top)  / rc.height * vb.h + vb.y
+    };
+  }
+
+  /* ── interaction state ── */
+  const IDLE = 0, PANNING = 1, DRAGGING = 2;
+  let mode = IDLE;
+  let dragNode = null;
+  let lastSVG  = { x: 0, y: 0 };       // last SVG-space pointer pos
+  let lastClient = { x: 0, y: 0 };      // last client-space pointer pos
+
+  /* ── find which data node owns an SVG group ── */
+  function findNode(el, n) {
+    if (n._g === el) return n;
+    for (const c of n.children) {
+      const r = findNode(el, c);
+      if (r) return r;
+    }
+    return null;
+  }
+
+  /* ── mousedown: node drag or canvas pan ── */
+  svg.addEventListener('mousedown', function(e) {
+    if (e.button !== 0) return;
+    const target = e.target.closest('.mm-node');
+    const pt = clientToSVG(e.clientX, e.clientY);
+    lastSVG = pt;
+    lastClient = { x: e.clientX, y: e.clientY };
+
+    if (target) {
+      const n = findNode(target, data);
+      if (n) {
+        mode = DRAGGING;
+        dragNode = n;
+        target.classList.add('dragging');
+        n._rect.setAttribute('filter', 'url(#glow)');
+        svg.style.cursor = 'move';
+        e.preventDefault();
+        return;
+      }
+    }
+    mode = PANNING;
+    svg.style.cursor = 'grabbing';
+  });
+
+  /* ── mousemove ── */
+  window.addEventListener('mousemove', function(e) {
+    if (mode === IDLE) return;
+
+    if (mode === DRAGGING && dragNode) {
+      const pt = clientToSVG(e.clientX, e.clientY);
+      const dx = pt.x - lastSVG.x;
+      const dy = pt.y - lastSVG.y;
+      moveSubtree(dragNode, dx, dy);
+      // Also update the edge from parent → this node's siblings (parent's other children)
+      // and the edge from this node's parent
+      if (dragNode._parent) {
+        for (const sib of dragNode._parent.children) {
+          updateEdge(sib);
+        }
+      }
+      lastSVG = pt;
+    }
+
+    if (mode === PANNING) {
+      const rc = svg.getBoundingClientRect();
+      vb.x -= (e.clientX - lastClient.x) / rc.width  * vb.w;
+      vb.y -= (e.clientY - lastClient.y) / rc.height * vb.h;
+      lastClient = { x: e.clientX, y: e.clientY };
+      updVB();
+    }
+  });
+
+  /* ── mouseup ── */
+  window.addEventListener('mouseup', function() {
+    if (mode === DRAGGING && dragNode) {
+      dragNode._g.classList.remove('dragging');
+      if (dragNode.d !== 0) dragNode._rect.removeAttribute('filter');
+      else dragNode._rect.setAttribute('filter', 'url(#sh)');
+    }
+    mode = IDLE;
+    dragNode = null;
+    svg.style.cursor = 'grab';
+  });
+
+  /* ── zoom (scroll wheel, pointer-anchored) ── */
+  svg.addEventListener('wheel', function(e) {
+    e.preventDefault();
+    const sc = e.deltaY > 0 ? 1.08 : 1 / 1.08;
+    const pt = clientToSVG(e.clientX, e.clientY);
+    vb.w *= sc; vb.h *= sc;
+    const rc = svg.getBoundingClientRect();
+    vb.x = pt.x - (e.clientX - rc.left) / rc.width  * vb.w;
+    vb.y = pt.y - (e.clientY - rc.top)  / rc.height * vb.h;
+    updVB();
+  }, { passive: false });
+
+  /* ── toolbar buttons ── */
+  document.getElementById('fit-btn').addEventListener('click', fitView);
+
+  document.getElementById('zin-btn').addEventListener('click', function() {
+    const cx = vb.x + vb.w / 2, cy = vb.y + vb.h / 2;
+    vb.w /= 1.3; vb.h /= 1.3;
+    vb.x = cx - vb.w / 2; vb.y = cy - vb.h / 2;
+    updVB();
+  });
+
+  document.getElementById('zout-btn').addEventListener('click', function() {
+    const cx = vb.x + vb.w / 2, cy = vb.y + vb.h / 2;
+    vb.w *= 1.3; vb.h *= 1.3;
+    vb.x = cx - vb.w / 2; vb.y = cy - vb.h / 2;
+    updVB();
+  });
+
+  document.getElementById('reset-btn').addEventListener('click', function() {
+    // Re-run layout from scratch
+    sizes(data, 0);
+    data.x = 0; data.y = 0; data.dir = 0;
+    const mid2 = Math.ceil(data.children.length / 2);
+    side(data.children.slice(0, mid2), 1);
+    side(data.children.slice(mid2), -1);
+    // Update all positions
+    function updAll(n) {
+      updateNodePos(n);
+      updateEdge(n);
+      n.children.forEach(updAll);
+    }
+    updAll(data);
+    fitView();
+  });
+})();
+</script>
+
+</body>
+</html>

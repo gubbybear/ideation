@@ -1,0 +1,41 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Dashboard",
+      "type": "shell",
+      "command": "python tools/dashboard.py --html",
+      "group": "build",
+      "presentation": { "reveal": "silent", "close": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "Session Starter",
+      "type": "shell",
+      "command": "python tools/session.py --html",
+      "presentation": { "reveal": "silent", "close": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "Mindmap",
+      "type": "shell",
+      "command": "python tools/mindmap.py --html",
+      "presentation": { "reveal": "silent", "close": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "Red Team",
+      "type": "shell",
+      "command": "python tools/redteam.py --html",
+      "presentation": { "reveal": "silent", "close": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "Red Team (write to file)",
+      "type": "shell",
+      "command": "python tools/redteam.py --html --write",
+      "presentation": { "reveal": "silent", "close": true },
+      "problemMatcher": []
+    }
+  ]
+}

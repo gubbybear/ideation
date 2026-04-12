@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Red Team — Round 3</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --border: #30363d;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --accent: #58a6ff;
+    --green: #3fb950;
+    --yellow: #d29922;
+    --red: #f85149;
+    --orange: #db6d28;
+    --purple: #bc8cff;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  h1 {
+    font-size: 1.8rem;
+    margin-bottom: 0.25rem;
+    color: var(--accent);
+  }
+  h2 {
+    font-size: 1.3rem;
+    margin: 2rem 0 1rem;
+    color: var(--text);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0.5rem;
+  }
+  h3 {
+    font-size: 1.1rem;
+    margin: 1.5rem 0 0.5rem;
+    color: var(--muted);
+  }
+  .timestamp {
+    color: var(--muted);
+    font-size: 0.85rem;
+    margin-bottom: 2rem;
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 1rem;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0.5rem 0;
+    font-size: 0.9rem;
+  }
+  th, td {
+    padding: 0.5rem 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  th {
+    color: var(--muted);
+    font-weight: 600;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  tr:last-child td { border-bottom: none; }
+  .badge {
+    display: inline-block;
+    padding: 0.15rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+  .badge-green { background: rgba(63,185,80,0.15); color: var(--green); }
+  .badge-yellow { background: rgba(210,153,34,0.15); color: var(--yellow); }
+  .badge-red { background: rgba(248,81,73,0.15); color: var(--red); }
+  .badge-blue { background: rgba(88,166,255,0.15); color: var(--accent); }
+  .badge-muted { background: rgba(139,148,158,0.15); color: var(--muted); }
+  .progress-bar {
+    height: 8px;
+    background: var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+    margin: 0.5rem 0;
+  }
+  .progress-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.3s;
+  }
+  .stat {
+    text-align: center;
+    padding: 1rem;
+  }
+  .stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--accent);
+  }
+  .stat-label {
+    font-size: 0.8rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  blockquote {
+    border-left: 3px solid var(--accent);
+    padding: 0.5rem 1rem;
+    margin: 0.75rem 0;
+    color: var(--muted);
+    background: rgba(88,166,255,0.05);
+    border-radius: 0 6px 6px 0;
+  }
+  .challenge {
+    border-left-color: var(--orange);
+    background: rgba(219,109,40,0.05);
+  }
+  .response {
+    border-left-color: var(--green);
+    background: rgba(63,185,80,0.05);
+  }
+  .empty {
+    color: var(--muted);
+    font-style: italic;
+  }
+  ul { padding-left: 1.5rem; }
+  li { margin: 0.25rem 0; }
+  .tag {
+    display: inline-block;
+    padding: 0.1rem 0.4rem;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-right: 0.25rem;
+  }
+  .tag-viability { background: rgba(248,81,73,0.15); color: var(--red); }
+  .tag-technical { background: rgba(88,166,255,0.15); color: var(--accent); }
+  .tag-business { background: rgba(210,153,34,0.15); color: var(--yellow); }
+  .tag-user { background: rgba(188,140,255,0.15); color: var(--purple); }
+  .tag-team { background: rgba(63,185,80,0.15); color: var(--green); }
+  .tag-contextual { background: rgba(219,109,40,0.15); color: var(--orange); }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .nav {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+  }
+  .nav a {
+    padding: 0.4rem 0.8rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 0.85rem;
+  }
+  .nav a:hover {
+    border-color: var(--accent);
+    text-decoration: none;
+  }
+  .nav a.active {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(88,166,255,0.1);
+  }
+  code {
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+    font-size: 0.85em;
+    background: rgba(139,148,158,0.1);
+    padding: 0.15rem 0.35rem;
+    border-radius: 4px;
+  }
+</style>
+
+</head>
+<body>
+<nav class="nav">
+  <a href="dashboard.html" >Dashboard</a>
+  <a href="session.html" >Session</a>
+  <a href="mindmap.html" >Mindmap</a>
+  <a href="redteam.html" class='active'>Red Team</a>
+</nav>
+<h1>Red Team — Round 3</h1>
+<div class="timestamp">Generated 2026-04-12 17:11</div>
+
+<p>Round 3 &mdash; Attacker: <strong>[Name]</strong></p>
+
+<div class="card">
+  <div style="margin-bottom: 0.5rem;"><span class="tag tag-user">user</span> Challenge 1</div>
+  <blockquote class="challenge">How does this fail for users with accessibility needs, low bandwidth, or older devices?</blockquote>
+  <blockquote class="response"><span class="empty">Awaiting response...</span></blockquote>
+</div>
+
+<div class="card">
+  <div style="margin-bottom: 0.5rem;"><span class="tag tag-viability">viability</span> Challenge 2</div>
+  <blockquote class="challenge">If we can&#x27;t get our first 100 users without paid ads, is this viable?</blockquote>
+  <blockquote class="response"><span class="empty">Awaiting response...</span></blockquote>
+</div>
+
+<div class="card">
+  <div style="margin-bottom: 0.5rem;"><span class="tag tag-team">team</span> Challenge 3</div>
+  <blockquote class="challenge">What are we avoiding talking about?</blockquote>
+  <blockquote class="response"><span class="empty">Awaiting response...</span></blockquote>
+</div>
+
+<div class="card">
+  <div style="margin-bottom: 0.5rem;"><span class="tag tag-contextual">contextual</span> Challenge 4</div>
+  <blockquote class="challenge">Our technical direction mentions: &#x27;- **Frontend:** React Native (cross-platform mobile)
+- **Backend:** Python/FastAPI on AWS Lambda
+- *...&#x27; — what&#x27;s the biggest risk with this stack choice?</blockquote>
+  <blockquote class="response"><span class="empty">Awaiting response...</span></blockquote>
+</div>
+
+<div class="card">
+  <div style="margin-bottom: 0.5rem;"><span class="tag tag-contextual">contextual</span> Challenge 5</div>
+  <blockquote class="challenge">Look at our feature list. Which feature would a user NEVER actually use? Be honest.</blockquote>
+  <blockquote class="response"><span class="empty">Awaiting response...</span></blockquote>
+</div>
+
+<div class="card" style="border-left: 4px solid var(--yellow);">
+  <h3 style="margin-top: 0;">Verdict</h3>
+  <p class="empty">What did we learn? What changed?</p>
+</div>
+
+</body>
+</html>

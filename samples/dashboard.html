@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Repo Dashboard</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --border: #30363d;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --accent: #58a6ff;
+    --green: #3fb950;
+    --yellow: #d29922;
+    --red: #f85149;
+    --orange: #db6d28;
+    --purple: #bc8cff;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  h1 {
+    font-size: 1.8rem;
+    margin-bottom: 0.25rem;
+    color: var(--accent);
+  }
+  h2 {
+    font-size: 1.3rem;
+    margin: 2rem 0 1rem;
+    color: var(--text);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0.5rem;
+  }
+  h3 {
+    font-size: 1.1rem;
+    margin: 1.5rem 0 0.5rem;
+    color: var(--muted);
+  }
+  .timestamp {
+    color: var(--muted);
+    font-size: 0.85rem;
+    margin-bottom: 2rem;
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 1rem;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0.5rem 0;
+    font-size: 0.9rem;
+  }
+  th, td {
+    padding: 0.5rem 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  th {
+    color: var(--muted);
+    font-weight: 600;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  tr:last-child td { border-bottom: none; }
+  .badge {
+    display: inline-block;
+    padding: 0.15rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+  .badge-green { background: rgba(63,185,80,0.15); color: var(--green); }
+  .badge-yellow { background: rgba(210,153,34,0.15); color: var(--yellow); }
+  .badge-red { background: rgba(248,81,73,0.15); color: var(--red); }
+  .badge-blue { background: rgba(88,166,255,0.15); color: var(--accent); }
+  .badge-muted { background: rgba(139,148,158,0.15); color: var(--muted); }
+  .progress-bar {
+    height: 8px;
+    background: var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+    margin: 0.5rem 0;
+  }
+  .progress-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.3s;
+  }
+  .stat {
+    text-align: center;
+    padding: 1rem;
+  }
+  .stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--accent);
+  }
+  .stat-label {
+    font-size: 0.8rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  blockquote {
+    border-left: 3px solid var(--accent);
+    padding: 0.5rem 1rem;
+    margin: 0.75rem 0;
+    color: var(--muted);
+    background: rgba(88,166,255,0.05);
+    border-radius: 0 6px 6px 0;
+  }
+  .challenge {
+    border-left-color: var(--orange);
+    background: rgba(219,109,40,0.05);
+  }
+  .response {
+    border-left-color: var(--green);
+    background: rgba(63,185,80,0.05);
+  }
+  .empty {
+    color: var(--muted);
+    font-style: italic;
+  }
+  ul { padding-left: 1.5rem; }
+  li { margin: 0.25rem 0; }
+  .tag {
+    display: inline-block;
+    padding: 0.1rem 0.4rem;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-right: 0.25rem;
+  }
+  .tag-viability { background: rgba(248,81,73,0.15); color: var(--red); }
+  .tag-technical { background: rgba(88,166,255,0.15); color: var(--accent); }
+  .tag-business { background: rgba(210,153,34,0.15); color: var(--yellow); }
+  .tag-user { background: rgba(188,140,255,0.15); color: var(--purple); }
+  .tag-team { background: rgba(63,185,80,0.15); color: var(--green); }
+  .tag-contextual { background: rgba(219,109,40,0.15); color: var(--orange); }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .nav {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+  }
+  .nav a {
+    padding: 0.4rem 0.8rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 0.85rem;
+  }
+  .nav a:hover {
+    border-color: var(--accent);
+    text-decoration: none;
+  }
+  .nav a.active {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(88,166,255,0.1);
+  }
+  code {
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+    font-size: 0.85em;
+    background: rgba(139,148,158,0.1);
+    padding: 0.15rem 0.35rem;
+    border-radius: 4px;
+  }
+</style>
+
+</head>
+<body>
+<nav class="nav">
+  <a href="dashboard.html" class='active'>Dashboard</a>
+  <a href="session.html" >Session</a>
+  <a href="mindmap.html" >Mindmap</a>
+  <a href="redteam.html" >Red Team</a>
+</nav>
+<h1>Repo Dashboard</h1>
+<div class="timestamp">Generated 2026-04-12 17:21</div>
+
+<div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); margin-bottom: 1.5rem;">
+  <div class="card"><div class="stat">
+  <div class="stat-value">12/12</div>
+  <div class="stat-label">Files Active</div>
+</div></div>
+  <div class="card"><div class="stat">
+  <div class="stat-value">5</div>
+  <div class="stat-label">Open Questions</div>
+</div></div>
+  <div class="card"><div class="stat">
+  <div class="stat-value">7</div>
+  <div class="stat-label">Assumptions</div>
+</div></div>
+  <div class="card"><div class="stat">
+  <div class="stat-value">2</div>
+  <div class="stat-label">Decisions</div>
+</div></div>
+  <div class="card"><div class="stat">
+  <div class="stat-value">4</div>
+  <div class="stat-label">Risks</div>
+</div></div>
+  <div class="card"><div class="stat">
+  <div class="stat-value">3</div>
+  <div class="stat-label">Sessions</div>
+</div></div>
+</div>
+
+<div class="grid">
+<div>
+<h2>File Health</h2>
+<div class="card">
+  <div class="progress-bar">
+  <div class="progress-fill" style="width:100%;background:var(--green)"></div>
+</div>
+  <table>
+    <tr><th>File</th><th>Status</th></tr>
+    <tr><td>PLAN.md</td><td><span class="badge badge-green">has content</span></td></tr>
+    <tr><td>IDEAS.md</td><td><span class="badge badge-green">has content</span></td></tr>
+    <tr><td>DECISIONS.md</td><td><span class="badge badge-green">has content</span></td></tr>
+    <tr><td>QUESTIONS.md</td><td><span class="badge badge-green">has content</span></td></tr>
+    <tr><td>RISKS.md</td><td><span class="badge badge-green">has content</span></td></tr>
+    <tr><td>ASSUMPTIONS.md</td><td><span class="badge badge-green">has content</span></td></tr>
+    <tr><td>MINDMAP.md</td><td><span class="badge badge-green">has content</span></td></tr>
+    <tr><td>LEAN-CANVAS.md</td><td><span class="badge badge-green">has content</span></td></tr>
+    <tr><td>PRIORITY-BALLOT.md</td><td><span class="badge badge-green">has content</span></td></tr>
+    <tr><td>RED-TEAM.md</td><td><span class="badge badge-green">has content</span></td></tr>
+    <tr><td>USER-JOURNEY.md</td><td><span class="badge badge-green">has content</span></td></tr>
+    <tr><td>DECISION-MATRIX.md</td><td><span class="badge badge-green">has content</span></td></tr>
+  </table>
+</div>
+
+</div>
+<div>
+<h2>PLAN.md Sections</h2>
+<div class="card">
+  <div class="progress-bar">
+  <div class="progress-fill" style="width:100%;background:var(--green)"></div>
+</div>
+  <table>
+    <tr><th>Section</th><th>Status</th></tr>
+    <tr><td>1. Problem Statement</td><td><span class="badge badge-green">filled</span></td></tr>
+    <tr><td>2. Target User</td><td><span class="badge badge-green">filled</span></td></tr>
+    <tr><td>3. Core Value Proposition</td><td><span class="badge badge-green">filled</span></td></tr>
+    <tr><td>4. Key Features / Capabilities</td><td><span class="badge badge-green">filled</span></td></tr>
+    <tr><td>5. How It Works (High-Level)</td><td><span class="badge badge-green">filled</span></td></tr>
+    <tr><td>6. Technical Direction</td><td><span class="badge badge-green">filled</span></td></tr>
+    <tr><td>7. Business Model / Monetization</td><td><span class="badge badge-green">filled</span></td></tr>
+    <tr><td>8. Competitive Landscape</td><td><span class="badge badge-green">filled</span></td></tr>
+    <tr><td>9. Open Questions</td><td><span class="badge badge-green">filled</span></td></tr>
+    <tr><td>10. Next Actions</td><td><span class="badge badge-green">filled</span></td></tr>
+  </table>
+</div>
+</div>
+</div>
+
+<h2>Questions</h2>
+<div class="card">
+  <div class="grid" style="grid-template-columns: 1fr 1fr;">
+    <div class="stat">
+  <div class="stat-value">5</div>
+  <div class="stat-label">Open</div>
+</div>
+    <div class="stat">
+  <div class="stat-value">0</div>
+  <div class="stat-label">Resolved</div>
+</div>
+  </div>
+  <p style="font-size:0.8rem;color:var(--muted);margin-top:0.5rem;">No questions resolved yet</p>
+</div>
+
+<h2>Assumptions</h2>
+<div class="card">
+  <div class="grid" style="grid-template-columns: 1fr 1fr 1fr;">
+    <div class="stat">
+  <div class="stat-value">7</div>
+  <div class="stat-label">Total</div>
+</div>
+    <div class="stat">
+  <div class="stat-value">4</div>
+  <div class="stat-label">Challenged</div>
+</div>
+    <div class="stat">
+  <div class="stat-value">3</div>
+  <div class="stat-label">Resolved</div>
+</div>
+  </div>
+  <div class="progress-bar">
+  <div class="progress-fill" style="width:43%;background:var(--green)"></div>
+</div>
+</div>
+
+<h2>Priority Ballot</h2>
+<div class="card">
+  <div class="grid" style="grid-template-columns: 1fr 1fr 1fr;">
+    <div class="stat">
+  <div class="stat-value">11</div>
+  <div class="stat-label">Features</div>
+</div>
+    <div class="stat">
+  <div class="stat-value">11</div>
+  <div class="stat-label">Partner A Scored</div>
+</div>
+    <div class="stat">
+  <div class="stat-value">11</div>
+  <div class="stat-label">Partner B Scored</div>
+</div>
+  </div>
+</div>
+
+<h2>Red Team</h2>
+<div class="card">
+  <div class="grid" style="grid-template-columns: 1fr 1fr 1fr;">
+    <div class="stat">
+  <div class="stat-value">2</div>
+  <div class="stat-label">Rounds</div>
+</div>
+    <div class="stat">
+  <div class="stat-value">3</div>
+  <div class="stat-label">Challenges</div>
+</div>
+    <div class="stat">
+  <div class="stat-value">3</div>
+  <div class="stat-label">Responses</div>
+</div>
+  </div>
+  <div class="progress-bar">
+  <div class="progress-fill" style="width:100%;background:var(--green)"></div>
+</div>
+</div>
+
+<h2>Risks</h2>
+<div class="card">
+  <div class="grid" style="grid-template-columns: 1fr 1fr;">
+    <div class="stat">
+  <div class="stat-value">4</div>
+  <div class="stat-label">Identified</div>
+</div>
+    <div class="stat">
+  <div class="stat-value">5</div>
+  <div class="stat-label">With Response</div>
+</div>
+  </div>
+  <div class="progress-bar">
+  <div class="progress-fill" style="width:125%;background:var(--green)"></div>
+</div>
+</div>
+
+</body>
+</html>
