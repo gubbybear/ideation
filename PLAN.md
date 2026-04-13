@@ -42,7 +42,7 @@ This matters because the knowledge economy is trending toward a model where the 
 
 _Who specifically is this for? What's their context? What do they do today?_
 
-**Beachhead: Software developers** — hitting the job market at scale right now. Big tech layoffs, AI reshaping roles, and a generation of devs who assumed they'd be at FAANG forever now rethinking their career model. This group is:
+**Beachhead: Software developers** — hitting the job market at scale right now. Big tech layoffs, AI reshaping roles, and a generation of devs who assumed they'd be at big tech forever now rethinking their career model. This group is:
 - Highly tool-literate (will adopt good software fast)
 - Already comfortable with Git, CLIs, structured data
 - Feeling acute pain *right now* — not a hypothetical future
@@ -50,7 +50,7 @@ _Who specifically is this for? What's their context? What do they do today?_
 
 **The SME pivot angle:** Many devs are discovering that small/medium businesses desperately need technical capability — software setup, system integration, workflow automation, and now **agentic AI deployment** — but can't afford or attract permanent senior hires. There's a natural match: experienced devs who need work + SMEs who need technical help for defined periods. But devs don't know how to find, pitch, scope, or deliver these engagements. They've never operated as a business.
 
-**Broader primary (later):** Mid-career knowledge workers (5-20 years experience) who've had 3+ roles and expect to keep moving. Developers, product managers, designers, consultants, data analysts, marketing strategists. Earning £40k-£150k. Mix of permanent and contract.
+**Broader primary (later):** Mid-career knowledge workers (5-20 years experience) who've had 3+ roles and expect to keep moving. Developers, product managers, designers, consultants, data analysts, marketing strategists. Earning $80k-$250k. Mix of permanent and contract.
 
 **What they do today:**
 - LinkedIn profile as their "home base" (passive, employer-controlled narrative)
@@ -112,8 +112,8 @@ _Describe the user flow or system behavior. Diagrams welcome._
 _How does this make money? Or what's the strategic value?_
 
 - **Free tier:** Worklog (limited entries), basic skills tracker, CV export
-- **Pro (£9.99/mo):** Unlimited worklog, transition toolkit, AI-assisted framing, reputation vault
-- **Career+ (£19.99/mo):** Career radar, contract intelligence, network matching, AI copilot
+- **Pro ($14.99/mo):** Unlimited worklog, transition toolkit, AI-assisted framing, reputation vault
+- **Career+ ($29.99/mo):** Career radar, contract intelligence, network matching, AI copilot
 - **Potential B2B angle:** Companies pay to *onboard* new hires faster using the worker's existing profile (with consent). Recruitment firms pay for verified skill/evidence data.
 
 ---
@@ -169,9 +169,10 @@ _What's the next concrete thing each person should work on?_
 
 | Who | Action | Status |
 |-----|--------|--------|
-| Partner | React to the problem statement and target user — does this match your thinking? | Not started |
-| Partner | Add competitive landscape entries we're missing | Not started |
+| Fi | React to the problem statement and target user — does this match your thinking? | Not started |
+| Fi | Add competitive landscape entries we're missing | Not started |
 | Both | Discuss: one product or a suite? What's the MVP wedge? | Not started |
+| Fi | Review all ideas in IDEAS.md — expand, riff, add new ones (divergence step) | Not started |
 
 ---
 
@@ -181,8 +182,8 @@ _Brief notes after each working session so the other person knows what happened.
 
 | Date | Who | What happened | Key outputs |
 |------|-----|---------------|-------------|
-| 2026-04-12 | Session 1 | Initial ideation — problem framing, target user, features, business model, competitive landscape | PLAN sections 1-5,7-8 filled, IDEAS seeded, MINDMAP created, QUESTIONS + ASSUMPTIONS populated |
-| 2026-04-12 | Session 2 | Added founding team domain expertise — resume writing, career services, big tech experience | PLAN §8b added, 3 new IDEAS, 4 new ASSUMPTIONS, 4 new QUESTIONS, MINDMAP "Founder Domain Expertise" branch |
+| 12-04-26 | Session 1 | Initial ideation — problem framing, target user, features, business model, competitive landscape | PLAN sections 1-5,7-8 filled, IDEAS seeded, MINDMAP created, QUESTIONS + ASSUMPTIONS populated |
+| 12-04-26 | Session 2 | Added founding team domain expertise — resume writing, career services, big tech experience | PLAN §8b added, 3 new IDEAS, 4 new ASSUMPTIONS, 4 new QUESTIONS, MINDMAP "Founder Domain Expertise" branch |
 
 ---
 

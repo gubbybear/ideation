@@ -20,7 +20,7 @@ def ensure_output_dir() -> Path:
 
 def html_page(title: str, body: str, extra_head: str = "") -> str:
     """Wrap body content in a full HTML page with shared styles."""
-    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M")
+    timestamp = datetime.now().strftime("%d-%m-%y %H:%M")
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -211,14 +211,121 @@ def html_page(title: str, body: str, extra_head: str = "") -> str:
     padding: 0.15rem 0.35rem;
     border-radius: 4px;
   }}
+  /* Modal overlay */
+  .modal-overlay {{
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 1000;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 2rem;
+    overflow-y: auto;
+  }}
+  .modal-overlay.open {{
+    display: flex;
+  }}
+  .modal-content {{
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 2rem;
+    max-width: 900px;
+    width: 100%;
+    position: relative;
+    margin: 2rem auto;
+    max-height: calc(100vh - 4rem);
+    overflow-y: auto;
+  }}
+  .modal-close {{
+    position: sticky;
+    top: 0;
+    float: right;
+    background: var(--border);
+    border: none;
+    color: var(--text);
+    font-size: 1.2rem;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+  }}
+  .modal-close:hover {{
+    background: var(--red);
+  }}
+  .modal-edit {{
+    position: sticky;
+    top: 0;
+    float: right;
+    background: var(--accent);
+    border: none;
+    color: #fff;
+    font-size: 0.8rem;
+    padding: 0.3rem 0.8rem;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-right: 0.5rem;
+    text-decoration: none;
+    line-height: 2rem;
+  }}
+  .modal-edit:hover {{ opacity: 0.85; }}
+  /* File tiles */
+  .file-tiles {{
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+  }}
+  .file-tile {{
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem 0.75rem;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    text-decoration: none;
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.35rem;
+  }}
+  .file-tile:hover {{
+    border-color: var(--accent);
+    background: rgba(88,166,255,0.05);
+    text-decoration: none;
+  }}
+  .file-tile .tile-icon {{
+    font-size: 1.5rem;
+    margin-bottom: 0.25rem;
+  }}
+  .file-tile .tile-name {{
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--accent);
+  }}
+  .file-tile .tile-status {{
+    font-size: 0.65rem;
+    color: var(--muted);
+  }}
+  .file-tile.has-content {{
+    border-color: rgba(63,185,80,0.3);
+  }}
+  .file-tile.needs-work {{
+    border-color: rgba(210,153,34,0.3);
+  }}
 </style>
 {extra_head}
 </head>
 <body>
 <nav class="nav">
   <a href="dashboard.html" {"class='active'" if "Dashboard" in title else ""}>Dashboard</a>
-  <a href="session.html" {"class='active'" if "Session" in title else ""}>Session</a>
-  <a href="mindmap.html" {"class='active'" if "Mindmap" in title else ""}>Mindmap</a>
   <a href="redteam.html" {"class='active'" if "Red Team" in title else ""}>Red Team</a>
 </nav>
 <h1>{title}</h1>
@@ -254,8 +361,12 @@ def tag(text: str, category: str = "") -> str:
 def open_in_browser(filepath: Path) -> None:
     """Open an HTML file in the default browser."""
     import os
-    import webbrowser
-    webbrowser.open(filepath.as_uri())
+    import sys
+    if sys.platform == "win32":
+        os.startfile(str(filepath))
+    else:
+        import webbrowser
+        webbrowser.open(filepath.as_uri())
 
 
 def render_markdown_to_html(text: str) -> str:

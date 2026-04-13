@@ -1,6 +1,6 @@
 ﻿# Open Questions
 
-> Questions that need the other person's input. Mark resolved when done and move the answer to DECISIONS.md if it's a decision.
+> Questions that need the other person's input. When resolved, move to the Resolved section below — and to DECISIONS.md if it's a decision.
 
 ---
 
@@ -8,6 +8,15 @@
 
 <!-- Add new questions at the top of this section -->
 
+- **IP / compliance risk:** If the worklog captures what you did at work, are users breaching their employment contracts? Most have IP assignment + NDA clauses. Is there a way to log *skills and growth* without capturing *employer-owned specifics*?
+- What's the line between "I built a React dashboard for a fintech" (probably fine) and detailed architecture notes or code patterns (probably not)?
+- Do we need legal guardrails in the product itself — e.g. prompts that say "describe what you learned, not what you built"?
+- Could this actually *increase* legal risk for our users and make us liable for encouraging it?
+- Is there a version of work evidence that's purely self-reflective ("I got better at X") rather than descriptive ("I built Y for client Z")?
+- **Partnership in a Box:** Do teams form around a project (demand-driven) or form first and hunt for work (supply-driven)? Which is easier to bootstrap?
+- What legal structure do instant partnerships need? Simple revenue-share agreements, or something more formal like an LLP?
+- How do we handle trust in ad-hoc teams? Reputation scores? Trial gigs? Mutual vetting?
+- Is the real competitor here traditional agencies? If so, what stops an agency from adopting our tooling?
 - **Founder expertise leverage:** How much of the resume writing / career services expertise can be encoded into AI vs. needing human-in-the-loop? Where's the quality cliff?
 - How do we position our career services credibility to users? "Built by career professionals" branding? Or let the product quality speak?
 - Could the career coaching expertise become a *service* layer on top of the product (premium human review / advisory) rather than just baked-in intelligence?

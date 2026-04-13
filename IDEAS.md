@@ -18,7 +18,7 @@ Detail, context, inspiration, links. Go wild.
 
 <!-- Add ideas below this line -->
 
-### Session 1 — 2026-04-12
+### Session 1 — 12-04-26
 
 **Idea:** "Career Compound" — your work history as a compounding asset
 
@@ -26,7 +26,7 @@ The core insight: every job change currently *resets* your professional context.
 
 ---
 
-### Session 1 — 2026-04-12
+### Session 1 — 12-04-26
 
 **Idea:** Transition-first wedge — "60-Day Edge"
 
@@ -34,7 +34,7 @@ Don't try to get people to log work daily (they won't). Instead, target the *acu
 
 ---
 
-### Session 1 — 2026-04-12
+### Session 1 — 12-04-26
 
 **Idea:** The "Professional API" — make yourself integrable
 
@@ -42,7 +42,7 @@ Knowledge workers increasingly need to plug into new teams fast. What if you had
 
 ---
 
-### Session 1 — 2026-04-12
+### Session 1 — 12-04-26
 
 **Idea:** "Work Evidence" capture via AI — passive where possible
 
@@ -50,7 +50,7 @@ Most work evidence lives in tools people already use: Git commits, Jira completi
 
 ---
 
-### Session 1 — 2026-04-12
+### Session 1 — 12-04-26
 
 **Idea:** Contract worker "business-in-a-box"
 
@@ -58,7 +58,7 @@ For people doing contract assignments: a lightweight suite that handles the thin
 
 ---
 
-### Session 1 — 2026-04-12
+### Session 1 — 12-04-26
 
 **Idea:** Network as living graph, not a contact list
 
@@ -66,7 +66,7 @@ LinkedIn connections are useless because they're undifferentiated. What if your 
 
 ---
 
-### Session 1 — 2026-04-12
+### Session 1 — 12-04-26
 
 **Idea:** Developers as beachhead — "Dev to Consultant" accelerator
 
@@ -74,7 +74,7 @@ Software developers are flooding the job market. Most are applying to the same s
 
 ---
 
-### Session 1 — 2026-04-12
+### Session 1 — 12-04-26
 
 **Idea:** "Agentic AI Deployer" — a specific wedge
 
@@ -82,7 +82,7 @@ SMEs know they need AI but have no idea how to deploy it. Senior devs understand
 
 ---
 
-### Session 1 — 2026-04-12
+### Session 1 — 12-04-26
 
 **Idea:** Skills reframing engine — "what else can I do with what I know?"
 
@@ -90,32 +90,32 @@ A dev who's spent 8 years building microservices at a bank doesn't realise they 
 
 ---
 
-### Session 1 — 2026-04-12
+### Session 1 — 12-04-26
 
 **Idea:** SME technical needs marketplace — demand-side aggregation
 
-Flip the model: instead of helping devs find clients, aggregate *demand* from SMEs. "We need someone to set up our CRM integrations." "We want to deploy AI chatbots for customer service." "Our systems don't talk to each other." Package these as scoped engagements and match to devs in our network. Like Upwork but specifically for mid-to-senior devs doing defined technical projects for UK SMEs. Premium positioning, not a race to the bottom.
+Flip the model: instead of helping devs find clients, aggregate *demand* from SMEs. "We need someone to set up our CRM integrations." "We want to deploy AI chatbots for customer service." "Our systems don't talk to each other." Package these as scoped engagements and match to devs in our network. Like Upwork but specifically for mid-to-senior devs doing defined technical projects for Australian SMEs. Premium positioning, not a race to the bottom.
 
 ---
 
-### Session 2 — 2026-04-12
+### Session 2 — 12-04-26
 
 **Idea:** "Career Copy" — AI resume engine powered by real career expertise
 
-We have professional resume writing and career services expertise in the founding team. Most AI CV builders are built by engineers who've never written a CV professionally — they produce generic, keyword-stuffed output. What if we encoded *real career writer expertise* into the AI layer? An engine that knows: how to frame achievements for impact, when to use metrics vs. narrative, how to tailor for different industries, what hiring managers actually scan for, and how to tell a career story across multiple short tenures without looking like a job-hopper. This isn't "GPT writes your CV" — it's expert career writing methodology delivered at software scale. The free tier generates a basic CV; the pro tier applies the kind of strategic framing you'd get from a £500 career consultant.
+We have professional resume writing and career services expertise in the founding team. Most AI CV builders are built by engineers who've never written a CV professionally — they produce generic, keyword-stuffed output. What if we encoded *real career writer expertise* into the AI layer? An engine that knows: how to frame achievements for impact, when to use metrics vs. narrative, how to tailor for different industries, what hiring managers actually scan for, and how to tell a career story across multiple short tenures without looking like a job-hopper. This isn't "GPT writes your CV" — it's expert career writing methodology delivered at software scale. The free tier generates a basic CV; the pro tier applies the kind of strategic framing you'd get from a  career consultant.
 
 ---
 
-### Session 2 — 2026-04-12
+### Session 2 — 12-04-26
 
 **Idea:** Productised career coaching — "Career Playbooks"
 
-Career coaching is a £2,000+ engagement that most people can't afford. But 80% of what a career coach does is repeatable: skills audit, career narrative construction, target role mapping, interview prep, negotiation strategy. We know this because we've *done* it. What if we turned the best of career coaching into structured, interactive playbooks? Self-guided modules with AI assistance, drawing on real coaching methodology — not the superficial "10 tips for your LinkedIn" content. A playbook for "Leaving big tech for consulting," another for "Making a career pivot at 40," another for "Going from IC to management." Each one is an expert-designed process, not just a template.
+Career coaching is a ,000+ engagement that most people can't afford. But 80% of what a career coach does is repeatable: skills audit, career narrative construction, target role mapping, interview prep, negotiation strategy. We know this because we've *done* it. What if we turned the best of career coaching into structured, interactive playbooks? Self-guided modules with AI assistance, drawing on real coaching methodology — not the superficial "10 tips for your LinkedIn" content. A playbook for "Leaving big tech for consulting," another for "Making a career pivot at 40," another for "Going from IC to management." Each one is an expert-designed process, not just a template.
 
 ---
 
-### Session 2 — 2026-04-12
+### Session 2 — 12-04-26
 
 **Idea:** "Big Tech Translator" — helping devs repackage for a different world
 
-Our team has lived the big-tech experience. Devs leaving FAANG often don't realise that the way they describe their work is *incomprehensible* outside that bubble. "I improved p99 latency on the ads serving pipeline by 40ms" means nothing to an SME owner or a startup CTO. We can build a translation layer — take big-tech experience and reframe it for the audience the dev is targeting. This is more than synonym replacement; it's understanding which parts of your experience *matter* in the new context and how to tell that story. Backed by real expertise in both the big-tech world and the career services world.
+Our team has lived the big-tech experience. Devs leaving big tech often don't realise that the way they describe their work is *incomprehensible* outside that bubble. "I improved p99 latency on the ads serving pipeline by 40ms" means nothing to an SME owner or a startup CTO. We can build a translation layer — take big-tech experience and reframe it for the audience the dev is targeting. This is more than synonym replacement; it's understanding which parts of your experience *matter* in the new context and how to tell that story. Backed by real expertise in both the big-tech world and the career services world.

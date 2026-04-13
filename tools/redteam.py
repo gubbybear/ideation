@@ -250,6 +250,7 @@ def generate_html(generic: list[tuple[str, str]], contextual: list[str],
     """Generate an HTML page showing the red team challenges."""
     body = f"""
 <p>Round {round_num} &mdash; Attacker: <strong>{html_mod.escape(attacker)}</strong></p>
+<p><a class="modal-edit" href="{(REPO_ROOT / 'RED-TEAM.md').resolve().as_uri().replace('file:///', 'vscode://file/')}">Edit RED-TEAM.md in VS Code</a></p>
 """
 
     num = 1

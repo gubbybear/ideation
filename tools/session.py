@@ -227,13 +227,20 @@ def _collect_recent_changes() -> tuple[list[str], list[str]]:
     return commits, files
 
 
-def _collect_open_questions() -> list[str]:
+def _collect_open_questions() -> list[dict]:
+    """Return open questions grouped by category.
+
+    Returns list of {"category": str|None, "text": str}.
+    A line starting with **Bold:** sets the category for itself
+    and subsequent uncategorised lines.
+    """
     qfile = REPO_ROOT / "QUESTIONS.md"
     if not qfile.exists():
         return []
     content = qfile.read_text(encoding="utf-8")
     in_open = False
-    questions = []
+    questions: list[dict] = []
+    current_cat = None
     for line in content.splitlines():
         if line.strip().lower().startswith("## open"):
             in_open = True
@@ -242,16 +249,26 @@ def _collect_open_questions() -> list[str]:
             in_open = False
             continue
         if in_open and line.strip().startswith("- "):
-            questions.append(line.strip()[2:])
+            text = line.strip()[2:]
+            m = re.match(r'\*\*(.+?):\*\*\s*(.*)', text)
+            if m:
+                current_cat = m.group(1)
+                questions.append({"category": current_cat, "text": m.group(2)})
+            else:
+                questions.append({"category": current_cat, "text": text})
     return questions
 
 
-def _collect_unresolved_assumptions() -> list[str]:
+def _collect_unresolved_assumptions() -> list[dict]:
+    """Return unresolved assumptions as rich dicts.
+
+    Returns list of {"num": str, "text": str, "confidence": str, "evidence": str}.
+    """
     afile = REPO_ROOT / "ASSUMPTIONS.md"
     if not afile.exists():
         return []
     content = afile.read_text(encoding="utf-8")
-    unresolved = []
+    unresolved: list[dict] = []
     for line in content.splitlines():
         if line.startswith("|") and not line.startswith("| #") and not line.startswith("|---"):
             cells = [c.strip() for c in line.split("|")]
@@ -260,7 +277,12 @@ def _collect_unresolved_assumptions() -> list[str]:
                 assumption = cells[1] if len(cells) > 1 else ""
                 verdict = cells[-1] if len(cells) >= 6 else ""
                 if assumption and not verdict and assumption != "Assumption":
-                    unresolved.append(f"{cells[0]}. {assumption}")
+                    unresolved.append({
+                        "num": cells[0],
+                        "text": assumption,
+                        "confidence": cells[2] if len(cells) >= 3 else "",
+                        "evidence": cells[3] if len(cells) >= 4 else "",
+                    })
     return unresolved
 
 
@@ -375,9 +397,18 @@ def generate_session_html(name: str | None = None) -> str:
     # Open questions
     body += '<div class="card"><h3 style="margin-top:0">Open Questions</h3>'
     if questions:
-        body += "<ul>"
+        current_cat = None
         for q in questions:
-            body += f"<li>{html_mod.escape(q)}</li>"
+            cat = q.get("category")
+            if cat and cat != current_cat:
+                if current_cat is not None:
+                    body += "</ul>"
+                body += f'<h4 style="margin:0.8rem 0 0.3rem;color:var(--accent)">{html_mod.escape(cat)}</h4><ul>'
+                current_cat = cat
+            elif current_cat is None:
+                body += "<ul>"
+                current_cat = ""
+            body += f"<li>{html_mod.escape(q['text'])}</li>"
         body += "</ul>"
     else:
         body += '<p class="empty">No open questions.</p>'
@@ -386,10 +417,12 @@ def generate_session_html(name: str | None = None) -> str:
     # Unresolved assumptions
     body += '<div class="card"><h3 style="margin-top:0">Unresolved Assumptions</h3>'
     if assumptions:
-        body += "<ul>"
+        body += '<table><tr><th>#</th><th>Assumption</th><th>Confidence</th></tr>'
         for a in assumptions:
-            body += f"<li>{html_mod.escape(a)}</li>"
-        body += "</ul>"
+            conf = a.get("confidence", "")
+            conf_color = {"H": "green", "M": "yellow", "L": "red"}.get(conf, "muted")
+            body += f'<tr><td>{html_mod.escape(a["num"])}</td><td>{html_mod.escape(a["text"])}</td><td>{badge(conf, conf_color)}</td></tr>'
+        body += "</table>"
     else:
         body += '<p class="empty">None yet.</p>'
     body += "</div>"

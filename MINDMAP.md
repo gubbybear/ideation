@@ -79,6 +79,25 @@
   - Project scoping marketplace
   - Vetted methodology badge
   - Repeat engagement tracking
+- Partnership in a Box {sky}
+  - Team assembly engine
+    - Skill-gap matching
+    - Availability & preference alignment
+    - Complementary skill suggestions
+  - Partnership infrastructure
+    - Joint proposals & SOWs
+    - Revenue split agreements
+    - Shared project management
+    - IP & NDA templates
+    - Joint invoicing & split payments
+  - Team reputation
+    - Mutual peer reviews
+    - Team-level track record
+    - "Works well together" signals
+  - Dissolve & reform
+    - Clean engagement close-out
+    - Relationship graph updates
+    - Re-assembly for repeat patterns
 - Agentic AI Specialisation
   - AI readiness assessment tool
   - Deployment playbooks
@@ -106,7 +125,7 @@
   - Career narrative construction
   - Productised coaching playbooks
 - Big Tech Insider Knowledge
-  - FAANG culture & transition empathy
+  - Big tech culture & transition empathy
   - "Big Tech Translator" — reframing for new audiences
   - Performance review → portable evidence mapping
   - Dev beachhead credibility
