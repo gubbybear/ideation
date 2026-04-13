@@ -119,3 +119,21 @@ Career coaching is a ,000+ engagement that most people can't afford. But 80% of 
 **Idea:** "Big Tech Translator" — helping devs repackage for a different world
 
 Our team has lived the big-tech experience. Devs leaving big tech often don't realise that the way they describe their work is *incomprehensible* outside that bubble. "I improved p99 latency on the ads serving pipeline by 40ms" means nothing to an SME owner or a startup CTO. We can build a translation layer — take big-tech experience and reframe it for the audience the dev is targeting. This is more than synonym replacement; it's understanding which parts of your experience *matter* in the new context and how to tell that story. Backed by real expertise in both the big-tech world and the career services world.
+
+---
+
+### Gub — 13-04-26
+
+**Idea:** ReachCore + ReachStack — tiered product architecture
+
+Split the product into two clear tiers with distinct names and identities:
+
+**ReachCore** (free or cheap) — the minimum viable professional toolkit. Career profile, basic skills inventory, CV generation, work evidence journal, transition checklist. Enough to be genuinely useful on its own. The thing you sign up for when you're suddenly job hunting and need something *now*.
+
+**ReachStack** — the full suite for professionals who are building a career as an independent or portfolio worker. This is where the ambitious, harder-to-build capabilities live:
+- **Auto-teaming:** find and automatically negotiate with other professionals to assemble a bid team for a specific project (Partnership in a Box, but with AI matching and deal structuring)
+- **Living networks:** a real professional network that's *active*, not a dead LinkedIn graph. Who's available, who's worked with whom successfully, who complements your skills — updated in real time, not when someone remembers to update their profile
+- **Automated contracting:** generate and execute partnership agreements, SOWs, revenue splits, invoicing — the legal and financial plumbing that kills ad-hoc collaboration
+- **Career intelligence:** proactive opportunity matching, market rate data, demand signals from SMEs
+
+The naming matters — "Core" signals essential and accessible, "Stack" signals power and depth (devs will get it). And the tier split gives us a natural freemium funnel: get people in on Core during a transition moment, graduate them to Stack as they build an independent practice.
