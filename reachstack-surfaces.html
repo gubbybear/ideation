@@ -1,0 +1,2058 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ReachStack Surfaces Prototype</title>
+  <style>
+    :root {
+      --ink: #0a0a0a;
+      --ink-soft: #242424;
+      --paper: #ffffff;
+      --wash: #f7f8f9;
+      --mist: #f2f3f4;
+      --fog: #e8eaed;
+      --line: #e1e4e8;
+      --line-strong: #c8cdd2;
+      --muted: #626a73;
+      --muted-strong: #3f464d;
+      --accent: #1f3357;
+      --accent-soft: #eef2f8;
+      --green: #15803d;
+      --green-soft: #eaf6ee;
+      --gold: #9a6a1f;
+      --gold-soft: #fff6df;
+      --red: #b42318;
+      --red-soft: #fff0ee;
+      --blue: #1e6f8a;
+      --blue-soft: #edf7fa;
+      --radius: 8px;
+      --shadow: 0 26px 70px rgba(13, 19, 28, 0.12);
+      --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      letter-spacing: 0;
+    }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+      background: var(--wash);
+      color: var(--ink);
+      font-family: var(--sans);
+    }
+
+    body {
+      padding: 24px;
+    }
+
+    button,
+    input,
+    textarea {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      cursor: default;
+    }
+
+    .app-frame {
+      width: min(1480px, 100%);
+      margin: 0 auto;
+      overflow: hidden;
+      border: 1px solid var(--line-strong);
+      border-radius: var(--radius);
+      background: var(--paper);
+      box-shadow: var(--shadow);
+    }
+
+    .chrome {
+      height: 32px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 0 14px;
+      background: var(--mist);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      flex: 0 0 auto;
+      border-radius: 50%;
+      background: #cfd3d8;
+    }
+
+    .dot:nth-child(1) { background: #d98b86; }
+    .dot:nth-child(2) { background: #d4b45f; }
+    .dot:nth-child(3) { background: #8aba97; }
+
+    .url {
+      min-width: 0;
+      margin-left: 12px;
+      padding: 4px 10px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.86);
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .topbar {
+      min-height: 64px;
+      display: grid;
+      grid-template-columns: minmax(220px, 1fr) auto minmax(220px, 1fr);
+      align-items: center;
+      gap: 18px;
+      padding: 13px 22px;
+      border-bottom: 1px solid var(--line);
+      background: var(--paper);
+    }
+
+    .tenant-brand,
+    .reach-badge,
+    .user-cluster,
+    .metric,
+    .privacy-mode,
+    .side-item,
+    .queue-item,
+    .review-action,
+    .portal-status,
+    .file-pill,
+    .theme-swatch {
+      display: flex;
+      align-items: center;
+    }
+
+    .tenant-brand {
+      min-width: 0;
+      gap: 12px;
+    }
+
+    .tenant-mark,
+    .avatar,
+    .reach-mark {
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+      font-weight: 900;
+    }
+
+    .tenant-mark {
+      width: 34px;
+      height: 34px;
+      border-radius: 7px;
+      background: var(--accent);
+      color: var(--paper);
+      font-size: 0.78rem;
+    }
+
+    .brand-name {
+      min-width: 0;
+      font-size: 1rem;
+      font-weight: 850;
+      color: var(--accent);
+      line-height: 1.1;
+    }
+
+    .brand-name span {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 0.72rem;
+      font-weight: 720;
+    }
+
+    .reach-badge {
+      justify-self: center;
+      gap: 8px;
+      color: var(--muted-strong);
+      font-size: 0.78rem;
+      font-weight: 760;
+      white-space: nowrap;
+    }
+
+    .reach-mark {
+      width: 23px;
+      height: 23px;
+      border-radius: 50%;
+      background: var(--ink);
+      color: var(--paper);
+      font-size: 0.68rem;
+    }
+
+    .user-cluster {
+      justify-self: end;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .privacy-mode {
+      gap: 7px;
+      min-height: 30px;
+      padding: 0 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--green-soft);
+      color: var(--green);
+      font-size: 0.74rem;
+      font-weight: 820;
+      white-space: nowrap;
+    }
+
+    .privacy-mode::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    .avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--ink);
+      color: var(--paper);
+      font-size: 0.72rem;
+    }
+
+    .shell {
+      display: grid;
+      grid-template-columns: 236px minmax(0, 1fr);
+      min-height: 760px;
+      background: var(--paper);
+    }
+
+    .sidebar {
+      padding: 18px 14px;
+      border-right: 1px solid var(--line);
+      background: var(--wash);
+    }
+
+    .side-group + .side-group {
+      margin-top: 18px;
+    }
+
+    .side-label {
+      padding: 6px 10px;
+      color: var(--muted);
+      font-size: 0.68rem;
+      font-weight: 830;
+      text-transform: uppercase;
+    }
+
+    .side-item {
+      width: 100%;
+      min-height: 38px;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 8px 10px;
+      border-radius: 7px;
+      background: transparent;
+      color: var(--ink-soft);
+      font-size: 0.86rem;
+      font-weight: 720;
+      text-align: left;
+    }
+
+    .side-item:hover,
+    .side-item.active {
+      background: var(--paper);
+    }
+
+    .side-item.active {
+      box-shadow: inset 3px 0 0 var(--accent);
+      color: var(--ink);
+      font-weight: 850;
+    }
+
+    .count {
+      min-width: 24px;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: var(--mist);
+      color: var(--muted-strong);
+      font-size: 0.7rem;
+      font-weight: 840;
+      text-align: center;
+    }
+
+    .side-item.active .count {
+      background: var(--accent);
+      color: var(--paper);
+    }
+
+    .side-footer {
+      margin-top: 22px;
+      padding: 12px 10px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--paper);
+    }
+
+    .side-footer strong {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 0.78rem;
+    }
+
+    .side-footer span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.72rem;
+      line-height: 1.35;
+    }
+
+    .main {
+      min-width: 0;
+      padding: 22px 24px 26px;
+      background: var(--paper);
+    }
+
+    .screen {
+      display: none;
+    }
+
+    .screen.active {
+      display: block;
+    }
+
+    .screen-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    .eyebrow {
+      margin-bottom: 4px;
+      color: var(--muted);
+      font-size: 0.72rem;
+      font-weight: 830;
+      text-transform: uppercase;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin: 0;
+    }
+
+    h1 {
+      color: var(--ink);
+      font-size: 1.46rem;
+      line-height: 1.15;
+      font-weight: 880;
+    }
+
+    h2 {
+      font-size: 1rem;
+      line-height: 1.2;
+      font-weight: 850;
+    }
+
+    h3 {
+      font-size: 0.88rem;
+      line-height: 1.25;
+      font-weight: 850;
+    }
+
+    p {
+      color: var(--muted);
+      font-size: 0.86rem;
+      line-height: 1.5;
+    }
+
+    .head-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .button {
+      min-height: 34px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 0 13px;
+      border-radius: 7px;
+      border: 1px solid var(--line-strong);
+      background: var(--paper);
+      color: var(--ink);
+      font-size: 0.82rem;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .button.primary {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: var(--paper);
+    }
+
+    .button.danger {
+      border-color: var(--red);
+      color: var(--red);
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .metric {
+      min-width: 0;
+      min-height: 84px;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--paper);
+    }
+
+    .metric strong {
+      display: block;
+      color: var(--ink);
+      font-size: 1.42rem;
+      line-height: 1;
+      font-weight: 900;
+    }
+
+    .metric span {
+      display: block;
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 0.74rem;
+      line-height: 1.25;
+      font-weight: 730;
+    }
+
+    .metric-mark {
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+      border-radius: 7px;
+      background: var(--mist);
+      color: var(--muted-strong);
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      font-weight: 850;
+    }
+
+    .metric.good .metric-mark { background: var(--green-soft); color: var(--green); }
+    .metric.watch .metric-mark { background: var(--gold-soft); color: var(--gold); }
+    .metric.info .metric-mark { background: var(--blue-soft); color: var(--blue); }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: minmax(300px, 0.95fr) minmax(430px, 1.2fr) minmax(270px, 0.75fr);
+      gap: 14px;
+      align-items: start;
+    }
+
+    .panel {
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--paper);
+    }
+
+    .panel-head {
+      min-height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 13px 14px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .panel-body {
+      padding: 14px;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 24px;
+      padding: 3px 8px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--mist);
+      color: var(--muted-strong);
+      font-size: 0.72rem;
+      font-weight: 830;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    .chip.good { background: var(--green-soft); color: var(--green); border-color: #cce8d5; }
+    .chip.watch { background: var(--gold-soft); color: var(--gold); border-color: #f2d996; }
+    .chip.fail { background: var(--red-soft); color: var(--red); border-color: #f5c7c1; }
+    .chip.info { background: var(--blue-soft); color: var(--blue); border-color: #c9e6ee; }
+    .chip.brand { background: var(--accent-soft); color: var(--accent); border-color: #d5deed; }
+
+    .filter-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .filter-strip .button {
+      min-height: 30px;
+      padding: 0 10px;
+      border-color: var(--line);
+      color: var(--muted-strong);
+      font-size: 0.76rem;
+      background: var(--paper);
+    }
+
+    .filter-strip .button.active {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+
+    .queue-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .queue-item {
+      width: 100%;
+      min-height: 76px;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 11px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--paper);
+      text-align: left;
+    }
+
+    .queue-item.selected {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+      box-shadow: inset 3px 0 0 var(--accent);
+    }
+
+    .queue-copy {
+      min-width: 0;
+    }
+
+    .queue-copy strong {
+      display: block;
+      overflow: hidden;
+      color: var(--ink);
+      font-size: 0.86rem;
+      line-height: 1.25;
+      font-weight: 850;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .queue-copy span {
+      display: block;
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 0.74rem;
+      line-height: 1.3;
+    }
+
+    .queue-score {
+      display: grid;
+      flex: 0 0 auto;
+      gap: 6px;
+      justify-items: end;
+    }
+
+    .confidence {
+      font-family: var(--mono);
+      color: var(--ink);
+      font-size: 0.78rem;
+      font-weight: 850;
+    }
+
+    .review-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+      gap: 12px;
+    }
+
+    .document-preview,
+    .draft-preview,
+    .decision-card,
+    .audit-line,
+    .portal-card,
+    .settings-row {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--paper);
+    }
+
+    .document-preview {
+      min-height: 414px;
+      padding: 14px;
+      background: var(--wash);
+    }
+
+    .doc-page {
+      min-height: 380px;
+      padding: 18px;
+      border: 1px solid var(--line-strong);
+      border-radius: 6px;
+      background: var(--paper);
+      box-shadow: 0 12px 28px rgba(13, 19, 28, 0.06);
+    }
+
+    .doc-page .doc-title {
+      margin-bottom: 14px;
+      color: var(--ink);
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      font-weight: 850;
+    }
+
+    .doc-line {
+      height: 9px;
+      margin-bottom: 9px;
+      border-radius: 999px;
+      background: var(--fog);
+    }
+
+    .doc-line.short { width: 55%; }
+    .doc-line.mid { width: 74%; }
+    .doc-line.long { width: 92%; }
+    .doc-line.redacted { width: 48%; background: var(--ink); }
+
+    .field-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 18px;
+    }
+
+    .field {
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--paper);
+    }
+
+    .field span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.68rem;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .field strong {
+      display: block;
+      margin-top: 5px;
+      color: var(--ink);
+      font-size: 0.8rem;
+      line-height: 1.25;
+    }
+
+    .draft-preview {
+      min-height: 414px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .draft-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 12px 13px;
+      border-bottom: 1px solid var(--line);
+      background: var(--wash);
+    }
+
+    .draft-copy {
+      flex: 1;
+      padding: 15px;
+    }
+
+    .draft-copy p + p {
+      margin-top: 12px;
+    }
+
+    .draft-copy p {
+      color: var(--ink-soft);
+      font-size: 0.88rem;
+    }
+
+    .draft-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 12px 13px;
+      border-top: 1px solid var(--line);
+      background: var(--wash);
+    }
+
+    .decision-stack {
+      display: grid;
+      gap: 10px;
+    }
+
+    .decision-card {
+      padding: 13px;
+    }
+
+    .decision-card h3 {
+      margin-bottom: 10px;
+    }
+
+    .decision-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 8px 0;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.78rem;
+    }
+
+    .decision-row:first-of-type {
+      border-top: 0;
+    }
+
+    .decision-row strong {
+      color: var(--ink);
+      font-weight: 850;
+      text-align: right;
+    }
+
+    .review-action {
+      width: 100%;
+      min-height: 38px;
+      justify-content: center;
+      border-radius: 7px;
+      border: 1px solid var(--line-strong);
+      background: var(--paper);
+      color: var(--ink);
+      font-size: 0.82rem;
+      font-weight: 830;
+    }
+
+    .review-action.primary {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: var(--paper);
+    }
+
+    .review-action + .review-action {
+      margin-top: 8px;
+    }
+
+    .bottom-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(310px, 0.78fr);
+      gap: 14px;
+      margin-top: 14px;
+    }
+
+    .portal-snapshot {
+      min-height: 300px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      overflow: hidden;
+      background: var(--paper);
+    }
+
+    .portal-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 52px;
+      padding: 12px 14px;
+      background: var(--accent);
+      color: var(--paper);
+    }
+
+    .portal-top strong {
+      font-size: 0.9rem;
+    }
+
+    .portal-top span {
+      color: rgba(255, 255, 255, 0.78);
+      font-size: 0.76rem;
+      font-weight: 720;
+    }
+
+    .portal-content {
+      display: grid;
+      grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+      gap: 12px;
+      padding: 14px;
+      background: var(--wash);
+    }
+
+    .upload-zone {
+      min-height: 206px;
+      display: grid;
+      place-items: center;
+      padding: 18px;
+      border: 1px dashed var(--line-strong);
+      border-radius: var(--radius);
+      background: var(--paper);
+      text-align: center;
+    }
+
+    .upload-zone strong {
+      display: block;
+      margin-bottom: 7px;
+      font-size: 0.92rem;
+    }
+
+    .upload-zone span {
+      color: var(--muted);
+      font-size: 0.78rem;
+      line-height: 1.35;
+    }
+
+    .portal-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .portal-status {
+      justify-content: space-between;
+      gap: 10px;
+      min-height: 62px;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--paper);
+    }
+
+    .portal-status strong {
+      display: block;
+      font-size: 0.82rem;
+    }
+
+    .portal-status span {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 0.72rem;
+    }
+
+    .audit-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .audit-line {
+      display: grid;
+      grid-template-columns: 68px minmax(0, 1fr) auto;
+      gap: 10px;
+      align-items: start;
+      padding: 10px;
+    }
+
+    .audit-time {
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      font-weight: 760;
+    }
+
+    .audit-copy strong {
+      display: block;
+      margin-bottom: 3px;
+      font-size: 0.82rem;
+    }
+
+    .audit-copy span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.76rem;
+      line-height: 1.35;
+    }
+
+    .wide-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(320px, 0.75fr);
+      gap: 14px;
+      align-items: start;
+    }
+
+    .queue-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82rem;
+    }
+
+    .queue-table th,
+    .queue-table td {
+      padding: 11px 10px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: middle;
+    }
+
+    .queue-table th {
+      color: var(--muted);
+      font-size: 0.72rem;
+      font-weight: 850;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .queue-table td {
+      color: var(--ink-soft);
+    }
+
+    .queue-table tr.selected td {
+      background: var(--accent-soft);
+    }
+
+    .queue-table .name {
+      color: var(--ink);
+      font-weight: 830;
+    }
+
+    .review-focus {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 14px;
+    }
+
+    .portal-screen-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(340px, 0.7fr);
+      gap: 14px;
+      align-items: start;
+    }
+
+    .client-page {
+      min-height: 660px;
+      overflow: hidden;
+      border: 1px solid var(--line-strong);
+      border-radius: var(--radius);
+      background: var(--paper);
+    }
+
+    .client-hero {
+      padding: 30px;
+      background: var(--accent);
+      color: var(--paper);
+    }
+
+    .client-hero .portal-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 42px;
+    }
+
+    .client-lockup {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 850;
+    }
+
+    .client-lockup .tenant-mark {
+      width: 30px;
+      height: 30px;
+      background: var(--paper);
+      color: var(--accent);
+    }
+
+    .portal-nav-links {
+      display: flex;
+      gap: 16px;
+      color: rgba(255, 255, 255, 0.78);
+      font-size: 0.8rem;
+      font-weight: 760;
+    }
+
+    .client-hero h2 {
+      max-width: 580px;
+      font-size: 2rem;
+      line-height: 1.06;
+      color: var(--paper);
+    }
+
+    .client-hero p {
+      max-width: 570px;
+      margin-top: 12px;
+      color: rgba(255, 255, 255, 0.82);
+      font-size: 0.94rem;
+    }
+
+    .client-main {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(280px, 0.72fr);
+      gap: 16px;
+      padding: 18px;
+      background: var(--wash);
+    }
+
+    .portal-card {
+      padding: 16px;
+    }
+
+    .portal-card h3 {
+      margin-bottom: 12px;
+    }
+
+    .file-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .file-pill {
+      gap: 7px;
+      min-height: 30px;
+      padding: 0 10px;
+      border-radius: 999px;
+      background: var(--mist);
+      color: var(--muted-strong);
+      font-size: 0.76rem;
+      font-weight: 760;
+    }
+
+    .status-steps {
+      display: grid;
+      gap: 10px;
+    }
+
+    .step {
+      display: grid;
+      grid-template-columns: 24px minmax(0, 1fr);
+      gap: 10px;
+      align-items: start;
+    }
+
+    .step-dot {
+      width: 24px;
+      height: 24px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--mist);
+      color: var(--muted-strong);
+      font-size: 0.72rem;
+      font-weight: 850;
+    }
+
+    .step.done .step-dot {
+      background: var(--green);
+      color: var(--paper);
+    }
+
+    .step.current .step-dot {
+      background: var(--accent);
+      color: var(--paper);
+    }
+
+    .step strong {
+      display: block;
+      margin-bottom: 3px;
+      font-size: 0.82rem;
+    }
+
+    .step span {
+      color: var(--muted);
+      font-size: 0.76rem;
+      line-height: 1.35;
+    }
+
+    .assurance-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .assurance-tile {
+      min-height: 122px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--paper);
+    }
+
+    .assurance-tile strong {
+      display: block;
+      margin-bottom: 7px;
+      font-size: 1.18rem;
+      font-weight: 900;
+    }
+
+    .assurance-tile span {
+      color: var(--muted);
+      font-size: 0.78rem;
+      line-height: 1.35;
+    }
+
+    .settings-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(330px, 0.74fr);
+      gap: 14px;
+      align-items: start;
+    }
+
+    .settings-row {
+      display: grid;
+      grid-template-columns: 190px minmax(0, 1fr);
+      gap: 14px;
+      align-items: center;
+      min-height: 76px;
+      padding: 14px;
+    }
+
+    .settings-row + .settings-row {
+      margin-top: 10px;
+    }
+
+    .settings-row strong {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 0.84rem;
+    }
+
+    .settings-row span {
+      color: var(--muted);
+      font-size: 0.76rem;
+      line-height: 1.35;
+    }
+
+    .theme-swatches {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .theme-swatch {
+      gap: 8px;
+      min-height: 34px;
+      padding: 0 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--muted-strong);
+      font-size: 0.76rem;
+      font-weight: 760;
+    }
+
+    .swatch-dot {
+      width: 14px;
+      height: 14px;
+      flex: 0 0 auto;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+
+    .swatch-dot.green { background: var(--green); }
+    .swatch-dot.blue { background: var(--blue); }
+    .swatch-dot.gold { background: var(--gold); }
+    .swatch-dot.black { background: var(--ink); }
+
+    .brand-preview {
+      overflow: hidden;
+      border: 1px solid var(--line-strong);
+      border-radius: var(--radius);
+      background: var(--paper);
+    }
+
+    .brand-preview .portal-snapshot {
+      border: 0;
+      border-radius: 0;
+    }
+
+    .toast-shelf {
+      display: grid;
+      gap: 8px;
+    }
+
+    .toast {
+      padding: 11px 12px;
+      border: 1px solid var(--line);
+      border-left: 4px solid var(--accent);
+      border-radius: 7px;
+      background: var(--paper);
+      font-size: 0.8rem;
+      line-height: 1.35;
+    }
+
+    .toast.good { border-left-color: var(--green); }
+    .toast.watch { border-left-color: var(--gold); }
+    .toast.fail { border-left-color: var(--red); }
+
+    body.embed {
+      height: 100vh;
+      min-height: 0;
+      overflow: hidden;
+      padding: 0;
+    }
+
+    body.embed .app-frame {
+      width: 100%;
+      height: 100vh;
+      border: 0;
+      border-radius: 0;
+      box-shadow: none;
+    }
+
+    body.embed .shell {
+      min-height: calc(100vh - 97px);
+    }
+
+    @media (max-width: 1180px) {
+      body {
+        padding: 16px;
+      }
+
+      .topbar {
+        grid-template-columns: 1fr auto;
+      }
+
+      .reach-badge {
+        display: none;
+      }
+
+      .workspace,
+      .bottom-grid,
+      .wide-grid,
+      .portal-screen-grid,
+      .settings-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .review-grid,
+      .review-focus,
+      .portal-content,
+      .client-main {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 860px) {
+      body {
+        padding: 0;
+        background: var(--paper);
+      }
+
+      .app-frame {
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+      }
+
+      .chrome {
+        display: none;
+      }
+
+      .topbar {
+        grid-template-columns: 1fr;
+        align-items: start;
+      }
+
+      .user-cluster {
+        justify-self: start;
+        width: 100%;
+        justify-content: space-between;
+      }
+
+      .shell {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        display: flex;
+        gap: 10px;
+        overflow-x: auto;
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+        padding: 10px;
+      }
+
+      .side-group {
+        display: flex;
+        gap: 8px;
+        flex: 0 0 auto;
+      }
+
+      .side-group + .side-group {
+        margin-top: 0;
+      }
+
+      .side-label,
+      .side-footer {
+        display: none;
+      }
+
+      .side-item {
+        width: auto;
+        white-space: nowrap;
+        border: 1px solid var(--line);
+        background: var(--paper);
+      }
+
+      .main {
+        padding: 16px;
+      }
+
+      .screen-head {
+        display: block;
+      }
+
+      .head-actions {
+        justify-content: flex-start;
+        margin-top: 12px;
+      }
+
+      .metrics,
+      .assurance-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .settings-row {
+        grid-template-columns: 1fr;
+      }
+
+      .queue-table thead {
+        display: none;
+      }
+
+      .queue-table,
+      .queue-table tbody,
+      .queue-table tr,
+      .queue-table td {
+        display: block;
+        width: 100%;
+      }
+
+      .queue-table tr {
+        border-bottom: 1px solid var(--line);
+      }
+
+      .queue-table td {
+        border-bottom: 0;
+        padding: 6px 10px;
+      }
+
+      .queue-table td:first-child {
+        padding-top: 12px;
+      }
+
+      .queue-table td:last-child {
+        padding-bottom: 12px;
+      }
+
+      .client-hero {
+        padding: 22px;
+      }
+
+      .client-hero .portal-nav {
+        display: block;
+        margin-bottom: 30px;
+      }
+
+      .portal-nav-links {
+        margin-top: 14px;
+        flex-wrap: wrap;
+      }
+
+      .client-hero h2 {
+        font-size: 1.58rem;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .metrics,
+      .assurance-grid,
+      .field-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .metric {
+        min-height: 72px;
+      }
+
+      .queue-item {
+        align-items: flex-start;
+      }
+
+      .queue-score {
+        justify-items: start;
+      }
+
+      .audit-line {
+        grid-template-columns: 1fr;
+      }
+
+      .privacy-mode {
+        white-space: normal;
+      }
+
+      h1 {
+        font-size: 1.28rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-frame">
+    <div class="chrome">
+      <span class="dot"></span>
+      <span class="dot"></span>
+      <span class="dot"></span>
+      <span class="url" id="chrome-url">stack.acmelegal.com.au/dashboard</span>
+    </div>
+
+    <header class="topbar">
+      <div class="tenant-brand">
+        <span class="tenant-mark">AL</span>
+        <div class="brand-name">Acme Legal<span>Client intake and matter support</span></div>
+      </div>
+      <div class="reach-badge"><span class="reach-mark">R</span> powered by ReachStack</div>
+      <div class="user-cluster">
+        <div class="privacy-mode">Restricted mode - AU inference</div>
+        <div class="avatar">MT</div>
+      </div>
+    </header>
+
+    <div class="shell">
+      <nav class="sidebar" aria-label="ReachStack surfaces">
+        <div class="side-group">
+          <div class="side-label">Staff</div>
+          <button class="side-item active" data-target="dashboard">Dashboard <span class="count">47</span></button>
+          <button class="side-item" data-target="queue">Queue <span class="count">18</span></button>
+          <button class="side-item" data-target="review">Review <span class="count">6</span></button>
+        </div>
+        <div class="side-group">
+          <div class="side-label">Client</div>
+          <button class="side-item" data-target="portal">Client portal <span class="count">9</span></button>
+        </div>
+        <div class="side-group">
+          <div class="side-label">Assurance</div>
+          <button class="side-item" data-target="audit">Audit <span class="count">100%</span></button>
+          <button class="side-item" data-target="branding">Branding <span class="count">v1</span></button>
+        </div>
+        <div class="side-footer">
+          <strong>Deployment theme</strong>
+          <span>Acme Legal navy, compact queue density, restricted privacy posture.</span>
+        </div>
+      </nav>
+
+      <main class="main">
+        <section class="screen active" id="dashboard">
+          <div class="screen-head">
+            <div>
+              <div class="eyebrow">Staff cockpit</div>
+              <h1>Today&apos;s inbound work, review risk, and client handoffs.</h1>
+            </div>
+            <div class="head-actions">
+              <span class="chip good">Eval pass 96.4%</span>
+              <span class="chip brand">Audit log open</span>
+              <button class="button primary">Review next item</button>
+            </div>
+          </div>
+
+          <div class="metrics">
+            <div class="metric good">
+              <div><strong>47</strong><span>Open inbound items</span></div>
+              <span class="metric-mark">IN</span>
+            </div>
+            <div class="metric watch">
+              <div><strong>6</strong><span>Need partner approval</span></div>
+              <span class="metric-mark">AP</span>
+            </div>
+            <div class="metric info">
+              <div><strong>9 hrs</strong><span>Average client handover</span></div>
+              <span class="metric-mark">SLA</span>
+            </div>
+            <div class="metric good">
+              <div><strong>100%</strong><span>PII redaction coverage</span></div>
+              <span class="metric-mark">PII</span>
+            </div>
+          </div>
+
+          <div class="workspace">
+            <div class="panel">
+              <div class="panel-head">
+                <h2>Inbound queue</h2>
+                <span class="chip">Newest first</span>
+              </div>
+              <div class="panel-body">
+                <div class="filter-strip">
+                  <button class="button active">All</button>
+                  <button class="button">Urgent</button>
+                  <button class="button">Review</button>
+                  <button class="button">Missing info</button>
+                </div>
+                <div class="queue-list">
+                  <button class="queue-item selected">
+                    <span class="queue-copy"><strong>Statement of claim from Hargrove Holdings</strong><span>Email - Smith v Hargrove - received 12:14</span></span>
+                    <span class="queue-score"><span class="confidence">98.4%</span><span class="chip watch">Partner</span></span>
+                  </button>
+                  <button class="queue-item">
+                    <span class="queue-copy"><strong>Signed engagement letter for Brennan Estate</strong><span>Portal upload - new matter - received 11:42</span></span>
+                    <span class="queue-score"><span class="confidence">99.1%</span><span class="chip good">File</span></span>
+                  </button>
+                  <button class="queue-item">
+                    <span class="queue-copy"><strong>Client asks for conveyancing settlement status</strong><span>Shared inbox - Coastal Holdings - received 10:53</span></span>
+                    <span class="queue-score"><span class="confidence">94.8%</span><span class="chip brand">Draft</span></span>
+                  </button>
+                  <button class="queue-item">
+                    <span class="queue-copy"><strong>Trust ledger reconciliation extract</strong><span>Drive folder - monthly close - received 10:02</span></span>
+                    <span class="queue-score"><span class="confidence">100%</span><span class="chip good">Logged</span></span>
+                  </button>
+                  <button class="queue-item">
+                    <span class="queue-copy"><strong>Counsel brief with incomplete annexures</strong><span>Email attachment - Smith v Hargrove - received 09:36</span></span>
+                    <span class="queue-score"><span class="confidence">87.4%</span><span class="chip fail">Hold</span></span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="panel">
+              <div class="panel-head">
+                <h2>Selected item review</h2>
+                <span class="chip watch">Human approval required</span>
+              </div>
+              <div class="panel-body">
+                <div class="review-grid">
+                  <div class="document-preview" aria-label="Document preview">
+                    <div class="doc-page">
+                      <div class="doc-title">QSC Form 2 - Statement of Claim</div>
+                      <div class="doc-line long"></div>
+                      <div class="doc-line mid"></div>
+                      <div class="doc-line short"></div>
+                      <div class="doc-line long"></div>
+                      <div class="doc-line redacted"></div>
+                      <div class="doc-line mid"></div>
+                      <div class="doc-line long"></div>
+                      <div class="doc-line short"></div>
+                      <div class="field-grid">
+                        <div class="field"><span>Matter</span><strong>ACL-1042</strong></div>
+                        <div class="field"><span>Type</span><strong>Pleadings</strong></div>
+                        <div class="field"><span>Source</span><strong>M365 inbox</strong></div>
+                        <div class="field"><span>Privacy</span><strong>3 refs redacted</strong></div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="draft-preview">
+                    <div class="draft-head">
+                      <h3>Draft response</h3>
+                      <span class="chip brand">Acme tone</span>
+                    </div>
+                    <div class="draft-copy">
+                      <p>Hi Jordan, thanks for sending through the statement of claim. We have linked it to matter ACL-1042 and flagged the newly named opposing party for partner review.</p>
+                      <p>Before we can confirm next steps, could you please send the missing annexures referenced on page 14? The matter team will review the filing date and respond once the partner check is complete.</p>
+                      <p class="muted">Private identifiers were tokenised before generation and restored inside the Acme Legal tenant.</p>
+                    </div>
+                    <div class="draft-actions">
+                      <button class="button primary">Approve draft</button>
+                      <button class="button">Edit</button>
+                      <button class="button">Request info</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <aside class="decision-stack">
+              <div class="decision-card">
+                <h3>Decision rail</h3>
+                <div class="decision-row"><span>Classification</span><strong>Pleadings</strong></div>
+                <div class="decision-row"><span>Engagement link</span><strong>ACL-1042</strong></div>
+                <div class="decision-row"><span>Suggested action</span><strong>Partner review</strong></div>
+                <div class="decision-row"><span>Confidence</span><strong>98.4%</strong></div>
+              </div>
+              <div class="decision-card">
+                <h3>Privacy posture</h3>
+                <div class="decision-row"><span>Inference</span><strong>AU-hosted</strong></div>
+                <div class="decision-row"><span>Redaction</span><strong>Enabled</strong></div>
+                <div class="decision-row"><span>Training use</span><strong>Disabled</strong></div>
+                <div class="decision-row"><span>Audit status</span><strong>Complete</strong></div>
+              </div>
+              <div class="decision-card">
+                <button class="review-action primary">Approve and send</button>
+                <button class="review-action">Escalate to partner</button>
+                <button class="review-action">Create missing-info request</button>
+                <button class="review-action">Mark as incorrect</button>
+              </div>
+            </aside>
+          </div>
+
+          <div class="bottom-grid">
+            <div class="portal-snapshot">
+              <div class="portal-top">
+                <strong>Client portal preview</strong>
+                <span>intake.acmelegal.com.au</span>
+              </div>
+              <div class="portal-content">
+                <div class="upload-zone">
+                  <div>
+                    <strong>Upload signed documents</strong>
+                    <span>PDF, DOCX, JPG, PNG up to 40 MB. Files stay inside Acme Legal&apos;s ReachStack workspace.</span>
+                  </div>
+                </div>
+                <div class="portal-list">
+                  <div class="portal-status"><div><strong>Brennan Estate</strong><span>Costs agreement received</span></div><span class="chip good">In review</span></div>
+                  <div class="portal-status"><div><strong>Coastal Holdings</strong><span>Settlement date confirmed</span></div><span class="chip brand">Answered</span></div>
+                  <div class="portal-status"><div><strong>Smith v Hargrove</strong><span>Annexures requested</span></div><span class="chip watch">Waiting</span></div>
+                </div>
+              </div>
+            </div>
+            <div class="panel">
+              <div class="panel-head">
+                <h2>Assurance events</h2>
+                <span class="chip good">Live</span>
+              </div>
+              <div class="panel-body">
+                <div class="audit-list">
+                  <div class="audit-line"><span class="audit-time">12:14</span><div class="audit-copy"><strong>Escalation created</strong><span>New opposing party detected and routed to partner queue.</span></div><span class="chip watch">Review</span></div>
+                  <div class="audit-line"><span class="audit-time">10:02</span><div class="audit-copy"><strong>PII redaction applied</strong><span>Three trust ledger references tokenised before inference.</span></div><span class="chip good">Done</span></div>
+                  <div class="audit-line"><span class="audit-time">09:48</span><div class="audit-copy"><strong>Classification complete</strong><span>Pleadings label selected with 98.4% confidence.</span></div><span class="chip brand">Logged</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="screen" id="queue">
+          <div class="screen-head">
+            <div>
+              <div class="eyebrow">Queue</div>
+              <h1>Unified inbound traffic across email, portal, forms, and storage.</h1>
+            </div>
+            <div class="head-actions">
+              <button class="button">Save view</button>
+              <button class="button primary">Bulk review</button>
+            </div>
+          </div>
+          <div class="wide-grid">
+            <div class="panel">
+              <div class="panel-head">
+                <h2>All inbound items</h2>
+                <span class="chip">47 visible</span>
+              </div>
+              <div class="panel-body">
+                <div class="filter-strip">
+                  <button class="button active">All channels</button>
+                  <button class="button">Inbox</button>
+                  <button class="button">Portal</button>
+                  <button class="button">Drive</button>
+                  <button class="button">Forms</button>
+                </div>
+                <table class="queue-table">
+                  <thead>
+                    <tr>
+                      <th>Inbound item</th>
+                      <th>Channel</th>
+                      <th>Engagement</th>
+                      <th>Confidence</th>
+                      <th>State</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr class="selected">
+                      <td class="name">Statement of claim from Hargrove Holdings</td>
+                      <td>Email</td>
+                      <td>ACL-1042</td>
+                      <td>98.4%</td>
+                      <td><span class="chip watch">Partner review</span></td>
+                    </tr>
+                    <tr>
+                      <td class="name">Signed engagement letter for Brennan Estate</td>
+                      <td>Portal</td>
+                      <td>ACL-1044</td>
+                      <td>99.1%</td>
+                      <td><span class="chip good">Auto-filed</span></td>
+                    </tr>
+                    <tr>
+                      <td class="name">Conveyancing settlement status question</td>
+                      <td>Shared inbox</td>
+                      <td>ACL-1051</td>
+                      <td>94.8%</td>
+                      <td><span class="chip brand">Draft ready</span></td>
+                    </tr>
+                    <tr>
+                      <td class="name">Trust ledger reconciliation extract</td>
+                      <td>Drive</td>
+                      <td>ACL-1027</td>
+                      <td>100%</td>
+                      <td><span class="chip good">Redacted</span></td>
+                    </tr>
+                    <tr>
+                      <td class="name">Counsel brief with incomplete annexures</td>
+                      <td>Email</td>
+                      <td>ACL-1042</td>
+                      <td>87.4%</td>
+                      <td><span class="chip fail">Below threshold</span></td>
+                    </tr>
+                    <tr>
+                      <td class="name">New client intake form for migration review</td>
+                      <td>Form</td>
+                      <td>New</td>
+                      <td>91.8%</td>
+                      <td><span class="chip watch">Needs check</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <aside class="decision-stack">
+              <div class="decision-card">
+                <h3>Queue health</h3>
+                <div class="decision-row"><span>Oldest waiting</span><strong>3h 18m</strong></div>
+                <div class="decision-row"><span>Auto-file eligible</span><strong>21</strong></div>
+                <div class="decision-row"><span>Draft backlog</span><strong>12</strong></div>
+                <div class="decision-row"><span>Blocked</span><strong>5</strong></div>
+              </div>
+              <div class="decision-card">
+                <h3>Channel mix</h3>
+                <div class="decision-row"><span>M365 inbox</span><strong>58%</strong></div>
+                <div class="decision-row"><span>Client portal</span><strong>24%</strong></div>
+                <div class="decision-row"><span>Drive</span><strong>13%</strong></div>
+                <div class="decision-row"><span>Forms</span><strong>5%</strong></div>
+              </div>
+            </aside>
+          </div>
+        </section>
+
+        <section class="screen" id="review">
+          <div class="screen-head">
+            <div>
+              <div class="eyebrow">Review workspace</div>
+              <h1>Original evidence, extracted facts, and generated draft in one place.</h1>
+            </div>
+            <div class="head-actions">
+              <span class="chip watch">Partner gate</span>
+              <button class="button primary">Approve and send</button>
+            </div>
+          </div>
+          <div class="review-focus">
+            <div class="document-preview">
+              <div class="doc-page">
+                <div class="doc-title">Email thread - Jordan Smith</div>
+                <div class="doc-line long"></div>
+                <div class="doc-line mid"></div>
+                <div class="doc-line long"></div>
+                <div class="doc-line redacted"></div>
+                <div class="doc-line short"></div>
+                <div class="doc-line long"></div>
+                <div class="doc-line mid"></div>
+                <div class="field-grid">
+                  <div class="field"><span>Sender</span><strong>Jordan Smith</strong></div>
+                  <div class="field"><span>Received</span><strong>12:14 today</strong></div>
+                  <div class="field"><span>Attachment</span><strong>Claim.pdf</strong></div>
+                  <div class="field"><span>Boundary</span><strong>In-tenant</strong></div>
+                </div>
+              </div>
+            </div>
+            <div class="draft-preview">
+              <div class="draft-head">
+                <h3>Generated response</h3>
+                <span class="chip brand">Draft v3</span>
+              </div>
+              <div class="draft-copy">
+                <p>Hi Jordan, thanks for sending the statement of claim. We have matched it to Smith v Hargrove and queued it for partner review because a new opposing party appears in the document.</p>
+                <p>Please send the missing annexures listed on page 14 when you have them. Once received, we will confirm the filing timeline and update the matter status in your portal.</p>
+                <p class="muted">Evidence anchors: email body, Claim.pdf pp. 1-2, Claim.pdf p. 14, LEAP matter 88421.</p>
+              </div>
+              <div class="draft-actions">
+                <button class="button primary">Approve</button>
+                <button class="button">Edit draft</button>
+                <button class="button">Add note</button>
+                <button class="button danger">Reject</button>
+              </div>
+            </div>
+          </div>
+          <div class="bottom-grid">
+            <div class="panel">
+              <div class="panel-head">
+                <h2>Extracted metadata</h2>
+                <span class="chip good">4 sources</span>
+              </div>
+              <div class="panel-body">
+                <div class="field-grid">
+                  <div class="field"><span>Matter</span><strong>ACL-1042 - Smith v Hargrove</strong></div>
+                  <div class="field"><span>Document class</span><strong>Pleadings - statement of claim</strong></div>
+                  <div class="field"><span>Completeness</span><strong>Missing annexures</strong></div>
+                  <div class="field"><span>Action permission</span><strong>Draft only, no autonomous send</strong></div>
+                </div>
+              </div>
+            </div>
+            <div class="panel">
+              <div class="panel-head">
+                <h2>Feedback capture</h2>
+                <span class="chip">Learning signal</span>
+              </div>
+              <div class="panel-body">
+                <div class="toast-shelf">
+                  <div class="toast good">Classification confirmed by M. Tran.</div>
+                  <div class="toast watch">Escalation rule fired because a new opposing party was found.</div>
+                  <div class="toast">Tone profile: concise, formal, no legal advice in portal replies.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="screen" id="portal">
+          <div class="screen-head">
+            <div>
+              <div class="eyebrow">Client-facing portal</div>
+              <h1>A branded intake and status surface that feels owned by the SMB.</h1>
+            </div>
+            <div class="head-actions">
+              <span class="chip brand">Acme Legal theme</span>
+              <button class="button primary">Preview secure link</button>
+            </div>
+          </div>
+          <div class="portal-screen-grid">
+            <div class="client-page">
+              <div class="client-hero">
+                <div class="portal-nav">
+                  <div class="client-lockup"><span class="tenant-mark">AL</span> Acme Legal</div>
+                  <div class="portal-nav-links"><span>Upload</span><span>Status</span><span>Messages</span><span>Privacy</span></div>
+                </div>
+                <h2>Secure document intake for your matter.</h2>
+                <p>Upload files, answer follow-up questions, and track what the Acme Legal team is reviewing.</p>
+              </div>
+              <div class="client-main">
+                <div class="portal-card">
+                  <h3>Upload documents</h3>
+                  <div class="upload-zone">
+                    <div>
+                      <strong>Drop files here</strong>
+                      <span>Accepted formats: PDF, DOCX, JPG, PNG. Files are checked, logged, and linked to your matter.</span>
+                    </div>
+                  </div>
+                  <div class="file-list">
+                    <span class="file-pill">passport-scan.pdf</span>
+                    <span class="file-pill">signed-letter.pdf</span>
+                    <span class="file-pill">bank-statement.pdf</span>
+                  </div>
+                </div>
+                <div class="portal-card">
+                  <h3>Matter status</h3>
+                  <div class="status-steps">
+                    <div class="step done"><span class="step-dot">1</span><div><strong>Received</strong><span>Documents uploaded and virus checked.</span></div></div>
+                    <div class="step done"><span class="step-dot">2</span><div><strong>Classified</strong><span>Matched to Brennan Estate.</span></div></div>
+                    <div class="step current"><span class="step-dot">3</span><div><strong>In review</strong><span>A staff member is checking the extracted details.</span></div></div>
+                    <div class="step"><span class="step-dot">4</span><div><strong>Next update</strong><span>Expected by 4:30 PM today.</span></div></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <aside class="decision-stack">
+              <div class="decision-card">
+                <h3>Portal controls</h3>
+                <div class="decision-row"><span>Domain</span><strong>intake.acmelegal.com.au</strong></div>
+                <div class="decision-row"><span>Return access</span><strong>Secure link</strong></div>
+                <div class="decision-row"><span>Uploads</span><strong>40 MB</strong></div>
+                <div class="decision-row"><span>Status copy</span><strong>Plain English</strong></div>
+              </div>
+              <div class="decision-card">
+                <h3>Client reassurance</h3>
+                <div class="decision-row"><span>Training use</span><strong>Never</strong></div>
+                <div class="decision-row"><span>Data location</span><strong>Australia</strong></div>
+                <div class="decision-row"><span>Access</span><strong>Acme team only</strong></div>
+                <div class="decision-row"><span>Receipt</span><strong>Instant</strong></div>
+              </div>
+            </aside>
+          </div>
+        </section>
+
+        <section class="screen" id="audit">
+          <div class="screen-head">
+            <div>
+              <div class="eyebrow">Audit and privacy</div>
+              <h1>Visible proof for every inference, redaction, review, and write-back.</h1>
+            </div>
+            <div class="head-actions">
+              <button class="button">Export pack</button>
+              <button class="button primary">Open audit item</button>
+            </div>
+          </div>
+          <div class="assurance-grid">
+            <div class="assurance-tile"><strong>100%</strong><span>Reviewed events have complete evidence links and actor attribution.</span></div>
+            <div class="assurance-tile"><strong>0</strong><span>Offshore inference calls in the selected period.</span></div>
+            <div class="assurance-tile"><strong>3,418</strong><span>Identifiers tokenised before generation this month.</span></div>
+          </div>
+          <div class="wide-grid">
+            <div class="panel">
+              <div class="panel-head">
+                <h2>Activity trail</h2>
+                <span class="chip good">Complete</span>
+              </div>
+              <div class="panel-body">
+                <div class="audit-list">
+                  <div class="audit-line"><span class="audit-time">12:14</span><div class="audit-copy"><strong>Partner escalation</strong><span>M. Tran accepted suggested escalation for ACL-1042.</span></div><span class="chip watch">Human</span></div>
+                  <div class="audit-line"><span class="audit-time">12:13</span><div class="audit-copy"><strong>Draft generated</strong><span>AU-hosted frontier model, 3 tokens restored inside tenant.</span></div><span class="chip brand">Inference</span></div>
+                  <div class="audit-line"><span class="audit-time">12:12</span><div class="audit-copy"><strong>PII redaction</strong><span>Names, phone number, and trust reference tokenised.</span></div><span class="chip good">Guardrail</span></div>
+                  <div class="audit-line"><span class="audit-time">12:11</span><div class="audit-copy"><strong>Classifier result</strong><span>Pleadings label chosen with 98.4% confidence.</span></div><span class="chip info">Model</span></div>
+                  <div class="audit-line"><span class="audit-time">12:10</span><div class="audit-copy"><strong>Ingest event</strong><span>Email and attachment pulled from shared M365 inbox.</span></div><span class="chip">Adapter</span></div>
+                </div>
+              </div>
+            </div>
+            <aside class="decision-stack">
+              <div class="decision-card">
+                <h3>Compliance posture</h3>
+                <div class="decision-row"><span>Mode</span><strong>Restricted</strong></div>
+                <div class="decision-row"><span>Inference region</span><strong>Australia</strong></div>
+                <div class="decision-row"><span>Adapters</span><strong>In-tenant</strong></div>
+                <div class="decision-row"><span>Autonomous reply</span><strong>Off by default</strong></div>
+              </div>
+              <div class="decision-card">
+                <h3>Audit pack scope</h3>
+                <div class="decision-row"><span>Date range</span><strong>May 2026</strong></div>
+                <div class="decision-row"><span>Events</span><strong>8,412</strong></div>
+                <div class="decision-row"><span>Exceptions</span><strong>0 open</strong></div>
+                <div class="decision-row"><span>Format</span><strong>Read-only export</strong></div>
+              </div>
+            </aside>
+          </div>
+        </section>
+
+        <section class="screen" id="branding">
+          <div class="screen-head">
+            <div>
+              <div class="eyebrow">Branding and deployment</div>
+              <h1>White-label controls for each SMB without changing the product shell.</h1>
+            </div>
+            <div class="head-actions">
+              <button class="button">Reset</button>
+              <button class="button primary">Publish theme</button>
+            </div>
+          </div>
+          <div class="settings-grid">
+            <div class="panel">
+              <div class="panel-head">
+                <h2>Theme settings</h2>
+                <span class="chip brand">Acme Legal</span>
+              </div>
+              <div class="panel-body">
+                <div class="settings-row">
+                  <div><strong>Identity</strong><span>Client logo, product label, and portal domain.</span></div>
+                  <div class="theme-swatches">
+                    <span class="theme-swatch"><span class="swatch-dot"></span> Acme navy</span>
+                    <span class="theme-swatch"><span class="swatch-dot black"></span> Reach black</span>
+                  </div>
+                </div>
+                <div class="settings-row">
+                  <div><strong>Accent system</strong><span>Brand color drives selected states, client hero, and primary actions.</span></div>
+                  <div class="theme-swatches">
+                    <span class="theme-swatch"><span class="swatch-dot green"></span> Approval</span>
+                    <span class="theme-swatch"><span class="swatch-dot gold"></span> Review</span>
+                    <span class="theme-swatch"><span class="swatch-dot blue"></span> Info</span>
+                  </div>
+                </div>
+                <div class="settings-row">
+                  <div><strong>Surface density</strong><span>Queue and review screens tuned for repeated operational use.</span></div>
+                  <div class="filter-strip">
+                    <button class="button">Comfortable</button>
+                    <button class="button active">Compact</button>
+                    <button class="button">Dense</button>
+                  </div>
+                </div>
+                <div class="settings-row">
+                  <div><strong>Privacy defaults</strong><span>Deployment-level posture is always visible in staff surfaces.</span></div>
+                  <div class="filter-strip">
+                    <button class="button">Standard</button>
+                    <button class="button active">Restricted</button>
+                    <button class="button">Air-gapped</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="brand-preview">
+              <div class="portal-snapshot">
+                <div class="portal-top">
+                  <strong>Acme Legal</strong>
+                  <span>Client portal</span>
+                </div>
+                <div class="portal-content">
+                  <div class="upload-zone">
+                    <div>
+                      <strong>Secure upload</strong>
+                      <span>Signed documents and supporting evidence.</span>
+                    </div>
+                  </div>
+                  <div class="portal-list">
+                    <div class="portal-status"><div><strong>Matter status</strong><span>In review</span></div><span class="chip good">Live</span></div>
+                    <div class="portal-status"><div><strong>Privacy</strong><span>AU-hosted inference</span></div><span class="chip brand">Visible</span></div>
+                    <div class="portal-status"><div><strong>Brand</strong><span>Navy accent applied</span></div><span class="chip">v1</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    const navButtons = document.querySelectorAll("[data-target]");
+    const screens = document.querySelectorAll(".screen");
+    const chromeUrl = document.getElementById("chrome-url");
+
+    function activateScreen(target) {
+      screens.forEach((screen) => {
+        screen.classList.toggle("active", screen.id === target);
+      });
+
+      navButtons.forEach((button) => {
+        const isActive = button.dataset.target === target;
+        button.classList.toggle("active", isActive);
+        button.setAttribute("aria-current", isActive ? "page" : "false");
+      });
+
+      chromeUrl.textContent = `stack.acmelegal.com.au/${target}`;
+    }
+
+    navButtons.forEach((button) => {
+      button.addEventListener("click", () => activateScreen(button.dataset.target));
+    });
+
+    if (new URLSearchParams(window.location.search).has("embed")) {
+      document.body.classList.add("embed");
+    }
+  </script>
+</body>
+</html>

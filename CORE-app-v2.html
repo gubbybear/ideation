@@ -1,0 +1,4578 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ReachCore v2 | Product Walkthrough</title>
+  <style>
+    :root {
+      --cream: #ffffff;
+      --cream-2: #f5f5f5;
+      --cream-3: #fafafa;
+      --ink: #0a0a0a;
+      --muted: #6b6b6b;
+      --green-900: #0a0a0a;
+      --green-800: #141414;
+      --green-700: #1c1c1c;
+      --green-600: #15803d;
+      --green-500: #22c55e;
+      --green-100: #ecfdf5;
+      --line: #ececec;
+      --line-strong: #d4d4d4;
+      --gold: #c08e3a;
+      --amber-bg: #fff7ed;
+      --amber-line: #fed7aa;
+      --red-600: #dc2626;
+      --white: #ffffff;
+      --shadow: 0 22px 70px rgba(0, 0, 0, 0.08);
+      --shadow-app: 0 24px 60px rgba(0, 0, 0, 0.10);
+      --radius: 26px;
+      --radius-small: 8px;
+      --control-safe-area: 132px;
+      --mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      background: var(--cream);
+      color: var(--ink);
+      font-family: var(--sans);
+    }
+
+    body { overflow: hidden; }
+    button { font: inherit; }
+
+    .deck {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      padding: 24px;
+      background:
+        linear-gradient(135deg, rgba(56, 134, 72, 0.08), transparent 28%),
+        linear-gradient(315deg, rgba(168, 122, 49, 0.08), transparent 30%),
+        var(--cream);
+    }
+
+    .topbar {
+      position: fixed;
+      top: 24px;
+      left: 36px;
+      right: 36px;
+      z-index: 40;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      pointer-events: none;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--green-900);
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      pointer-events: auto;
+    }
+
+    .mark {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      color: var(--cream-3);
+      background: var(--green-800);
+      font-weight: 900;
+    }
+
+    .section-nav {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px;
+      border: 1px solid rgba(23, 55, 27, 0.14);
+      border-radius: 999px;
+      background: rgba(248, 251, 247, 0.72);
+      box-shadow: 0 8px 30px rgba(9, 30, 12, 0.08);
+      backdrop-filter: blur(10px);
+      pointer-events: auto;
+    }
+
+    .section-nav button,
+    .menu-toggle,
+    .arrow,
+    .menu-close {
+      border: 0;
+      cursor: pointer;
+      color: var(--green-900);
+      background: transparent;
+    }
+
+    .section-nav button {
+      min-width: 72px;
+      min-height: 34px;
+      padding: 0 14px;
+      border-radius: 999px;
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 750;
+    }
+
+    .section-nav button.active {
+      color: var(--cream-3);
+      background: var(--green-800);
+    }
+
+    .menu-toggle {
+      min-width: 92px;
+      min-height: 42px;
+      padding: 0 18px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border: 1px solid rgba(23, 55, 27, 0.16);
+      background: rgba(248, 251, 247, 0.82);
+      box-shadow: 0 8px 30px rgba(9, 30, 12, 0.08);
+      font-weight: 800;
+      pointer-events: auto;
+    }
+
+    .menu-lines { width: 18px; display: grid; gap: 4px; }
+    .menu-lines span { height: 2px; border-radius: 999px; background: var(--green-800); }
+
+    .slides { height: 100%; width: 100%; }
+
+    .slide {
+      display: none;
+      height: calc(100vh - 48px);
+      width: 100%;
+      overflow: auto;
+      border: 1px solid rgba(23, 55, 27, 0.16);
+      border-radius: var(--radius);
+      background: rgba(248, 251, 247, 0.78);
+      box-shadow: var(--shadow);
+      padding: 96px 72px 132px;
+    }
+
+    .slide.active { display: flex; }
+    .slide.center { align-items: center; justify-content: center; text-align: center; }
+    .slide.split { gap: 64px; align-items: stretch; }
+
+    .slide.dark-left {
+      padding: 0;
+      background: var(--cream-3);
+      overflow: hidden;
+    }
+
+    .dark-panel {
+      flex: 0 0 39%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-width: 340px;
+      padding: 92px;
+      color: var(--cream-3);
+      background: var(--green-900);
+    }
+
+    .dark-panel .eyebrow { color: #9bd39f; }
+    .dark-panel .lead { color: #e6f1e5; }
+
+    .light-panel {
+      flex: 1;
+      padding: 96px 72px 132px;
+      overflow: auto;
+    }
+
+    .content { width: min(1240px, 100%); margin: 0 auto; }
+    .content.wide { width: min(1420px, 100%); }
+
+    .slide:not(.center):not(.dark-left) > .content::after,
+    .light-panel::after {
+      content: "";
+      display: block;
+      height: var(--control-safe-area);
+    }
+
+    .eyebrow {
+      margin: 0 0 18px;
+      color: var(--green-600);
+      font-size: 0.92rem;
+      font-weight: 850;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    h1, h2, h3, h4, p { margin-top: 0; }
+
+    h1 { margin-bottom: 24px; font-size: 5.2rem; line-height: 0.98; }
+    h2 { margin-bottom: 18px; font-size: 3.1rem; line-height: 1.04; }
+    h3 { margin-bottom: 10px; font-size: 1.3rem; line-height: 1.2; }
+    h4 { margin-bottom: 8px; font-size: 1rem; line-height: 1.2; font-weight: 800; }
+
+    .lead {
+      max-width: 1080px;
+      margin: 0 auto;
+      color: var(--muted);
+      font-size: 1.4rem;
+      line-height: 1.45;
+    }
+
+    .slide:not(.center) .lead { margin-left: 0; }
+    .lede-tight { max-width: 880px; }
+
+    .small { color: var(--muted); font-size: 0.95rem; line-height: 1.5; }
+
+    .grid { display: grid; gap: 20px; }
+    .grid.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .grid.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .grid.four { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+    .tile {
+      padding: 24px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-small);
+      background: rgba(255, 255, 255, 0.58);
+    }
+
+    .tile.dark { color: var(--cream-3); border-color: transparent; background: var(--green-900); }
+    .tile h3 { display: flex; align-items: center; gap: 10px; }
+    .tile p, .tile li { color: var(--muted); font-size: 1.03rem; line-height: 1.55; }
+    .tile.dark p, .tile.dark li { color: #dce8dc; }
+
+    .number {
+      flex: 0 0 auto;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      display: inline-grid;
+      place-items: center;
+      color: var(--cream-3);
+      background: var(--green-600);
+      font-family: var(--mono);
+      font-weight: 900;
+      font-size: 0.9rem;
+    }
+
+    .agenda-list { display: grid; gap: 22px; margin: 0; padding: 0; list-style: none; }
+    .agenda-list li {
+      display: grid;
+      grid-template-columns: 64px 1fr;
+      gap: 26px;
+      align-items: center;
+      padding-bottom: 22px;
+      border-bottom: 1px solid var(--line);
+    }
+    .agenda-list li:last-child { border-bottom: 0; padding-bottom: 0; }
+    .agenda-num { color: var(--green-600); font-family: var(--mono); font-size: 1.6rem; font-weight: 900; }
+    .agenda-title { display: block; font-size: 1.4rem; font-weight: 900; }
+    .agenda-copy { display: block; margin-top: 4px; color: var(--muted); font-size: 0.98rem; line-height: 1.4; }
+
+    .thesis-line {
+      max-width: 1080px;
+      margin: 28px auto 0;
+      padding-top: 22px;
+      border-top: 1px solid var(--line);
+      color: var(--green-900);
+      font-size: 1.18rem;
+      line-height: 1.55;
+      font-weight: 750;
+    }
+
+    .quote-block {
+      margin-top: 26px;
+      padding: 24px;
+      border-radius: var(--radius-small);
+      background: var(--green-900);
+      color: var(--cream-3);
+    }
+    .quote-block p {
+      margin: 0;
+      color: #eef7ee;
+      font-size: 1.25rem;
+      line-height: 1.45;
+      font-weight: 750;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 26px;
+      padding: 3px 10px;
+      border: 1px solid rgba(56, 134, 72, 0.24);
+      border-radius: 999px;
+      color: var(--green-900);
+      background: var(--cream-2);
+      font-size: 0.74rem;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .check-list { margin: 14px 0 0; padding: 0; list-style: none; }
+    .check-list li {
+      position: relative;
+      padding: 0 0 8px 22px;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+    .check-list li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0.65em;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--green-600);
+    }
+
+    /* ===========================================================
+       Screen mockup layout
+       =========================================================== */
+
+    .screen-slide {
+      display: none;
+      height: calc(100vh - 48px);
+      width: 100%;
+      overflow: auto;
+      border: 1px solid rgba(23, 55, 27, 0.16);
+      border-radius: var(--radius);
+      background: rgba(248, 251, 247, 0.78);
+      box-shadow: var(--shadow);
+      padding: 84px 56px 132px;
+      flex-direction: column;
+    }
+    .screen-slide.active { display: flex; }
+
+    .screen-head { width: 100%; max-width: 1480px; margin: 0 auto 22px; }
+    .screen-head .eyebrow { margin-bottom: 10px; }
+    .screen-head h2 { font-size: 2.4rem; margin-bottom: 8px; }
+    .screen-head p { margin: 0; color: var(--muted); font-size: 1.1rem; line-height: 1.45; max-width: 980px; }
+
+    .screen-body {
+      width: 100%;
+      max-width: 1480px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: minmax(0, 1.45fr) 200px minmax(0, 0.9fr);
+      gap: 22px;
+      align-items: start;
+    }
+
+    .screen-body::after {
+      content: "";
+      grid-column: 1 / -1;
+      display: block;
+      height: 24px;
+    }
+
+    .annotations {
+      display: grid;
+      gap: 14px;
+    }
+
+    .annotation {
+      display: grid;
+      grid-template-columns: 30px 1fr;
+      gap: 12px;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-small);
+      background: var(--white);
+    }
+
+    .annotation .marker {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      color: var(--cream-3);
+      background: var(--green-700);
+      font-family: var(--mono);
+      font-weight: 900;
+      font-size: 0.78rem;
+    }
+
+    .annotation h4 { margin: 0 0 4px; }
+    .annotation p { margin: 0; color: var(--muted); font-size: 0.92rem; line-height: 1.4; }
+
+    /* ===========================================================
+       App frame mockup
+       =========================================================== */
+
+    .app-frame {
+      border-radius: 16px;
+      overflow: hidden;
+      background: var(--white);
+      border: 1px solid var(--line-strong);
+      box-shadow: var(--shadow-app);
+    }
+
+    .app-chrome {
+      height: 32px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0 14px;
+      background: #e8efe7;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .app-chrome .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #c4d2c1;
+    }
+    .app-chrome .dot:nth-child(1) { background: #d28a8a; }
+    .app-chrome .dot:nth-child(2) { background: #d2c08a; }
+    .app-chrome .dot:nth-child(3) { background: #9ec79e; }
+
+    .app-chrome .url {
+      margin-left: 14px;
+      padding: 3px 10px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.85);
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 0.74rem;
+    }
+
+    .app-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 12px 18px;
+      background: var(--green-900);
+      color: var(--cream-3);
+    }
+
+    .app-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      font-size: 0.92rem;
+      letter-spacing: 0.02em;
+    }
+
+    .app-brand .mark {
+      width: 24px;
+      height: 24px;
+      font-size: 0.7rem;
+      background: var(--green-600);
+    }
+
+    .app-context {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .app-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(248, 251, 247, 0.12);
+      color: var(--cream-3);
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+
+    .app-chip .dot-sm {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--green-500);
+    }
+
+    .app-user {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.8rem;
+    }
+
+    .app-user .avatar {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: var(--gold);
+      color: var(--cream-3);
+      font-weight: 900;
+      font-size: 0.72rem;
+    }
+
+    .app-shell {
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      min-height: 480px;
+    }
+
+    .app-side {
+      padding: 16px 12px;
+      background: #0c2010;
+      color: #cfdccf;
+    }
+
+    .side-section { margin-bottom: 14px; }
+    .side-section:last-child { margin-bottom: 0; }
+
+    .side-label {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      color: #6f8f72;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      padding: 6px 10px 4px;
+    }
+
+    .side-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 7px 10px;
+      border-radius: 6px;
+      color: #cfdccf;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: default;
+    }
+
+    .side-item .badge {
+      font-family: var(--mono);
+      font-size: 0.66rem;
+      color: #9bd39f;
+    }
+
+    .side-item.active {
+      background: rgba(78, 162, 96, 0.22);
+      color: var(--cream-3);
+      box-shadow: inset 3px 0 0 var(--green-500);
+    }
+
+    .app-main {
+      padding: 22px 24px;
+      background: var(--cream-3);
+      overflow: hidden;
+    }
+
+    .main-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+
+    .main-head h3 {
+      margin: 0;
+      font-size: 1.15rem;
+      color: var(--green-900);
+    }
+
+    .main-head .crumb {
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-family: var(--mono);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--green-700);
+      color: var(--cream-3);
+      background: var(--green-700);
+      font-size: 0.78rem;
+      font-weight: 800;
+      cursor: default;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .btn.ghost {
+      color: var(--green-800);
+      background: transparent;
+    }
+    .btn.amber {
+      color: var(--green-900);
+      background: #f1d883;
+      border-color: #d3b760;
+    }
+
+    .panel {
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--white);
+    }
+    .panel + .panel { margin-top: 12px; }
+
+    .panel-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .panel-head h4 {
+      margin: 0;
+      font-size: 0.92rem;
+      font-weight: 800;
+      color: var(--green-900);
+    }
+
+    .row { display: flex; align-items: center; gap: 10px; }
+    .row.spread { justify-content: space-between; }
+    .row.wrap { flex-wrap: wrap; }
+
+    .field {
+      display: grid;
+      gap: 4px;
+      font-size: 0.82rem;
+    }
+    .field label {
+      color: var(--muted);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 800;
+    }
+    .field .input {
+      padding: 8px 10px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--cream-3);
+      color: var(--ink);
+      font-size: 0.85rem;
+    }
+    .field .input.full { background: var(--white); }
+
+    .check {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 8px;
+      border-radius: 6px;
+      background: var(--cream-2);
+      font-size: 0.8rem;
+      color: var(--green-900);
+      font-weight: 700;
+    }
+    .check .box {
+      width: 14px;
+      height: 14px;
+      border-radius: 3px;
+      border: 1px solid var(--line-strong);
+      background: var(--white);
+    }
+    .check.on .box {
+      background: var(--green-600);
+      border-color: var(--green-600);
+      position: relative;
+    }
+    .check.on .box::after {
+      content: "";
+      position: absolute;
+      inset: 2px;
+      border-radius: 1px;
+      background:
+        linear-gradient(45deg, transparent 45%, var(--cream-3) 45% 55%, transparent 55%);
+    }
+
+    .badge-soft {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: var(--cream-2);
+      color: var(--green-900);
+      font-size: 0.72rem;
+      font-weight: 800;
+    }
+    .badge-soft.green { background: rgba(56, 134, 72, 0.16); color: var(--green-800); }
+    .badge-soft.amber { background: var(--amber-bg); color: #6b4d10; }
+    .badge-soft.red { background: #f6dcd8; color: var(--red-600); }
+    .badge-soft.dark { background: var(--green-900); color: var(--cream-3); }
+
+    .meter {
+      position: relative;
+      height: 6px;
+      border-radius: 999px;
+      background: var(--cream-2);
+      overflow: hidden;
+    }
+    .meter > span {
+      position: absolute;
+      inset: 0;
+      width: var(--w, 50%);
+      background: var(--green-600);
+      border-radius: 999px;
+    }
+
+    .stat {
+      padding: 10px 12px;
+      border-radius: 8px;
+      background: var(--cream-2);
+    }
+    .stat strong {
+      display: block;
+      font-family: var(--mono);
+      font-size: 1.15rem;
+      color: var(--green-800);
+      line-height: 1;
+    }
+    .stat span {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 800;
+    }
+
+    .price-card {
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--white);
+    }
+    .price-card.featured {
+      border: 2px solid var(--green-600);
+      background: var(--cream-3);
+    }
+    .price-card .name {
+      font-size: 0.78rem;
+      color: var(--green-700);
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .price-card .price {
+      margin-top: 6px;
+      font-family: var(--mono);
+      font-weight: 900;
+      color: var(--green-900);
+      font-size: 1.35rem;
+    }
+    .price-card .price small {
+      font-family: var(--sans);
+      font-weight: 700;
+      color: var(--muted);
+      font-size: 0.7rem;
+      margin-left: 2px;
+    }
+    .price-card .meta {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 0.78rem;
+      line-height: 1.35;
+    }
+
+    .mini-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+    .mini-table th, .mini-table td {
+      padding: 8px 10px;
+      text-align: left;
+      border-bottom: 1px solid var(--line);
+      vertical-align: middle;
+    }
+    .mini-table th {
+      color: var(--muted);
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      background: var(--cream-2);
+    }
+    .mini-table tr:last-child td { border-bottom: 0; }
+    .mini-table .money { font-family: var(--mono); color: var(--green-800); font-weight: 800; }
+
+    .doc-preview {
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--white);
+      font-family: var(--sans);
+    }
+
+    .doc-preview .doc-h {
+      font-size: 0.7rem;
+      color: var(--muted);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+    .doc-preview .doc-title { font-size: 1.05rem; font-weight: 900; color: var(--green-900); margin-bottom: 8px; }
+    .doc-preview .doc-section {
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px dashed var(--line);
+    }
+    .doc-preview .doc-section h5 {
+      margin: 0 0 4px;
+      font-size: 0.78rem;
+      color: var(--green-800);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .doc-preview .doc-section p {
+      margin: 0;
+      font-size: 0.82rem;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    .kanban {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .kanban-col h5 {
+      margin: 0 0 8px;
+      font-size: 0.7rem;
+      color: var(--muted);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-weight: 900;
+    }
+    .kanban-card {
+      padding: 8px 10px;
+      margin-bottom: 6px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--white);
+      font-size: 0.78rem;
+    }
+    .kanban-card.done { background: rgba(56, 134, 72, 0.08); border-color: rgba(56, 134, 72, 0.4); }
+    .kanban-card.gate { background: var(--amber-bg); border-color: var(--amber-line); }
+    .kanban-card .small {
+      font-size: 0.7rem;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .ontology {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 6px 12px;
+      align-items: center;
+      font-size: 0.82rem;
+    }
+    .ontology .o-cell {
+      padding: 7px 10px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--white);
+    }
+    .ontology .o-cell.std { background: var(--cream-2); }
+    .ontology .arrow-mini {
+      color: var(--green-600);
+      font-weight: 900;
+      text-align: center;
+    }
+
+    .rule-row {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 12px;
+      padding: 8px 10px;
+      align-items: center;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--white);
+      font-size: 0.82rem;
+      margin-bottom: 6px;
+    }
+
+    .checklist-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--line);
+      font-size: 0.85rem;
+    }
+    .checklist-row:last-child { border-bottom: 0; }
+    .checklist-row .tick {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      color: var(--cream-3);
+      background: var(--green-600);
+      font-size: 0.7rem;
+      font-weight: 900;
+    }
+    .checklist-row .tick.empty { background: var(--cream-2); color: var(--muted); border: 1px solid var(--line-strong); }
+    .checklist-row .tick.gate { background: var(--gold); }
+
+    .chart-bars {
+      display: grid;
+      grid-template-columns: repeat(14, 1fr);
+      gap: 4px;
+      align-items: end;
+      height: 70px;
+    }
+    .chart-bars .bar {
+      background: var(--green-600);
+      border-radius: 2px 2px 0 0;
+    }
+
+    .chart-line {
+      position: relative;
+      height: 70px;
+      padding: 4px 0;
+    }
+    .chart-line svg { width: 100%; height: 100%; display: block; }
+
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .activity {
+      display: grid;
+      gap: 8px;
+      max-height: 180px;
+      overflow: hidden;
+    }
+    .activity .act {
+      display: grid;
+      grid-template-columns: 16px 1fr auto;
+      gap: 10px;
+      padding: 8px 10px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--white);
+      font-size: 0.78rem;
+    }
+    .activity .act .dot-sm {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--green-600);
+      margin-top: 6px;
+    }
+    .activity .act .ts {
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 0.72rem;
+    }
+
+    .toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.8rem;
+      color: var(--green-900);
+      font-weight: 700;
+    }
+    .toggle .switch {
+      width: 32px;
+      height: 18px;
+      border-radius: 999px;
+      background: var(--cream-2);
+      position: relative;
+      border: 1px solid var(--line-strong);
+    }
+    .toggle .switch::after {
+      content: "";
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--white);
+      position: absolute;
+      top: 1px;
+      left: 1px;
+      transition: left .15s ease;
+    }
+    .toggle.on .switch { background: var(--green-600); border-color: var(--green-600); }
+    .toggle.on .switch::after { left: 16px; }
+
+    /* Slider */
+    .slider-row {
+      display: grid;
+      grid-template-columns: 1fr 60px;
+      gap: 12px;
+      align-items: center;
+      font-size: 0.82rem;
+    }
+    .slider {
+      position: relative;
+      height: 6px;
+      border-radius: 999px;
+      background: var(--cream-2);
+    }
+    .slider .track {
+      position: absolute;
+      inset: 0;
+      width: var(--w, 60%);
+      background: var(--green-600);
+      border-radius: 999px;
+    }
+    .slider .knob {
+      position: absolute;
+      top: 50%;
+      left: var(--w, 60%);
+      transform: translate(-50%, -50%);
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--white);
+      border: 2px solid var(--green-700);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+    }
+
+    /* ===========================================================
+       Mobile / phone mockup
+       =========================================================== */
+
+    .phones-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 32px;
+      width: 100%;
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 4px 0 12px;
+      align-items: start;
+      justify-items: center;
+    }
+
+    .phone-stage { text-align: center; width: 100%; max-width: 280px; }
+
+    .phone-stage .stage-label {
+      margin: 0 0 6px;
+      font-size: 0.74rem;
+      color: var(--green-700);
+      font-weight: 900;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .phone-stage .stage-copy {
+      margin: 0 0 16px;
+      color: var(--muted);
+      font-size: 0.88rem;
+      line-height: 1.4;
+    }
+
+    .phone-frame {
+      width: 248px;
+      margin: 0 auto;
+      border: 10px solid #0c2010;
+      border-radius: 34px;
+      background: #0c2010;
+      box-shadow: 0 22px 50px rgba(9, 30, 12, 0.22);
+    }
+
+    .phone-screen {
+      background: var(--cream-3);
+      border-radius: 24px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      min-height: 460px;
+    }
+
+    .phone-status {
+      padding: 5px 12px;
+      background: var(--green-900);
+      color: var(--cream-3);
+      font-size: 0.6rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: var(--mono);
+    }
+
+    .phone-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 12px;
+      background: var(--green-900);
+      color: var(--cream-3);
+      font-size: 0.78rem;
+      font-weight: 800;
+    }
+
+    .phone-topbar .ham { width: 16px; display: grid; gap: 3px; }
+    .phone-topbar .ham span { height: 2px; background: var(--cream-3); border-radius: 999px; }
+
+    .phone-topbar .pavatar {
+      width: 22px; height: 22px; border-radius: 50%;
+      display: grid; place-items: center;
+      background: var(--gold); color: var(--cream-3);
+      font-size: 0.62rem; font-weight: 900;
+    }
+
+    .phone-body {
+      padding: 12px;
+      flex: 1;
+      background: var(--cream-3);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .phone-section {
+      font-size: 0.62rem;
+      color: var(--muted);
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin: 4px 0 -2px;
+    }
+
+    .phone-card {
+      padding: 10px;
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      font-size: 0.74rem;
+    }
+
+    .phone-card h6 {
+      margin: 0 0 6px;
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: var(--green-900);
+    }
+
+    .phone-card .small-q {
+      color: var(--muted);
+      font-size: 0.68rem;
+      line-height: 1.35;
+    }
+
+    .phone-stat {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+
+    .pstat {
+      background: var(--cream-2);
+      padding: 8px 10px;
+      border-radius: 6px;
+    }
+    .pstat strong {
+      display: block;
+      font-family: var(--mono);
+      color: var(--green-800);
+      font-size: 0.95rem;
+      line-height: 1;
+    }
+    .pstat span {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 0.58rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-weight: 800;
+    }
+
+    .phone-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 0;
+      border-bottom: 1px dashed var(--line);
+      font-size: 0.72rem;
+    }
+    .phone-row:last-child { border-bottom: 0; }
+
+    .phone-tick {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: var(--green-600);
+      color: var(--cream-3);
+      font-size: 0.56rem;
+      font-weight: 900;
+      flex-shrink: 0;
+    }
+    .phone-tick.gate { background: var(--gold); }
+    .phone-tick.empty {
+      background: var(--cream-2);
+      color: var(--muted);
+      border: 1px solid var(--line-strong);
+    }
+
+    .phone-button {
+      padding: 9px;
+      background: var(--green-700);
+      color: var(--cream-3);
+      border-radius: 6px;
+      text-align: center;
+      font-size: 0.72rem;
+      font-weight: 800;
+      margin-top: auto;
+    }
+
+    .phone-act {
+      display: flex;
+      gap: 6px;
+      align-items: flex-start;
+      padding: 6px 0;
+      border-bottom: 1px dashed var(--line);
+      font-size: 0.7rem;
+      color: var(--ink);
+    }
+    .phone-act:last-child { border-bottom: 0; }
+    .phone-act .pdot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--green-600);
+      margin-top: 5px;
+      flex-shrink: 0;
+    }
+    .phone-act .pdot.amber { background: var(--gold); }
+    .phone-act .pts {
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 0.6rem;
+    }
+
+    /* Compact phone variant injected next to each desktop screen */
+    .phone-mini {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .phone-mini-label {
+      font-size: 0.62rem;
+      color: var(--green-700);
+      font-weight: 900;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .phone-mini .phone-frame {
+      width: 188px;
+      border-width: 8px;
+      border-radius: 28px;
+    }
+    .phone-mini .phone-screen {
+      border-radius: 20px;
+      min-height: 360px;
+    }
+    .phone-mini .phone-status {
+      padding: 4px 10px;
+      font-size: 0.54rem;
+    }
+    .phone-mini .phone-topbar {
+      padding: 7px 10px;
+      font-size: 0.66rem;
+    }
+    .phone-mini .phone-topbar .pavatar {
+      width: 18px;
+      height: 18px;
+      font-size: 0.55rem;
+    }
+    .phone-mini .phone-body {
+      padding: 8px 10px;
+      gap: 6px;
+    }
+    .phone-mini .phone-section {
+      font-size: 0.56rem;
+    }
+    .phone-mini .pstat {
+      padding: 6px 8px;
+    }
+    .phone-mini .pstat strong {
+      font-size: 0.78rem;
+    }
+    .phone-mini .pstat span {
+      font-size: 0.5rem;
+    }
+    .phone-mini .phone-card {
+      padding: 7px 9px;
+      font-size: 0.62rem;
+    }
+    .phone-mini .phone-card h6 {
+      font-size: 0.62rem;
+      margin-bottom: 3px;
+    }
+    .phone-mini .phone-card .small-q {
+      font-size: 0.58rem;
+    }
+    .phone-mini .phone-row {
+      padding: 5px 0;
+      font-size: 0.6rem;
+      gap: 6px;
+    }
+    .phone-mini .phone-tick {
+      width: 12px;
+      height: 12px;
+      font-size: 0.48rem;
+    }
+    .phone-mini .phone-button {
+      padding: 7px;
+      font-size: 0.6rem;
+    }
+    .phone-mini .phone-act {
+      padding: 5px 0;
+      font-size: 0.58rem;
+    }
+    .phone-mini .phone-act .pts {
+      font-size: 0.5rem;
+    }
+    .phone-mini .phone-act .pdot {
+      width: 5px; height: 5px;
+      margin-top: 4px;
+    }
+
+    /* ===========================================================
+       Controls + menu (shared with reach deck)
+       =========================================================== */
+
+    .controls {
+      position: fixed;
+      right: 36px;
+      bottom: 30px;
+      z-index: 45;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .counter {
+      min-width: 88px;
+      min-height: 44px;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(23, 55, 27, 0.16);
+      border-radius: 999px;
+      color: var(--green-900);
+      background: rgba(248, 251, 247, 0.82);
+      box-shadow: 0 8px 30px rgba(9, 30, 12, 0.08);
+      font-family: var(--mono);
+      font-size: 0.86rem;
+      font-weight: 900;
+      backdrop-filter: blur(10px);
+    }
+
+    .arrow {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      color: var(--cream-3);
+      background: var(--green-900);
+      box-shadow: 0 8px 30px rgba(9, 30, 12, 0.16);
+      font-size: 1.3rem;
+      font-weight: 900;
+    }
+
+    .arrow:disabled { opacity: 0.35; cursor: default; }
+
+    .menu {
+      position: fixed;
+      inset: 0;
+      z-index: 80;
+      display: none;
+      padding: 28px;
+      background: rgba(7, 18, 10, 0.42);
+      backdrop-filter: blur(8px);
+    }
+
+    .menu.open { display: grid; place-items: center; }
+
+    .menu-panel {
+      width: min(1040px, 100%);
+      max-height: calc(100vh - 56px);
+      overflow: auto;
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      background: var(--cream-3);
+      box-shadow: var(--shadow);
+      padding: 28px;
+    }
+
+    .menu-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 18px;
+    }
+
+    .menu-head h2 { margin: 0; font-size: 2rem; }
+
+    .menu-close {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      color: var(--cream-3);
+      background: var(--green-900);
+      font-size: 1.2rem;
+      font-weight: 900;
+    }
+
+    .menu-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .menu-list button {
+      width: 100%;
+      min-height: 74px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-small);
+      display: grid;
+      grid-template-columns: 48px 1fr;
+      gap: 12px;
+      align-items: center;
+      text-align: left;
+      background: var(--white);
+      color: var(--ink);
+      cursor: pointer;
+    }
+
+    .menu-list button.active {
+      border-color: var(--green-600);
+      box-shadow: inset 0 0 0 2px rgba(56, 134, 72, 0.16);
+    }
+
+    .menu-list .idx { color: var(--green-600); font-family: var(--mono); font-weight: 900; }
+    .menu-list .title { display: block; font-weight: 900; }
+    .menu-list .section {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    @media (max-width: 1180px) {
+      .deck { padding: 12px; }
+      .topbar { top: 16px; left: 18px; right: 18px; }
+      .section-nav { display: none; }
+      .slide, .screen-slide {
+        height: calc(100vh - 24px);
+        padding: 88px 22px 132px;
+      }
+      .screen-body { grid-template-columns: 1fr; }
+      .app-shell { grid-template-columns: 1fr; }
+      .app-side { display: none; }
+      .slide.split, .slide.dark-left { display: none; }
+      .slide.split.active { display: block; }
+      .slide.dark-left.active { display: block; overflow: auto; }
+      .dark-panel { min-width: 0; padding: 92px 34px 46px; }
+      .light-panel { padding: 42px 34px 132px; }
+      h1 { font-size: 3.3rem; }
+      h2 { font-size: 2.2rem; }
+      .lead { font-size: 1.1rem; }
+      .grid.two, .grid.three, .grid.four { grid-template-columns: 1fr; }
+      .phones-grid { grid-template-columns: 1fr; gap: 36px; }
+      .menu-list { grid-template-columns: 1fr; }
+      .controls { right: 18px; bottom: 18px; }
+    }
+
+    @media (max-width: 640px) {
+      .brand span:last-child { display: none; }
+      .menu-toggle { min-width: 48px; width: 48px; padding: 0; }
+      .menu-toggle .menu-word { display: none; }
+      h1 { font-size: 2.4rem; }
+      h2 { font-size: 1.9rem; }
+    }
+
+    @media print {
+      body { overflow: visible; background: var(--white); }
+      .deck { height: auto; padding: 0; background: var(--white); }
+      .topbar, .controls, .menu { display: none !important; }
+      .slide, .screen-slide,
+      .slide.active, .screen-slide.active,
+      .slide.split, .slide.dark-left {
+        display: flex !important;
+        height: 100vh;
+        page-break-after: always;
+        box-shadow: none;
+        border-radius: 0;
+      }
+    }
+
+    /* =====================================================
+       v2 — clean white & black with semantic accents only.
+       Overrides hardcoded colours that the var swap missed,
+       and strips green chrome where it was decorative.
+       Accents reserved for status: green = live/passing,
+       gold = value/commercial, amber = pending/gate, red = failure.
+       ===================================================== */
+
+    .deck {
+      background:
+        linear-gradient(135deg, rgba(0, 0, 0, 0.018), transparent 30%),
+        linear-gradient(315deg, rgba(0, 0, 0, 0.018), transparent 30%),
+        #ffffff;
+    }
+
+    .slide, .screen-slide {
+      background: #ffffff;
+      border: 1px solid #ececec;
+    }
+
+    /* Top chrome */
+    .brand { color: #0a0a0a; }
+    .mark { background: #0a0a0a; color: #ffffff; }
+    .menu-lines span { background: #0a0a0a; }
+
+    .section-nav {
+      background: rgba(255, 255, 255, 0.85);
+      border-color: #ececec;
+    }
+    .section-nav button { color: #6b6b6b; }
+    .section-nav button.active {
+      background: #0a0a0a;
+      color: #ffffff;
+    }
+    .menu-toggle {
+      background: rgba(255, 255, 255, 0.85);
+      border-color: #ececec;
+    }
+
+    /* Controls */
+    .arrow { background: #0a0a0a; }
+    .counter {
+      background: rgba(255, 255, 255, 0.85);
+      border-color: #ececec;
+      color: #0a0a0a;
+    }
+
+    /* Eyebrow neutralised — green only on semantic chips */
+    .eyebrow { color: #6b6b6b; }
+    .lead { color: #555; }
+
+    /* Dark surfaces — use pure black, white text */
+    .tile.dark,
+    .dark-panel,
+    .quote-block,
+    .flow-node.strong,
+    .layer.stack {
+      background: #0a0a0a;
+      color: #ffffff;
+      border-color: #0a0a0a;
+    }
+
+    .tile.dark p, .tile.dark li,
+    .layer.stack .label, .layer.stack .small, .layer.stack li,
+    .flow-node.strong .small,
+    .dark-panel .lead {
+      color: #d4d4d4;
+    }
+
+    .dark-panel .eyebrow,
+    .tile.dark .eyebrow {
+      color: #888;
+    }
+
+    .quote-block p { color: #f5f5f5; }
+
+    .layer.stack .pill {
+      background: rgba(255, 255, 255, 0.06);
+      border-color: rgba(255, 255, 255, 0.16);
+      color: #ffffff;
+    }
+
+    /* Numbers in lists */
+    .number {
+      background: #0a0a0a;
+      color: #ffffff;
+    }
+
+    /* Money figures stay grayscale, mono for emphasis */
+    .money,
+    .metric strong,
+    .cash-row b,
+    .decision h3 {
+      color: #0a0a0a;
+    }
+
+    /* Tables & stats — punchier KPI tiles, single-line labels */
+    th { background: #fafafa; color: #0a0a0a; }
+    .stat {
+      padding: 12px 14px;
+      background: #ffffff;
+      border: 1px solid #ececec;
+      border-radius: 8px;
+    }
+    .stat strong {
+      font-family: var(--sans);
+      font-size: 1.55rem;
+      font-weight: 900;
+      color: #0a0a0a;
+      letter-spacing: -0.015em;
+      line-height: 1;
+    }
+    .stat span {
+      margin-top: 6px;
+      font-size: 0.7rem;
+      letter-spacing: 0.04em;
+      text-transform: none;
+      color: #6b6b6b;
+      font-weight: 700;
+    }
+    .mini-table th { background: #fafafa; color: #0a0a0a; }
+    .mini-table .money { color: #0a0a0a; }
+
+    /* Pills and badges */
+    .pill { background: #f5f5f5; color: #0a0a0a; border-color: #ececec; }
+    .stack .pill,
+    .layer.stack .pill {
+      background: rgba(255, 255, 255, 0.06);
+      border-color: rgba(255, 255, 255, 0.16);
+      color: #ffffff;
+    }
+
+    /* Status pills — solid colour blocks, single-line, sharp corners.
+       Tag-shaped (4px radius), never capsule. Default (no modifier) is
+       neutral data without a verdict. flex-shrink: 0 + !important on
+       white-space defends against parent flex layouts squeezing the
+       pill into a width that would force text wrap. */
+    .badge-soft {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: #ffffff;
+      color: #0a0a0a;
+      border: 1px solid #d4d4d4;
+      font-size: 0.7rem;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      line-height: 1.5;
+      white-space: nowrap !important;
+      word-break: keep-all;
+      text-transform: none;
+      flex-shrink: 0;
+    }
+    .badge-soft.green { background: #15803d; color: #ffffff; border-color: #15803d; }
+    .badge-soft.amber { background: #b45309; color: #ffffff; border-color: #b45309; }
+    .badge-soft.red   { background: #dc2626; color: #ffffff; border-color: #dc2626; }
+    .badge-soft.dark  { background: #0a0a0a; color: #ffffff; border-color: #0a0a0a; }
+
+    /* Bullets in check-list */
+    .check-list li::before { background: #0a0a0a; }
+
+    /* Annotation marker — black */
+    .annotation .marker { background: #0a0a0a; }
+
+    /* App frame chrome — pure black topbar/sidebar/phone */
+    .app-topbar,
+    .app-side,
+    .phone-topbar,
+    .phone-status {
+      background: #0a0a0a;
+    }
+    .phone-frame {
+      border-color: #0a0a0a;
+      background: #0a0a0a;
+    }
+
+    .app-side { padding: 16px 12px; }
+    .side-label { color: #777; }
+    .side-item { color: #b5b5b5; }
+    .side-item.active {
+      background: rgba(255, 255, 255, 0.06);
+      color: #ffffff;
+      box-shadow: inset 3px 0 0 #ffffff;
+    }
+    .side-item .badge {
+      min-width: 18px;
+      padding: 1px 6px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.12);
+      color: #ffffff;
+      font-family: var(--sans);
+      font-size: 0.66rem;
+      font-weight: 800;
+      text-align: center;
+      line-height: 1.4;
+    }
+
+    .app-brand .mark { background: #ffffff; color: #0a0a0a; }
+    .app-user .avatar { background: #ffffff; color: #0a0a0a; }
+
+    /* Live indicator dot stays green — semantic */
+    .app-chip .dot-sm { background: #22c55e; }
+    .app-chip { background: rgba(255, 255, 255, 0.08); }
+
+    /* Buttons — solid black for primary, outlined for ghost */
+    .btn {
+      background: #0a0a0a;
+      border-color: #0a0a0a;
+      color: #ffffff;
+    }
+    .btn.ghost {
+      background: transparent;
+      color: #0a0a0a;
+      border: 1px solid #0a0a0a;
+    }
+    .btn.amber {
+      background: #fde68a;
+      color: #0a0a0a;
+      border-color: #d97706;
+    }
+
+    /* Form controls */
+    .check.on .box { background: #0a0a0a; border-color: #0a0a0a; }
+    .toggle.on .switch { background: #0a0a0a; border-color: #0a0a0a; }
+    .slider .track { background: #0a0a0a; }
+    .slider .knob { border-color: #0a0a0a; }
+
+    /* Phone tick — green for completed, gold for gate */
+    .phone-tick { background: #16a34a; color: #ffffff; }
+    .phone-tick.gate { background: #c08e3a; }
+    .phone-tick.empty { background: #f5f5f5; color: #888; border: 1px solid #ececec; }
+
+    /* Activity dots */
+    .activity .act .dot-sm { background: #16a34a; }
+
+    /* Charts */
+    .chart-bars .bar { background: #0a0a0a; }
+    .chart-line svg path[fill="none"] { stroke: #0a0a0a; }
+    .chart-line svg path[stroke="none"] { fill: rgba(0, 0, 0, 0.07); }
+
+    /* Price card — featured uses solid black border */
+    .price-card.featured {
+      border: 2px solid #0a0a0a;
+      background: #fafafa;
+    }
+    .price-card .name { color: #6b6b6b; }
+    .price-card .price { color: #0a0a0a; }
+    .price-card .price small { color: #6b6b6b; }
+
+    /* Kanban — white cards with a solid accent left-stripe instead of
+       pastel-tinted backgrounds. Matches the accent-stripe rhythm used
+       on the host deck's matrix and decision tiles. */
+    .kanban-card { background: #ffffff; border-color: #ececec; }
+    .kanban-card.done { box-shadow: inset 3px 0 0 #15803d; }
+    .kanban-card.gate { box-shadow: inset 3px 0 0 #b45309; }
+
+    /* Doc preview */
+    .doc-preview .doc-title { color: #0a0a0a; }
+    .doc-preview .doc-section h5 { color: #0a0a0a; }
+
+    /* Ladder — grayscale steps so it reads as progression */
+    .rung,
+    .rung:nth-child(n) { background: #2a2a2a; color: #ffffff; }
+    .rung:nth-child(1) { background: #0a0a0a; }
+    .rung:nth-child(2) { background: #1a1a1a; }
+    .rung:nth-child(3) { background: #2a2a2a; }
+    .rung:nth-child(4) { background: #3a3a3a; }
+    .rung:nth-child(5) { background: #4a4a4a; }
+    .rung:nth-child(6) { background: #5a5a5a; }
+    .rung:nth-child(7) { background: #6a6a6a; }
+    .rung small { color: #d4d4d4; }
+
+    /* Menu */
+    .menu { background: rgba(0, 0, 0, 0.32); }
+    .menu-panel { background: #ffffff; border-color: #ececec; }
+    .menu-list button { background: #ffffff; }
+    .menu-list button.active {
+      border-color: #0a0a0a;
+      box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.12);
+    }
+    .menu-list .idx { color: #0a0a0a; }
+    .menu-close { background: #0a0a0a; }
+
+    /* Inputs & fields inside the app */
+    .field .input { background: #fafafa; border-color: #ececec; }
+    .field .input.full { background: #ffffff; }
+    .field label { color: #6b6b6b; }
+
+    /* Mini phone label */
+    .phone-mini-label { color: #6b6b6b; }
+
+    /* Embed mode — strip chrome when this deck is loaded inside an iframe.
+       Activated by adding ?embed=1 to the URL. Overflow is HIDDEN everywhere
+       so the host deck never shows a scrollbar. Phone-mini is hidden because
+       the host has a dedicated mobile slide; annotations are kept compact. */
+    html.embed-mode, body.embed,
+    body.embed .deck,
+    body.embed .slide,
+    body.embed .screen-slide {
+      overflow: hidden !important;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+    body.embed::-webkit-scrollbar,
+    body.embed .deck::-webkit-scrollbar,
+    body.embed .slide::-webkit-scrollbar,
+    body.embed .screen-slide::-webkit-scrollbar,
+    body.embed *::-webkit-scrollbar {
+      width: 0 !important;
+      height: 0 !important;
+      display: none !important;
+    }
+    body.embed * { scrollbar-width: none; -ms-overflow-style: none; }
+
+    body.embed .topbar,
+    body.embed .controls,
+    body.embed .menu {
+      display: none !important;
+    }
+    body.embed .deck {
+      padding: 0;
+      height: 100vh;
+      min-height: 100vh;
+    }
+    body.embed .slide,
+    body.embed .screen-slide {
+      height: 100vh;
+      min-height: 0;
+      border-radius: 0;
+      border: 0;
+      box-shadow: none;
+      padding: 36px 48px 36px;
+    }
+    body.embed .slide.active,
+    body.embed .screen-slide.active {
+      display: flex;
+    }
+    body.embed .dark-panel { padding: 48px 36px; }
+    body.embed .light-panel { padding: 36px 48px; }
+    body.embed .slide:not(.center):not(.dark-left) > .content::after,
+    body.embed .light-panel::after { display: none; }
+
+    /* Cap heading sizes so they fit shorter iframe viewports */
+    body.embed h1 { font-size: clamp(2.2rem, 4.5vw, 3.6rem); margin-bottom: 14px; line-height: 1; }
+    body.embed h2 { font-size: clamp(1.5rem, 3vw, 2.3rem); margin-bottom: 12px; line-height: 1.04; }
+    body.embed .lead { font-size: clamp(0.9rem, 1.4vw, 1.15rem); line-height: 1.4; }
+    body.embed .screen-head h2 { font-size: clamp(1.3rem, 2.6vw, 1.95rem); }
+    body.embed .screen-head p { font-size: clamp(0.82rem, 1.3vw, 1rem); }
+    body.embed .screen-head { margin-bottom: 14px; }
+
+    /* Phone-mini is redundant inside the host deck — host deck shows mobile
+       in its own dedicated slide. Drop it to give the desktop view + the
+       annotations room to breathe. */
+    body.embed .phone-mini { display: none; }
+    body.embed .screen-body {
+      grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
+      gap: 18px;
+    }
+
+    /* Tighten the app-frame mockup so the screen-body fits the viewport */
+    body.embed .app-shell { min-height: 380px; }
+    body.embed .app-main { padding: 16px 18px; }
+    body.embed .annotations { gap: 8px; }
+    body.embed .annotation { padding: 10px 12px; }
+    body.embed .annotation h4 { font-size: 0.92rem; }
+    body.embed .annotation p { font-size: 0.84rem; line-height: 1.35; }
+
+    /* Compact the overall slide content so it fits without scrolling */
+    body.embed .grid { gap: 14px; }
+    body.embed .tile { padding: 18px; }
+    body.embed .tile h3 { font-size: 1.18rem; margin-bottom: 8px; }
+    body.embed .check-list li { padding-bottom: 6px; line-height: 1.35; }
+    body.embed .agenda-list { gap: 16px; }
+    body.embed .agenda-list li { padding-bottom: 14px; }
+    body.embed .thesis-line { margin-top: 22px; padding-top: 16px; font-size: 1rem; }
+
+    /* Phone-only view — &view=phone hides everything except the
+       injected phone-mini mockup, centered in the viewport.
+       Used when a host deck wants just the mobile preview of a screen. */
+    body.embed.view-phone,
+    body.embed.view-phone .deck { overflow: hidden; height: 100vh; min-height: 0; }
+    body.embed.view-phone .screen-slide.active {
+      display: flex !important;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+      height: 100vh;
+      min-height: 0;
+    }
+    body.embed.view-phone .screen-head,
+    body.embed.view-phone .screen-body > .app-frame,
+    body.embed.view-phone .annotations,
+    body.embed.view-phone .phone-mini-label {
+      display: none !important;
+    }
+    body.embed.view-phone .screen-body {
+      display: flex !important;
+      align-items: center;
+      justify-content: center;
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      grid-template-columns: 1fr;
+      gap: 0;
+    }
+    body.embed.view-phone .screen-body::after { display: none; }
+    body.embed.view-phone .phone-mini { margin: 0; gap: 0; }
+  </style>
+</head>
+<body>
+  <main class="deck" aria-label="ReachCore product walkthrough">
+    <header class="topbar">
+      <div class="brand" aria-label="ReachCore">
+        <span class="mark">R</span>
+        <span>ReachCore</span>
+      </div>
+      <nav class="section-nav" aria-label="Section navigation">
+        <button type="button" data-section-jump="Open">Open</button>
+        <button type="button" data-section-jump="Practice">Practice</button>
+        <button type="button" data-section-jump="Sell">Sell</button>
+        <button type="button" data-section-jump="Deploy">Deploy</button>
+        <button type="button" data-section-jump="Operate">Operate</button>
+        <button type="button" data-section-jump="Close">Close</button>
+      </nav>
+      <button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false">
+        <span class="menu-lines" aria-hidden="true"><span></span><span></span><span></span></span>
+        <span class="menu-word">Menu</span>
+      </button>
+    </header>
+
+    <section class="slides">
+
+      <!-- =====================================================
+           OPEN
+           ===================================================== -->
+
+      <article class="slide center active" data-title="Cover" data-section="Open">
+        <div class="content">
+          <p class="eyebrow">Product walkthrough &middot; v2 minimal</p>
+          <h1>ReachCore</h1>
+          <p class="lead">The PWA the consultant lives in. The commercial wrapper and deployment console used to scope, deploy, and operate STACK capability at Australian SMBs.</p>
+          <p class="thesis-line">v2 stripping: clean white surfaces, near-black chrome, accents reserved for live status, value, gates, and failures.</p>
+        </div>
+      </article>
+
+      <article class="slide dark-left" data-title="Walkthrough" data-section="Open">
+        <aside class="dark-panel">
+          <p class="eyebrow">Walkthrough</p>
+          <h2>What you will see</h2>
+          <p class="lead">Twelve mock screens organised around CORE's three modules, plus the framing and the recap at each end.</p>
+        </aside>
+        <div class="light-panel">
+          <ol class="agenda-list">
+            <li><span class="agenda-num">01</span><span><span class="agenda-title">What CORE is</span><span class="agenda-copy">The Dev-facing app. Four working areas across the lifecycle of every client.</span></span></li>
+            <li><span class="agenda-num">02</span><span><span class="agenda-title">Practice</span><span class="agenda-copy">Dashboard, Pipeline, Earnings, Certifications. The Dev's home in CORE.</span></span></li>
+            <li><span class="agenda-num">03</span><span><span class="agenda-title">Sell</span><span class="agenda-copy">Capability Profile, Sprint Selector, SMB Diagnostic, Scope &amp; Quote, Proposal &amp; SOW.</span></span></li>
+            <li><span class="agenda-num">04</span><span><span class="agenda-title">Deploy</span><span class="agenda-copy">Deployment Console, mappings and vocabulary, rules and eval baselines, delivery checklist.</span></span></li>
+            <li><span class="agenda-num">05</span><span><span class="agenda-title">Operate</span><span class="agenda-copy">Live Monitoring, Retainer Builder, Case Study Generator.</span></span></li>
+            <li><span class="agenda-num">06</span><span><span class="agenda-title">Recap</span><span class="agenda-copy">What CORE compounds for the consultant, the SMB, and Reach.</span></span></li>
+          </ol>
+        </div>
+      </article>
+
+      <article class="slide" data-title="What CORE is" data-section="Open">
+        <div class="content wide">
+          <p class="eyebrow">What CORE is</p>
+          <h2>The Dev's app, end to end.</h2>
+          <p class="lead lede-tight">CORE is the app the Dev signs in to. STACK is the AI tooling that ships at the SMB. This deck walks CORE only. CORE has four working areas: Practice for the whole book of clients, then Sell, Deploy, and Operate for the lifecycle of any one client.</p>
+          <div class="grid four" style="margin-top: 30px;">
+            <div class="tile dark">
+              <h3><span class="number">00</span>Practice</h3>
+              <p>The Dev's whole book of clients in one view. Where the practice lives across every deployment.</p>
+              <ul class="check-list">
+                <li>Dashboard</li>
+                <li>Pipeline</li>
+                <li>Earnings &amp; commissions</li>
+                <li>Certifications &amp; tier</li>
+              </ul>
+            </div>
+            <div class="tile">
+              <h3><span class="number">01</span>Sell</h3>
+              <p>Position the Dev, scope the sprint with the SMB, generate proposal and SOW.</p>
+              <ul class="check-list">
+                <li>Capability Profile</li>
+                <li>Sprint Selector</li>
+                <li>SMB Diagnostic</li>
+                <li>Scope &amp; Quote</li>
+                <li>Proposal &amp; SOW</li>
+              </ul>
+            </div>
+            <div class="tile">
+              <h3><span class="number">02</span>Deploy</h3>
+              <p>Configure the STACK against the SMB. Every step approval-gated and evidence-backed.</p>
+              <ul class="check-list">
+                <li>Deployment Console</li>
+                <li>Mappings &amp; vocabulary</li>
+                <li>Rules &amp; eval baselines</li>
+                <li>Delivery checklist</li>
+              </ul>
+            </div>
+            <div class="tile">
+              <h3><span class="number">03</span>Operate</h3>
+              <p>Track live usage, quality, and cost. Convert success into retainer and case study.</p>
+              <ul class="check-list">
+                <li>Live Monitoring</li>
+                <li>Usage / cost / quality</li>
+                <li>Retainer Builder</li>
+                <li>Case Study Generator</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="slide" data-title="Scenario" data-section="Open">
+        <div class="content wide">
+          <p class="eyebrow">Anchor scenario</p>
+          <h2>Acme Legal &mdash; 25-person firm in Brisbane.</h2>
+          <p class="lead lede-tight">A growing commercial-litigation practice. Document handover takes days, junior staff burn hours classifying and chasing missing pieces, and partners want partners' time back.</p>
+          <div class="grid four" style="margin-top: 30px;">
+            <div class="tile">
+              <h3>Vertical</h3>
+              <p>Document Intake STACK</p>
+              <p class="small">Selected because the firm's pain is concentrated in document handovers and matter setup.</p>
+            </div>
+            <div class="tile">
+              <h3>Tier</h3>
+              <p>Growth, ~1,800 docs/mo</p>
+              <p class="small">Activation $1,500. STACK $999/mo. Headroom for matter intake spikes.</p>
+            </div>
+            <div class="tile">
+              <h3>Dev</h3>
+              <p>Dev McLean, on Starter CORE</p>
+              <p class="small">Solo consultant, ex-platform engineer. First paid Document Intake deployment.</p>
+            </div>
+            <div class="tile dark">
+              <h3>Sprint</h3>
+              <p>3-week scoped engagement</p>
+              <p class="small">Discovery, configure, eval, train, go-live. Followed by an optional ongoing retainer.</p>
+            </div>
+          </div>
+          <p class="thesis-line">Every screen in this deck reflects this single deployment, end to end, so the lifecycle reads as one continuous story.</p>
+        </div>
+      </article>
+
+      <!-- =====================================================
+           COCKPIT
+           ===================================================== -->
+
+      <article class="screen-slide" data-title="Dashboard" data-section="Practice">
+        <header class="screen-head">
+          <p class="eyebrow">Practice &middot; 01 Dashboard</p>
+          <h2>The first screen the Dev sees on every login.</h2>
+          <p>The whole practice in one view: active deployments, open opportunities, this month's revenue, and the actions waiting on the Dev. CORE is a product the Dev opens for themselves before they open it for any client.</p>
+        </header>
+        <div class="screen-body">
+          <div class="app-frame" aria-hidden="true">
+            <div class="app-chrome">
+              <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+              <span class="url">app.reach.au/practice</span>
+            </div>
+            <div class="app-topbar">
+              <div class="app-brand"><span class="mark">R</span> ReachCore</div>
+              <div class="app-context"><span class="app-chip"><span class="dot-sm"></span>Starter CORE &middot; 3 active clients</span></div>
+              <div class="app-user"><span class="avatar">DM</span><span>Dev McLean</span></div>
+            </div>
+            <div class="app-shell">
+              <nav class="app-side">
+                <div class="side-section">
+                  <div class="side-label">Practice</div>
+                  <div class="side-item active">Dashboard</div>
+                  <div class="side-item">Pipeline <span class="badge">2</span></div>
+                  <div class="side-item">Earnings</div>
+                  <div class="side-item">Certifications</div>
+                </div>
+                <div class="side-section">
+                  <div class="side-label">Sell</div>
+                  <div class="side-item">Capability Profile</div>
+                  <div class="side-item">Sprint Selector</div>
+                </div>
+                <div class="side-section">
+                  <div class="side-label">Deploy</div>
+                  <div class="side-item">Deployment Console</div>
+                </div>
+                <div class="side-section">
+                  <div class="side-label">Operate</div>
+                  <div class="side-item">Live Monitoring</div>
+                </div>
+              </nav>
+              <div class="app-main">
+                <div class="main-head">
+                  <div>
+                    <div class="crumb">Practice &rsaquo; Dashboard</div>
+                    <h3>Welcome back, Dev McLean</h3>
+                  </div>
+                  <div class="row">
+                    <span class="badge-soft amber">3 actions waiting</span>
+                    <button class="btn" type="button">+ New opportunity</button>
+                  </div>
+                </div>
+                <div class="kpi-row">
+                  <div class="stat"><strong>3</strong><span>Active deployments</span></div>
+                  <div class="stat"><strong>2</strong><span>Open opportunities</span></div>
+                  <div class="stat"><strong>$13.4k</strong><span>This month revenue</span></div>
+                  <div class="stat"><strong>$374/mo</strong><span>Lifetime STACK MRR</span></div>
+                </div>
+                <div class="grid two" style="gap:12px;">
+                  <div class="panel">
+                    <div class="panel-head">
+                      <h4>Active deployments</h4>
+                      <span class="badge-soft">3 clients</span>
+                    </div>
+                    <table class="mini-table">
+                      <thead><tr><th>Client</th><th>STACK</th><th>State</th></tr></thead>
+                      <tbody>
+                        <tr><td>Acme Legal</td><td>Doc Intake Growth</td><td><span class="badge-soft amber">Sprint w2</span></td></tr>
+                        <tr><td>Northwind Advisory</td><td>Doc Intake Foundation</td><td><span class="badge-soft green">Live 4mo</span></td></tr>
+                        <tr><td>Globex Migration</td><td>Doc Intake Growth</td><td><span class="badge-soft green">Live 2mo</span></td></tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <div class="panel">
+                    <div class="panel-head">
+                      <h4>Action queue</h4>
+                      <span class="badge-soft amber">3 waiting</span>
+                    </div>
+                    <div class="activity">
+                      <div class="act"><span class="dot-sm"></span><span><strong>Acme Legal</strong> &middot; 2 deployment gates need partner sign-off</span><span class="ts">today</span></div>
+                      <div class="act"><span class="dot-sm"></span><span><strong>Northwind Advisory</strong> &middot; eval drift trending toward 89%, schedule tuning</span><span class="ts">yest</span></div>
+                      <div class="act"><span class="dot-sm"></span><span><strong>Greer &amp; Co</strong> &middot; diagnostic submitted, ready to scope sprint</span><span class="ts">2d</span></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <aside class="annotations">
+            <div class="annotation">
+              <div class="marker">A</div>
+              <div>
+                <h4>One pane for the whole practice</h4>
+                <p>Active clients, opportunities, revenue, and pending actions visible without clicking around. The Dev sees their business in five seconds.</p>
+              </div>
+            </div>
+            <div class="annotation">
+              <div class="marker">B</div>
+              <div>
+                <h4>Action queue is the daily hook</h4>
+                <p>Pending gates, drift alerts, and ready-to-scope diagnostics surface here. CORE earns its subscription by removing email triage.</p>
+              </div>
+            </div>
+            <div class="annotation">
+              <div class="marker">C</div>
+              <div>
+                <h4>Lifetime STACK MRR is visible</h4>
+                <p>The compounding commission figure is the long-term hook. Every shipped client raises it permanently and visibly.</p>
+              </div>
+            </div>
+            <div class="annotation">
+              <div class="marker">D</div>
+              <div>
+                <h4>Why investors care</h4>
+                <p>Practice is where CORE's daily-active-use story lives. The Dashboard is what makes CORE the Dev's primary work surface.</p>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </article>
+
+      <article class="screen-slide" data-title="Pipeline" data-section="Practice">
+        <header class="screen-head">
+          <p class="eyebrow">Practice &middot; 02 Pipeline</p>
+          <h2>Every opportunity, every stage, every dollar.</h2>
+          <p>Pipeline is a five-stage flow from prospect to live deployment. Cards carry expected sprint value, days in stage, and the next action. Forecasts roll up into the Dashboard and the Earnings projection.</p>
+        </header>
+        <div class="screen-body">
+          <div class="app-frame" aria-hidden="true">
+            <div class="app-chrome">
+              <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+              <span class="url">app.reach.au/practice/pipeline</span>
+            </div>
+            <div class="app-topbar">
+              <div class="app-brand"><span class="mark">R</span> ReachCore</div>
+              <div class="app-context"><span class="app-chip"><span class="dot-sm"></span>Starter CORE &middot; Q3 forecast</span></div>
+              <div class="app-user"><span class="avatar">DM</span><span>Dev McLean</span></div>
+            </div>
+            <div class="app-shell">
+              <nav class="app-side">
+                <div class="side-section">
+                  <div class="side-label">Practice</div>
+                  <div class="side-item">Dashboard</div>
+                  <div class="side-item active">Pipeline <span class="badge">5</span></div>
+                  <div class="side-item">Earnings</div>
+                  <div class="side-item">Certifications</div>
+                </div>
+                <div class="side-section">
+                  <div class="side-label">Sell</div>
+                  <div class="side-item">Capability Profile</div>
+                  <div class="side-item">SMB Diagnostic</div>
+                </div>
+                <div class="side-section">
+                  <div class="side-label">Deploy</div>
+                  <div class="side-item">Deployment Console</div>
+                </div>
+                <div class="side-section">
+                  <div class="side-label">Operate</div>
+                  <div class="side-item">Live Monitoring</div>
+                </div>
+              </nav>
+              <div class="app-main">
+                <div class="main-head">
+                  <div>
+                    <div class="crumb">Practice &rsaquo; Pipeline</div>
+                    <h3>5 opportunities &middot; weighted $42.6k expected close</h3>
+                  </div>
+                  <div class="row">
+                    <span class="badge-soft green">+1 this week</span>
+                    <button class="btn ghost" type="button">Filter</button>
+                    <button class="btn" type="button">+ Add</button>
+                  </div>
+                </div>
+                <div class="kpi-row">
+                  <div class="stat"><strong>$78k</strong><span>Pipeline value</span></div>
+                  <div class="stat"><strong>$42.6k</strong><span>Weighted</span></div>
+                  <div class="stat"><strong>$24k</strong><span>Closing this month</span></div>
+                  <div class="stat"><strong>62%</strong><span>Win rate (last 6mo)</span></div>
+                </div>
+                <div class="kanban">
+                  <div class="kanban-col">
+                    <h5>Prospect</h5>
+                    <div class="kanban-card">Helix Insurance Brokers<div class="small">Doc Intake &middot; ~$15k &middot; intro booked</div></div>
+                  </div>
+                  <div class="kanban-col">
+                    <h5>Diagnostic</h5>
+                    <div class="kanban-card">Greer &amp; Co<div class="small">Customer Support &middot; ~$11k &middot; day 3</div></div>
+                  </div>
+                  <div class="kanban-col">
+                    <h5>Proposal</h5>
+                    <div class="kanban-card">Sterling Advisors<div class="small">Doc Intake &middot; ~$13k &middot; v0.3 sent</div></div>
+                  </div>
+                  <div class="kanban-col">
+                    <h5>In sprint</h5>
+                    <div class="kanban-card gate">Acme Legal<div class="small">Doc Intake Growth &middot; $12k &middot; week 2/3</div></div>
+                  </div>
+                  <div class="kanban-col">
+                    <h5>Live</h5>
+                    <div class="kanban-card done">Northwind Advisory<div class="small">Doc Intake Foundation &middot; $499/mo</div></div>
+                    <div class="kanban-card done">Globex Migration<div class="small">Doc Intake Growth &middot; $999/mo</div></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <aside class="annotations">
+            <div class="annotation">
+              <div class="marker">A</div>
+              <div>
+                <h4>Five fixed stages, vertical-aware</h4>
+                <p>Stages mirror CORE's own Sell/Deploy/Operate flow, so a card moving right is the deployment moving forward.</p>
+              </div>
+            </div>
+            <div class="annotation">
+              <div class="marker">B</div>
+              <div>
+                <h4>Weighted value with explicit probability</h4>
+                <p>Each stage has a default close probability. The Earnings projection plans against the weighted pipeline.</p>
+              </div>
+            </div>
+            <div class="annotation">
+              <div class="marker">C</div>
+              <div>
+                <h4>Cards become deployments</h4>
+                <p>A card in Sprint or Live is the same record as the deployment in Deploy/Operate. Pipeline is the front door to that record.</p>
+              </div>
+            </div>
+            <div class="annotation">
+              <div class="marker">D</div>
+              <div>
+                <h4>Why investors care</h4>
+                <p>Pipeline turns Devs into operators of a small business, with forecasting that keeps Reach close to MRR signal across the network.</p>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </article>
+
+      <article class="screen-slide" data-title="Earnings" data-section="Practice">
+        <header class="screen-head">
+          <p class="eyebrow">Practice &middot; 03 Earnings</p>
+          <h2>Implementation, retainer, and lifetime commission in one place.</h2>
+          <p>Three income streams, one ledger. The Dev sees what each client contributes monthly, what is hitting their account next, and how the lifetime STACK commission compounds across deployments.</p>
+        </header>
+        <div class="screen-body">
+          <div class="app-frame" aria-hidden="true">
+            <div class="app-chrome">
+              <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+              <span class="url">app.reach.au/practice/earnings</span>
+            </div>
+            <div class="app-topbar">
+              <div class="app-brand"><span class="mark">R</span> ReachCore</div>
+              <div class="app-context"><span class="app-chip"><span class="dot-sm"></span>Starter CORE &middot; FY26 view</span></div>
+              <div class="app-user"><span class="avatar">DM</span><span>Dev McLean</span></div>
+            </div>
+            <div class="app-shell">
+              <nav class="app-side">
+                <div class="side-section">
+                  <div class="side-label">Practice</div>
+                  <div class="side-item">Dashboard</div>
+                  <div class="side-item">Pipeline</div>
+                  <div class="side-item active">Earnings</div>
+                  <div class="side-item">Certifications</div>
+                </div>
+                <div class="side-section">
+                  <div class="side-label">Sell</div>
+                  <div class="side-item">Scope &amp; Quote</div>
+                </div>
+                <div class="side-section">
+                  <div class="side-label">Operate</div>
+                  <div class="side-item">Retainer Builder</div>
+                </div>
+              </nav>
+              <div class="app-main">
+                <div class="main-head">
+                  <div>
+                    <div class="crumb">Practice &rsaquo; Earnings</div>
+                    <h3>Three streams &middot; one ledger</h3>
+                  </div>
+                  <div class="row">
+                    <span class="badge-soft green">Next payout in 8 days</span>
+                    <button class="btn ghost" type="button">Export</button>
+                  </div>
+                </div>
+                <div class="kpi-row">
+                  <div class="stat"><strong>$13.4k</strong><span>This month</span></div>
+                  <div class="stat"><strong>$48.7k</strong><span>YTD revenue</span></div>
+                  <div class="stat"><strong>$374/mo</strong><span>Lifetime STACK MRR</span></div>
+                  <div class="stat"><strong>$2,124</strong><span>Next payout</span></div>
+                </div>
+                <div class="grid two" style="gap:12px;">
+                  <div class="panel">
+                    <div class="panel-head">
+                      <h4>By client (this month)</h4>
+                      <span class="badge-soft">Three streams</span>
+                    </div>
+                    <table class="mini-table">
+                      <thead><tr><th>Client</th><th>Implementation</th><th>Retainer</th><th>Commission</th></tr></thead>
+                      <tbody>
+                        <tr><td>Acme Legal</td><td class="money">$12,000</td><td>&mdash;</td><td>&mdash;</td></tr>
+                        <tr><td>Northwind Advisory</td><td>&mdash;</td><td class="money">$500</td><td class="money">$75</td></tr>
+                        <tr><td>Globex Migration</td><td>&mdash;</td><td class="money">$750</td><td class="money">$150</td></tr>
+                        <tr><td colspan="2"><strong>Subtotals</strong></td><td class="money">$1,250</td><td class="money">$225</td></tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <div class="panel">
+                    <div class="panel-head">
+                      <h4>Earnings trend</h4>
+                      <span class="badge-soft green">Trending up</span>
+                    </div>
+                    <div class="chart-line" aria-hidden="true">
+                      <svg viewBox="0 0 200 60" preserveAspectRatio="none">
+                        <path d="M0,52 L20,50 L40,46 L60,44 L80,38 L100,34 L120,30 L140,26 L160,22 L180,18 L200,12"
+                              stroke="#388648" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M0,52 L20,50 L40,46 L60,44 L80,38 L100,34 L120,30 L140,26 L160,22 L180,18 L200,12 L200,60 L0,60 Z"
+                              fill="rgba(56,134,72,0.14)" stroke="none"/>
+                      </svg>
+                    </div>
+                    <div class="row spread" style="margin-top:10px; gap:10px; flex-wrap:wrap;">
+                      <span class="badge-soft">Implementation</span>
+                      <span class="badge-soft green">Retainer (recurring)</span>
+                      <span class="badge-soft dark">STACK commission</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <aside class="annotations">
+            <div class="annotation">
+              <div class="marker">A</div>
+              <div>
+                <h4>Three income streams, one ledger</h4>
+                <p>Implementation fees, retainer MRR, and STACK commission roll into one view, so the Dev tracks practice income coherently.</p>
+              </div>
+            </div>
+            <div class="annotation">
+              <div class="marker">B</div>
+              <div>
+                <h4>Commission visible per client</h4>
+                <p>The Dev sees exactly which deployment contributes which lifetime MRR, which directly informs Retainer Builder offers.</p>
+              </div>
+            </div>
+            <div class="annotation">
+              <div class="marker">C</div>
+              <div>
+                <h4>Forecast pulls from Pipeline</h4>
+                <p>Future months draw on weighted Pipeline value, so the Dev can plan capacity and decide when to upgrade CORE tier.</p>
+              </div>
+            </div>
+            <div class="annotation">
+              <div class="marker">D</div>
+              <div>
+                <h4>Why investors care</h4>
+                <p>Earnings makes the Reach commission story tangible to the Dev every month. It is what makes the lifetime hook real.</p>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </article>
+
+      <article class="screen-slide" data-title="Certifications" data-section="Practice">
+        <header class="screen-head">
+          <p class="eyebrow">Practice &middot; 04 Certifications</p>
+          <h2>The Dev's progression ladder, owned by Reach.</h2>
+          <p>Certifications track each Dev's qualified verticals, connector readiness, and CORE tier. Levelling up unlocks higher commission, larger sprint scopes, and visibility on the Reach marketplace.</p>
+        </header>
+        <div class="screen-body">
+          <div class="app-frame" aria-hidden="true">
+            <div class="app-chrome">
+              <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+              <span class="url">app.reach.au/practice/certifications</span>
+            </div>
+            <div class="app-topbar">
+              <div class="app-brand"><span class="mark">R</span> ReachCore</div>
+              <div class="app-context"><span class="app-chip"><span class="dot-sm"></span>Starter CORE &middot; Doc Intake L2</span></div>
+              <div class="app-user"><span class="avatar">DM</span><span>Dev McLean</span></div>
+            </div>
+            <div class="app-shell">
+              <nav class="app-side">
+                <div class="side-section">
+                  <div class="side-label">Practice</div>
+                  <div class="side-item">Dashboard</div>
+                  <div class="side-item">Pipeline</div>
+                  <div class="side-item">Earnings</div>
+                  <div class="side-item active">Certifications</div>
+                </div>
+                <div class="side-section">
+                  <div class="side-label">Sell</div>
+                  <div class="side-item">Capability Profile</div>
+                </div>
+                <div class="side-section">
+                  <div class="side-label">Deploy</div>
+                  <div class="side-item">Rules &amp; Evals</div>
+                </div>
+              </nav>
+              <div class="app-main">
+                <div class="main-head">
+                  <div>
+                    <div class="crumb">Practice &rsaquo; Certifications</div>
+                    <h3>Verticals, connectors, and tier</h3>
+                  </div>
+                  <div class="row">
+                    <span class="badge-soft green">L3 unlocks at 5 live deployments</span>
+                    <button class="btn ghost" type="button">View on profile</button>
+                  </div>
+                </div>
+                <div class="panel">
+                  <div class="panel-head">
+                    <h4>Vertical specialisations</h4>
+                    <span class="badge-soft dark">Reach-issued</span>
+                  </div>
+                  <table class="mini-table">
+                    <thead><tr><th>Vertical</th><th>L1 Foundation</th><th>L2 Practitioner</th><th>L3 Specialist</th></tr></thead>
+                    <tbody>
+                      <tr>
+                        <td><strong>Document Intake</strong></td>
+                        <td><span class="badge-soft green">Earned</span></td>
+                        <td><span class="badge-soft green">Current</span></td>
+                        <td><span class="badge-soft amber">3 of 5 live</span></td>
+                      </tr>
+                      <tr>
+                        <td><strong>Customer Support</strong></td>
+                        <td><span class="badge-soft amber">Eval module ready</span></td>
+                        <td>Locked</td>
+                        <td>Locked</td>
+                      </tr>
+                      <tr>
+                        <td><strong>HR</strong></td>
+                        <td>Locked</td>
+                        <td>Locked</td>
+                        <td>Locked</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="grid two" style="gap:12px;">
+                  <div class="panel">
+                    <div class="panel-head">
+                      <h4>Connector certifications</h4>
+                      <span class="badge-soft">Reach-issued</span>
+                    </div>
+                    <div class="row wrap" style="gap:6px;">
+                      <span class="badge-soft green">Karbon</span>
+                      <span class="badge-soft green">LEAP</span>
+                      <span class="badge-soft green">FYI Docs</span>
+                      <span class="badge-soft green">SharePoint</span>
+                      <span class="badge-soft amber">Helpscout (eval)</span>
+                      <span class="badge-soft">Zendesk &middot; start</span>
+                    </div>
+                  </div>
+                  <div class="panel">
+                    <div class="panel-head">
+                      <h4>CORE tier</h4>
+                      <span class="badge-soft green">Practice unlocks at 4 active</span>
+                    </div>
+                    <div class="row wrap" style="gap:6px; margin-bottom:8px;">
+                      <span class="badge-soft">Launch</span>
+                      <span class="badge-soft green">Starter</span>
+                      <span class="badge-soft">Practice</span>
+                      <span class="badge-soft">Studio</span>
+                    </div>
+                    <div class="meter" style="--w: 75%;"><span></span></div>
+                    <p class="small" style="margin-top:8px;">3 of 4 active clients to qualify for Practice tier &middot; 20% commission and priority support.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <aside class="annotations">
+            <div class="annotation">
+              <div class="marker">A</div>
+              <div>
+                <h4>Levels are earned through evals and live work</h4>
+                <p>Vertical levels unlock through eval modules and live deployments, so a certification means something to an SMB.</p>
+              </div>
+            </div>
+            <div class="annotation">
+              <div class="marker">B</div>
+              <div>
+                <h4>Connector certs map directly to Sell</h4>
+                <p>The Sprint Selector recommends only the verticals and connectors the Dev is qualified to ship.</p>
+              </div>
+            </div>
+            <div class="annotation">
+              <div class="marker">C</div>
+              <div>
+                <h4>Tier progression is visible</h4>
+                <p>The Dev sees exactly what unlocks the next CORE tier, with the commercial upside (20% commission, more seats) inline.</p>
+              </div>
+            </div>
+            <div class="annotation">
+              <div class="marker">D</div>
+              <div>
+                <h4>Why investors care</h4>
+                <p>Certifications turn the Dev network into a quality-graded supply, which is the part the Reach marketplace eventually charges for.</p>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </article>
+
+      <!-- =====================================================
+           SELL
+           ===================================================== -->
+
+      <article class="screen-slide" data-title="Capability Profile" data-section="Sell">
+        <header class="screen-head">
+          <p class="eyebrow">Sell &middot; 01 Capability Profile</p>
+          <h2>Position the consultant before the pitch.</h2>
+          <p>Every Dev gets a public profile that records vertical specialisations, deployments shipped, evals passed, and a verifiable practice history. The SMB sees a credible practitioner, the Dev gets a sales artifact they did not have to build.</p>
+        </header>
+        <div class="screen-body">
+          <div class="app-frame" aria-hidden="true">
+            <div class="app-chrome">
+              <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+              <span class="url">app.reach.au/sell/profile</span>
+            </div>
+            <div class="app-topbar">
+              <div class="app-brand"><span class="mark">R</span> ReachCore</div>
+              <div class="app-context">
+                <span class="app-chip"><span class="dot-sm"></span>Acme Legal &middot; Document Intake</span>
+              </div>
+              <div class="app-user"><span class="avatar">DM</span><span>Dev McLean</span></div>
+            </div>
+            <div class="app-shell">
+              <nav class="app-side">
+                <div class="side-section">
+                  <div class="side-label">Practice</div>
+                  <div class="side-item">Dashboard</div>
+                  <div class="side-item">Pipeline</div>
+                </div>
+                <div class="side-section">
+                  <div class="side-label">Sell</div>
+                  <div class="side-item active">Capability Profile</div>
+                  <div class="side-item">Sprint Selector</div>
+                  <div class="side-item">SMB Diagnostic</div>
+                  <div class="side-item">Scope &amp; Quote</div>
+                  <div class="side-item">Proposal &amp; SOW</div>
+                </div>
+                <div class="side-section">
+                  <div class="side-label">Deploy</div>
+                  <div class="side-item">Deployment Console</div>
+                  <div class="side-item">Mappings</div>
+                  <div class="side-item">Rules &amp; Evals</div>
+                </div>
+                <div class="side-section">
+                  <div class="side-label">Operate</div>
+                  <div class="side-item">Live Monitoring</div>
+                  <div class="side-item">Retainer Builder</div>
+                </div>
+              </nav>
+              <div class="app-main">
+                <div class="main-head">
+                  <div>
+                    <div class="crumb">Sell &rsaquo; Capability Profile</div>
+                    <h3>Dev McLean &middot; reach.au/dev/mclean</h3>
+                  </div>
+                  <div class="row">
+                    <button class="btn ghost" type="button">Preview public</button>
+                    <button class="btn" type="button">Publish</button>
+                  </div>
+                </div>
+                <div class="panel">
+                  <div class="panel-head">
+                    <h4>Specialisations</h4>
+                    <span class="badge-soft green">Verified</span>
+                  </div>
+                  <div class="row wrap" style="gap:8px;">
+                    <span class="check on"><span class="box"></span>Document Intake</span>
+                    <span class="check"><span class="box"></span>Customer Support</span>
+                    <span class="check"><span class="box"></span>HR</span>
+                  </div>
+                </div>
+                <div class="panel">
+                  <div class="panel-head">
+                    <h4>STACK certifications</h4>
+                    <span class="badge-soft dark">Reach-issued</span>
+                  </div>
+                  <div class="row wrap" style="gap:10px;">
+                    <span class="badge-soft green">Document Intake L2</span>
+                    <span class="badge-soft">Connectors: Karbon, FYI Docs, LEAP</span>
+                    <span class="badge-soft">Eval pass: 96%</span>
+                  </div>
+                </div>
+                <div class="panel">
+                  <div class="panel-head">
+                    <h4>Practice history</h4>
+                    <span class="badge-soft">Auto-synced from CORE</span>
+                  </div>
+                  <table class="mini-table">
+                    <thead><tr><th>Client</th><th>Vertical</th><th>Tier</th><th>Status</th></tr></thead>
+                    <tbody>
+                      <tr><td>Northwind Advisory</td><td>Document Intake</td><td>Foundation</td><td><span class="badge-soft green">Live 4mo</span></td></tr>
+                      <tr><td>Globex Migration</td><td>Document Intake</td><td>Growth</td><td><span class="badge-soft green">Live 2mo</span></td></tr>
+                      <tr><td>Acme Legal</td><td>Document Intake</td><td>Growth</td><td><span class="badge-soft amber">In sprint</span></td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+          <aside class="annotations">
+            <div class="annotation">
+              <div class="marker">A</div>
+              <div>
+                <h4>One verifiable Dev page</h4>
+                <p>The SMB clicks through to a hosted profile page. The Dev does not build a website to start practising.</p>
+              </div>
+            </div>
+            <div class="annotation">
+              <div class="marker">B</div>
+              <div>
+                <h4>Reach-issued certifications</h4>
+                <p>Vertical certifications and connector readiness are issued by Reach against eval results, giving the SMB an external trust signal.</p>
+              </div>
+            </div>
+            <div class="annotation">
+              <div class="marker">C</div>
+              <div>
+                <h4>Practice history auto-syncs</h4>
+                <p>Live deployments populate from CORE itself, so the credibility surface compounds with every shipped client.</p>
+              </div>
+            </div>
+            <div class="annotation">
+              <div class="marker">D</div>
+              <div>
+                <h4>Why investors care</h4>
+                <p>Capability Profile is the on-ramp that turns capable individuals into Reach-branded practitioners with a marketable surface.</p>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </article>
+
+      <article class="screen-slide" data-title="Sprint Selector" data-section="Sell">
+        <header class="screen-head">
+          <p class="eyebrow">Sell &middot; 02 Sprint Selector</p>
+          <h2>Three pre-shaped sprints, picked in the room.</h2>
+          <p>Once the vertical is set, the Dev picks a sprint shape with the SMB. Each option is pre-tuned to the STACK tier and the change appetite of a typical SMB at that scale, with a recommendation flagged from the diagnostic.</p>
+        </header>
+        <div class="screen-body">
+          <div class="app-frame" aria-hidden="true">
+            <div class="app-chrome">
+              <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+              <span class="url">app.reach.au/sell/sprint</span>
+            </div>
+            <div class="app-topbar">
+              <div class="app-brand"><span class="mark">R</span> ReachCore</div>
+              <div class="app-context"><span class="app-chip"><span class="dot-sm"></span>Acme Legal &middot; Document Intake</span></div>
+              <div class="app-user"><span class="avatar">DM</span><span>Dev McLean</span></div>
+            </div>
+            <div class="app-shell">
+              <nav class="app-side">
+                <div class="side-section">
+                  <div class="side-label">Practice</div>
+                  <div class="side-item">Dashboard</div>
+                  <div class="side-item">Pipeline</div>
+                </div>
+                <div class="side-section">
+                  <div class="side-label">Sell</div>
+                  <div class="side-item">Capability Profile</div>
+                  <div class="side-item active">Sprint Selector</div>
+                  <div class="side-item">SMB Diagnostic</div>
+                  <div class="side-item">Scope &amp; Quote</div>
+                  <div class="side-item">Proposal &amp; SOW</div>
+                </div>
+                <div class="side-section">
+                  <div class="side-label">Deploy</div>
+                  <div class="side-item">Deployment Console</div>
+                  <div class="side-item">Mappings</div>
+                </div>
+                <div class="side-section">
+                  <div class="side-label">Operate</div>
+                  <div class="side-item">Live Monitoring</div>
+                </div>
+              </nav>
+              <div class="app-main">
+                <div class="main-head">
+                  <div>
+                    <div class="crumb">Sell &rsaquo; Sprint Selector</div>
+                    <h3>Pick a sprint shape for Acme Legal</h3>
+                  </div>
+                  <div class="row">
+                    <span class="badge-soft green">Recommended: Growth</span>
+                    <button class="btn" type="button">Continue &rarr;</button>
+                  </div>
+                </div>
+                <div class="grid three" style="gap:10px;">
+                  <div class="price-card">
+                    <div class="name">Foundation</div>
+                    <div class="price">$499<small>/mo</small></div>
+                    <div class="meta">&le;500 docs/mo &middot; 1 connector &middot; staged drafts only</div>
+                    <ul class="check-list" style="margin-top:8px;">
+                      <li>2-week sprint</li>
+                      <li>Up to 4 staff onboarded</li>
+                      <li>Activation $1,500</li>
+                    </ul>
+                  </div>
+                  <div class="price-card featured">
+                    <div class="name">Growth &middot; recommended</div>
+                    <div class="price">$999<small>/mo</small></div>
+                    <div class="meta">&le;2,000 docs/mo &middot; 3 connectors &middot; autonomous low-risk</div>
+                    <ul class="check-list" style="margin-top:8px;">
+                      <li>3-week sprint</li>
+                      <li>Up to 12 staff onboarded</li>
+                      <li>Activation $1,500</li>
+                    </ul>
+                  </div>
+                  <div class="price-card">
+                    <div class="name">Scale</div>
+                    <div class="price">$1,999<small>/mo</small></div>
+                    <div class="meta">&le;5,000 docs/mo &middot; 5 connectors &middot; matter automation</div>
+                    <ul class="check-list" style="margin-top:8px;">
+                      <li>4-week sprint</li>
+                      <li>Up to 30 staff onboarded</li>
+                      <li>Activation $2,500</li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="panel" style="margin-top:14px;">
+                  <div class="panel-head">
+                    <h4>Why Growth fits Acme Legal</h4>
+                    <span class="badge-soft">From diagnostic</span>
+                  </div>
+                  <div class="row" style="gap:14px;flex-wrap:wrap;">
+                    <span class="badge-soft green">~1,800 docs/mo observed</span>
+                    <span class="badge-soft green">Karbon + LEAP + cloud storage detected</span>
+                    <span class="badge-soft amber">Matter handover SLA pain</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <aside class="annotations">
+            <div class="annotation">
+              <div class="marker">A</div>
+              <div>
+                <h4>Pre-shaped sprints</h4>
+                <p>The Dev configures inside fixed shapes. Each shape is priced and scoped against the matching STACK tier.</p>
+              </div>
+            </div>
+            <div class="annotation">
+              <div class="marker">B</div>
+              <div>
+                <h4>Recommendation has reasons</h4>
+                <p>The diagnostic surfaces signals that justify the recommended tier, so the Dev anchors to evidence in the room.</p>
+              </div>
+            </div>
+            <div class="annotation">
+              <div class="marker">C</div>
+              <div>
+                <h4>Drives consistent unit economics</h4>
+                <p>Pre-shaped sprints keep activation hours predictable, which keeps Reach margin and Dev hourly rate intact.</p>
+              </div>
+            </div>
+            <div class="annotation">
+              <div class="marker">D</div>
+              <div>
+                <h4>Stops scope-from-scratch</h4>
+                <p>The Dev never has to invent a packaged offer. CORE supplies the menu and lets the SMB choose with confidence.</p>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </article>
+
+      <article class="screen-slide" data-title="SMB Diagnostic" data-section="Sell">
+        <header class="screen-head">
+          <p class="eyebrow">Sell &middot; 03 SMB Diagnostic</p>
+          <h2>A vertical-specific intake the SMB can complete in one sitting.</h2>
+          <p>The Dev shares a CORE diagnostic link with the SMB ahead of the working session. Answers feed the Sprint Selector recommendation, the scope numbers, and the proposal narrative automatically.</p>
+        </header>
+        <div class="screen-body">
+          <div class="app-frame" aria-hidden="true">
+            <div class="app-chrome">
+              <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+              <span class="url">app.reach.au/sell/diagnostic/acme-legal</span>
+            </div>
+            <div class="app-topbar">
+              <div class="app-brand"><span class="mark">R</span> ReachCore</div>
+              <div class="app-context"><span class="app-chip"><span class="dot-sm"></span>Acme Legal &middot; Document Intake</span></div>
+              <div class="app-user"><span class="avatar">DM</span><span>Dev McLean</span></div>
+            </div>
+            <div class="app-shell">
+              <nav class="app-side">
+                <div class="side-section">
+                  <div class="side-label">Practice</div>
+                  <div class="side-item">Dashboard</div>
+                  <div class="side-item">Pipeline</div>
+                </div>
+                <div class="side-section">
+                  <div class="side-label">Sell</div>
+                  <div class="side-item">Capability Profile</div>
+                  <div class="side-item">Sprint Selector</div>
+                  <div class="side-item active">SMB Diagnostic</div>
+                  <div class="side-item">Scope &amp; Quote</div>
+                  <div class="side-item">Proposal &amp; SOW</div>
+                </div>
+                <div class="side-section">
+                  <div class="side-label">Deploy</div>
+                  <div class="side-item">Deployment Console</div>
+                </div>
+                <div class="side-section">
+                  <div class="side-label">Operate</div>
+                  <div class="side-item">Live Monitoring</div>
+                </div>
+              </nav>
+              <div class="app-main">
+                <div class="main-head">
+                  <div>
+                    <div class="crumb">Sell &rsaquo; Diagnostic &rsaquo; Acme Legal</div>
+                    <h3>Document Intake diagnostic &middot; 9 of 12 answered</h3>
+                  </div>
+                  <div class="row">
+                    <span class="badge-soft amber">Awaiting partner sign-off</span>
+                    <button class="btn ghost" type="button">Copy share link</button>
+                  </div>
+                </div>
+                <div class="kpi-row">
+                  <div class="stat"><strong>1,800</strong><span>Docs / month</span></div>
+                  <div class="stat"><strong>6</strong><span>Staff impacted</span></div>
+                  <div class="stat"><strong>72h</strong><span>Avg matter handover</span></div>
+                  <div class="stat"><strong>22%</strong><span>Missing-info rework</span></div>
+                </div>
+                <div class="panel">
+                  <div class="panel-head">
+                    <h4>Workflow signals</h4>
+                    <span class="badge-soft green">Drives Sprint &amp; Scope</span>
+                  </div>
+                  <div class="field" style="margin-bottom:10px;">
+                    <label>Document types most chased</label>
+                    <div class="row wrap" style="gap:6px;">
+                      <span class="badge-soft">Statements of claim</span>
+                      <span class="badge-soft">Trust account confirmations</span>
+                      <span class="badge-soft">Engagement letters</span>
+                      <span class="badge-soft">Search results</span>
+                    </div>
+                  </div>
+                  <div class="field" style="margin-bottom:10px;">
+                    <label>Systems used today</label>
+                    <div class="row wrap" style="gap:6px;">
+                      <span class="badge-soft">LEAP</span>
+                      <span class="badge-soft">Karbon</span>
+                      <span class="badge-soft">SharePoint</span>
+                      <span class="badge-soft">Outlook</span>
+                    </div>
+                  </div>
+                  <div class="field">
+                    <label>Where partners want time back</label>
+                    <div class="input full">"Stop being asked the same matter status questions. Get matter packs ready before the partner reads them."</div>
+                  </div>
+                </div>
+                <div class="panel">
+                  <div class="panel-head">
+                    <h4>CORE inferences</h4>
+                    <span class="badge-soft dark">Auto</span>
+                  </div>
+                  <ul class="check-list" style="margin: 4px 0 0;">
+                    <li>Tier recommendation: <strong>Growth</strong> (volume + connector mix)</li>
+                    <li>Activation effort: <strong>~30 hours</strong> across 3 weeks</li>
+                    <li>Risk flag: trust account redaction needs explicit guardrail</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+          <aside class="annotations">
+            <div class="annotation">
+              <div class="marker">A</div>
+              <div>
+                <h4>The intake is the discovery</h4>
+                <p>Answers are converted into volume, system, and pain signals so the Dev shows up to the working session with insight.</p>
+              </div>
+            </div>
+            <div class="annotation">
+              <div class="marker">B</div>
+              <div>
+                <h4>Inferences feed every other Sell screen</h4>
+                <p>Sprint, Scope &amp; Quote, and Proposal all read from the same diagnostic record. One source of truth.</p>
+              </div>
+            </div>
+            <div class="annotation">
+              <div class="marker">C</div>
+              <div>
+                <h4>Risk flags surface early</h4>
+                <p>Vertical-specific risks (PII, redaction, regulated docs) are flagged before the SOW is generated.</p>
+              </div>
+            </div>
+            <div class="annotation">
+              <div class="marker">D</div>
+              <div>
+                <h4>Why investors care</h4>
+                <p>Diagnostics compress what would have been multiple unpaid scoping calls into a 20-minute structured intake.</p>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </article>
+
+      <article class="screen-slide" data-title="Scope &amp; Quote" data-section="Sell">
+        <header class="screen-head">
+          <p class="eyebrow">Sell &middot; 04 Scope &amp; Quote</p>
+          <h2>Live numbers the Dev can move with the SMB watching.</h2>
+          <p>The Dev configures sprint shape, retainer, and add-ons. Live totals show the SMB's year-one cost and the Dev's expected take. The figures trace back to the master STACK pricing table.</p>
+        </header>
+        <div class="screen-body">
+          <div class="app-frame" aria-hidden="true">
+            <div class="app-chrome">
+              <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+              <span class="url">app.reach.au/sell/scope</span>
+            </div>
+            <div class="app-topbar">
+              <div class="app-brand"><span class="mark">R</span> ReachCore</div>
+              <div class="app-context"><span class="app-chip"><span class="dot-sm"></span>Acme Legal &middot; Document Intake</span></div>
+              <div class="app-user"><span class="avatar">DM</span><span>Dev McLean</span></div>
+            </div>
+            <div class="app-shell">
+              <nav class="app-side">
+                <div class="side-section">
+                  <div class="side-label">Practice</div>
+                  <div class="side-item">Dashboard</div>
+                  <div class="side-item">Pipeline</div>
+                </div>
+                <div class="side-section">
+                  <div class="side-label">Sell</div>
+                  <div class="side-item">Capability Profile</div>
+                  <div class="side-item">Sprint Selector</div>
+                  <div class="side-item">SMB Diagnostic</div>
+                  <div class="side-item active">Scope &amp; Quote</div>
+                  <div class="side-item">Proposal &amp; SOW</div>
+                </div>
+                <div class="side-section">
+                  <div class="side-label">Deploy</div>
+                  <div class="side-item">Deployment Console</div>
+                </div>
+                <div class="side-section">
+                  <div class="side-label">Operate</div>
+                  <div class="side-item">Live Monitoring</div>
+                </div>
+              </nav>
+              <div class="app-main">
+                <div class="main-head">
+                  <div>
+                    <div class="crumb">Sell &rsaquo; Scope &amp; Quote</div>
+                    <h3>Configure the engagement</h3>
+                  </div>
+                  <div class="row">
+                    <button class="btn ghost" type="button">Save as draft</button>
+                    <button class="btn" type="button">Build proposal &rarr;</button>
+                  </div>
+                </div>
+                <div class="grid two" style="gap:12px;">
+                  <div class="panel">
+                    <div class="panel-head"><h4>Sprint shape</h4></div>
+                    <div class="row wrap" style="gap:6px; margin-bottom:10px;">
+                      <span class="badge-soft">Foundation</span>
+                      <span class="badge-soft green">Growth</span>
+                      <span class="badge-soft">Scale</span>
+                    </div>
+                    <div class="slider-row" style="margin-bottom:8px;">
+                      <span>Connectors enabled</span>
+                      <span><strong>3 of 5</strong></span>
+                    </div>
+                    <div class="slider" style="--w: 60%;"><span class="track"></span><span class="knob"></span></div>
+                    <div class="slider-row" style="margin-top:14px; margin-bottom:8px;">
+                      <span>Staff to onboard</span>
+                      <span><strong>6</strong></span>
+                    </div>
+                    <div class="slider" style="--w: 40%;"><span class="track"></span><span class="knob"></span></div>
+                    <div class="row" style="margin-top:14px; gap:14px;">
+                      <span class="toggle on"><span class="switch"></span>Trust account redaction</span>
+                      <span class="toggle on"><span class="switch"></span>Branded client portal</span>
+                      <span class="toggle"><span class="switch"></span>Practice review service</span>
+                    </div>
+                  </div>
+                  <div class="panel">
+                    <div class="panel-head">
+                      <h4>Live totals</h4>
+                      <span class="badge-soft green">Recalculated</span>
+                    </div>
+                    <table class="mini-table">
+                      <tbody>
+                        <tr><td>SMB &rarr; Dev implementation</td><td class="money">$12,000 once</td></tr>
+                        <tr><td>SMB &rarr; Reach activation</td><td class="money">$1,500 once</td></tr>
+                        <tr><td>SMB &rarr; Reach STACK Growth</td><td class="money">$999/mo</td></tr>
+                        <tr><td>SMB &rarr; Dev retainer</td><td class="money">$750/mo</td></tr>
+                      </tbody>
+                    </table>
+                    <div class="grid two" style="gap:8px; margin-top:12px;">
+                      <div class="stat"><strong>$13.5k</strong><span>SMB Year 1 upfront</span></div>
+                      <div class="stat"><strong>$21.85k</strong><span>Dev Year 1 net</span></div>
+                      <div class="stat"><strong>$10.5k</strong><span>Reach Year 1 STACK net</span></div>
+                      <div class="stat"><strong>$150/mo</strong><span>Dev lifetime commission</span></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <aside class="annotations">
+            <div class="annotation">
+              <div class="marker">A</div>
+              <div>
+                <h4>Numbers move live</h4>
+                <p>Adjusting connectors, retainer, or add-ons recalculates the table. The Dev navigates trade-offs in real time.</p>
+              </div>
+            </div>
+            <div class="annotation">
+              <div class="marker">B</div>
+              <div>
+                <h4>Both sides of the deal visible</h4>
+                <p>The SMB sees their cost. The Dev sees their take. Trust comes from the numbers being the same numbers in the proposal.</p>
+              </div>
+            </div>
+            <div class="annotation">
+              <div class="marker">C</div>
+              <div>
+                <h4>STACK pricing is structural</h4>
+                <p>STACK figures pull from the master pricing table, so commissions and Reach revenue are always in lockstep.</p>
+              </div>
+            </div>
+            <div class="annotation">
+              <div class="marker">D</div>
+              <div>
+                <h4>One click into proposal</h4>
+                <p>Configuration becomes the SOW. The Dev does not retype anything between Scope and Proposal.</p>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </article>
+
+      <article class="screen-slide" data-title="Proposal &amp; SOW" data-section="Sell">
+        <header class="screen-head">
+          <p class="eyebrow">Sell &middot; 05 Proposal &amp; SOW</p>
+          <h2>A signable artifact, generated from the configuration.</h2>
+          <p>Proposal narrative, sprint plan, pricing, terms, and SOW are generated from the diagnostic and scope. Branded with the Dev's profile, signed in CORE, and stored against the deployment record.</p>
+        </header>
+        <div class="screen-body">
+          <div class="app-frame" aria-hidden="true">
+            <div class="app-chrome">
+              <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+              <span class="url">app.reach.au/sell/proposal/acme-legal</span>
+            </div>
+            <div class="app-topbar">
+              <div class="app-brand"><span class="mark">R</span> ReachCore</div>
+              <div class="app-context"><span class="app-chip"><span class="dot-sm"></span>Acme Legal &middot; Document Intake</span></div>
+              <div class="app-user"><span class="avatar">DM</span><span>Dev McLean</span></div>
+            </div>
+            <div class="app-shell">
+              <nav class="app-side">
+                <div class="side-section">
+                  <div class="side-label">Practice</div>
+                  <div class="side-item">Dashboard</div>
+                  <div class="side-item">Pipeline</div>
+                </div>
+                <div class="side-section">
+                  <div class="side-label">Sell</div>
+                  <div class="side-item">Capability Profile</div>
+                  <div class="side-item">Sprint Selector</div>
+                  <div class="side-item">SMB Diagnostic</div>
+                  <div class="side-item">Scope &amp; Quote</div>
+                  <div class="side-item active">Proposal &amp; SOW</div>
+                </div>
+                <div class="side-section">
+                  <div class="side-label">Deploy</div>
+                  <div class="side-item">Deployment Console</div>
+                </div>
+              </nav>
+              <div class="app-main">
+                <div class="main-head">
+                  <div>
+                    <div class="crumb">Sell &rsaquo; Proposal &amp; SOW</div>
+                    <h3>v0.4 &middot; ready for partner sign-off</h3>
+                  </div>
+                  <div class="row">
+                    <button class="btn ghost" type="button">Download PDF</button>
+                    <button class="btn" type="button">Send for e-sign &rarr;</button>
+                  </div>
+                </div>
+                <div class="doc-preview">
+                  <div class="doc-h">Statement of Work</div>
+                  <div class="doc-title">Document Intake STACK &middot; Acme Legal &middot; 3-week sprint</div>
+                  <p class="small" style="margin:0;">Prepared by Dev McLean &middot; reach.au/dev/mclean &middot; v0.4</p>
+                  <div class="doc-section">
+                    <h5>Outcome</h5>
+                    <p>Reduce matter handover from ~72 hours to under 8 hours, halve missing-information rework, and free 6 staff from manual classification.</p>
+                  </div>
+                  <div class="doc-section">
+                    <h5>Sprint plan</h5>
+                    <p>Week 1: connectors and ontology. Week 2: rules, evals, and partner review. Week 3: training, branded portal, and go-live with two pilot matter types.</p>
+                  </div>
+                  <div class="doc-section">
+                    <h5>Pricing summary</h5>
+                    <p>Implementation $12,000 once &middot; Activation $1,500 once &middot; STACK Growth $999/mo &middot; Optional retainer $750/mo.</p>
+                  </div>
+                  <div class="doc-section">
+                    <h5>Compliance posture</h5>
+                    <p>Australian residency, APP-aligned PII handling, redaction enforced on trust account references, audit trail on every classification.</p>
+                  </div>
+                </div>
+                <div class="row spread" style="margin-top:12px;">
+                  <span class="badge-soft green">Generated from diagnostic + scope</span>
+                  <span class="badge-soft">Counter-signed in CORE, archived against deployment</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <aside class="annotations">
+            <div class="annotation">
+              <div class="marker">A</div>
+              <div>
+                <h4>Generated from the Sell record</h4>
+                <p>Each section is built from a structured Sell record, so the SOW reflects exactly what the Dev configured.</p>
+              </div>
+            </div>
+            <div class="annotation">
+              <div class="marker">B</div>
+              <div>
+                <h4>Compliance posture is included</h4>
+                <p>Vertical-specific compliance language pulls from the STACK template, so the Dev does not draft legal posture.</p>
+              </div>
+            </div>
+            <div class="annotation">
+              <div class="marker">C</div>
+              <div>
+                <h4>Signed and archived in one place</h4>
+                <p>The signed SOW lives against the deployment record, ready to be referenced by Deploy and Operate.</p>
+              </div>
+            </div>
+            <div class="annotation">
+              <div class="marker">D</div>
+              <div>
+                <h4>Compresses sales cycle</h4>
+                <p>The bottleneck is partner attention, removed by giving them a tight, structured artifact built from their own answers.</p>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </article>
+
+      <!-- =====================================================
+           DEPLOY
+           ===================================================== -->
+
+      <article class="screen-slide" data-title="Deployment Console" data-section="Deploy">
+        <header class="screen-head">
+          <p class="eyebrow">Deploy &middot; 06 Deployment Console</p>
+          <h2>The 3-week sprint, visible at a glance.</h2>
+          <p>The Console replaces a project tracker. Phases are pre-defined for the chosen STACK, with tasks generated from the SOW. Approval gates require explicit sign-off from a named SMB owner.</p>
+        </header>
+        <div class="screen-body">
+          <div class="app-frame" aria-hidden="true">
+            <div class="app-chrome">
+              <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+              <span class="url">app.reach.au/deploy/console/acme-legal</span>
+            </div>
+            <div class="app-topbar">
+              <div class="app-brand"><span class="mark">R</span> ReachCore</div>
+              <div class="app-context"><span class="app-chip"><span class="dot-sm"></span>Acme Legal &middot; Sprint week 2 of 3</span></div>
+              <div class="app-user"><span class="avatar">DM</span><span>Dev McLean</span></div>
+            </div>
+            <div class="app-shell">
+              <nav class="app-side">
+                <div class="side-section">
+                  <div class="side-label">Practice</div>
+                  <div class="side-item">Dashboard</div>
+                  <div class="side-item">Pipeline</div>
+                </div>
+                <div class="side-section">
+                  <div class="side-label">Sell</div>
+                  <div class="side-item">Proposal &amp; SOW</div>
+                </div>
+                <div class="side-section">
+                  <div class="side-label">Deploy</div>
+                  <div class="side-item active">Deployment Console</div>
+                  <div class="side-item">Mappings &amp; Vocabulary</div>
+                  <div class="side-item">Rules &amp; Evals</div>
+                  <div class="side-item">Delivery Checklist</div>
+                </div>
+                <div class="side-section">
+                  <div class="side-label">Operate</div>
+                  <div class="side-item">Live Monitoring</div>
+                </div>
+              </nav>
+              <div class="app-main">
+                <div class="main-head">
+                  <div>
+                    <div class="crumb">Deploy &rsaquo; Console</div>
+                    <h3>Document Intake &middot; Acme Legal &middot; Growth tier</h3>
+                  </div>
+                  <div class="row">
+                    <span class="badge-soft amber">2 gates pending</span>
+                    <button class="btn" type="button">Open next gate</button>
+                  </div>
+                </div>
+                <div class="kanban">
+                  <div class="kanban-col">
+                    <h5>Discovery</h5>
+                    <div class="kanban-card done">Diagnostic captured<div class="small">Day 1 &middot; signed</div></div>
+                    <div class="kanban-card done">Stakeholders mapped<div class="small">Day 2</div></div>
+                    <div class="kanban-card done">Scope baselined<div class="small">SOW v1</div></div>
+                  </div>
+                  <div class="kanban-col">
+                    <h5>Configure</h5>
+                    <div class="kanban-card done">Karbon connector<div class="small">Day 4 &middot; OAuth</div></div>
+                    <div class="kanban-card done">LEAP connector<div class="small">Day 5</div></div>
+                    <div class="kanban-card">Trust account ontology<div class="small">In review</div></div>
+                    <div class="kanban-card gate">Gate: ontology sign-off<div class="small">Owner: M. Tran</div></div>
+                  </div>
+                  <div class="kanban-col">
+                    <h5>Evaluate</h5>
+                    <div class="kanban-card">Eval baseline run<div class="small">96% on intake set</div></div>
+                    <div class="kanban-card">Partner sample review<div class="small">12 of 20 done</div></div>
+                    <div class="kanban-card gate">Gate: partner sign-off<div class="small">Required pre go-live</div></div>
+                  </div>
+                  <div class="kanban-col">
+                    <h5>Go-live</h5>
+                    <div class="kanban-card">Staff training<div class="small">Scheduled day 14</div></div>
+                    <div class="kanban-card">Branded client portal<div class="small">Live URL ready</div></div>
+                    <div class="kanban-card">Cutover &amp; observability<div class="small">Day 18</div></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <aside class="annotations">
+            <div class="annotation">
+              <div class="marker">A</div>
+              <div>
+                <h4>Pre-shaped phases</h4>
+                <p>The four columns are fixed for Document Intake. Tasks generate from the SOW, with vertical-specific defaults filled in.</p>
+              </div>
+            </div>
+            <div class="annotation">
+              <div class="marker">B</div>
+              <div>
+                <h4>Gates are real</h4>
+                <p>Yellow gate cards block progression until a named SMB owner approves. Evidence is captured against the deployment record.</p>
+              </div>
+            </div>
+            <div class="annotation">
+              <div class="marker">C</div>
+              <div>
+                <h4>Eval baseline before go-live</h4>
+                <p>The STACK runs against a vertical evaluation set. The Dev cannot ship until baseline is met or risk is explicitly accepted.</p>
+              </div>
+            </div>
+            <div class="annotation">
+              <div class="marker">D</div>
+              <div>
+                <h4>Why investors care</h4>
+                <p>Approval gates and evals turn what would have been "an agency project" into a quality-controlled, repeatable deployment.</p>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </article>
+
+      <article class="screen-slide" data-title="Mappings &amp; Vocabulary" data-section="Deploy">
+        <header class="screen-head">
+          <p class="eyebrow">Deploy &middot; 07 Mappings &amp; Vocabulary</p>
+          <h2>The vertical ontology meets the firm's vocabulary.</h2>
+          <p>Document Intake ships with a base ontology of clients, matters, parties, references, regulations, and completeness rules. The Dev maps the firm's specific terms onto that ontology in one screen, then trains the firm on the language they already use.</p>
+        </header>
+        <div class="screen-body">
+          <div class="app-frame" aria-hidden="true">
+            <div class="app-chrome">
+              <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+              <span class="url">app.reach.au/deploy/mappings/acme-legal</span>
+            </div>
+            <div class="app-topbar">
+              <div class="app-brand"><span class="mark">R</span> ReachCore</div>
+              <div class="app-context"><span class="app-chip"><span class="dot-sm"></span>Acme Legal &middot; Document Intake ontology v3.2</span></div>
+              <div class="app-user"><span class="avatar">DM</span><span>Dev McLean</span></div>
+            </div>
+            <div class="app-shell">
+              <nav class="app-side">
+                <div class="side-section">
+                  <div class="side-label">Practice</div>
+                  <div class="side-item">Dashboard</div>
+                  <div class="side-item">Pipeline</div>
+                </div>
+                <div class="side-section">
+                  <div class="side-label">Deploy</div>
+                  <div class="side-item">Deployment Console</div>
+                  <div class="side-item active">Mappings &amp; Vocabulary</div>
+                  <div class="side-item">Rules &amp; Evals</div>
+                  <div class="side-item">Delivery Checklist</div>
+                </div>
+                <div class="side-section">
+                  <div class="side-label">Operate</div>
+                  <div class="side-item">Live Monitoring</div>
+                </div>
+              </nav>
+              <div class="app-main">
+                <div class="main-head">
+                  <div>
+                    <div class="crumb">Deploy &rsaquo; Mappings</div>
+                    <h3>Map STACK ontology to Acme Legal terms</h3>
+                  </div>
+                  <div class="row">
+                    <span class="badge-soft green">14 of 18 mapped</span>
+                    <button class="btn ghost" type="button">Suggest from corpus</button>
+                  </div>
+                </div>
+                <div class="panel">
+                  <div class="panel-head">
+                    <h4>Document Intake entities</h4>
+                    <span class="badge-soft dark">STACK v3.2</span>
+                  </div>
+                  <div class="ontology" style="row-gap:10px;">
+                    <div class="o-cell std">Matter</div><div class="arrow-mini">&rarr;</div><div class="o-cell">Brief / file</div>
+                    <div class="o-cell std">Party</div><div class="arrow-mini">&rarr;</div><div class="o-cell">Counter-party / opponent</div>
+                    <div class="o-cell std">Engagement letter</div><div class="arrow-mini">&rarr;</div><div class="o-cell">Costs agreement</div>
+                    <div class="o-cell std">Statement of claim</div><div class="arrow-mini">&rarr;</div><div class="o-cell">Pleadings &middot; SOC</div>
+                    <div class="o-cell std">Trust account ref</div><div class="arrow-mini">&rarr;</div><div class="o-cell">Trust ledger entry</div>
+                    <div class="o-cell std">Completeness rule</div><div class="arrow-mini">&rarr;</div><div class="o-cell">Matter pack checklist</div>
+                  </div>
+                </div>
+                <div class="panel">
+                  <div class="panel-head">
+                    <h4>Vocabulary suggestions</h4>
+                    <span class="badge-soft amber">Pending review</span>
+                  </div>
+                  <ul class="check-list" style="margin: 4px 0 0;">
+                    <li><strong>"Search results"</strong> &rarr; map to Document Intake entity <em>Title search</em>?</li>
+                    <li><strong>"Brief to counsel"</strong> &rarr; new bespoke entity, scoped to litigation matter type?</li>
+                    <li><strong>"Costs disclosure"</strong> &rarr; alias on existing <em>Engagement letter</em>?</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+          <aside class="annotations">
+            <div class="annotation">
+              <div class="marker">A</div>
+              <div>
+                <h4>Ontology is the moat</h4>
+                <p>The Document Intake STACK ships a maintained ontology. Each deployment refines it with vertical-specific aliases.</p>
+              </div>
+            </div>
+            <div class="annotation">
+              <div class="marker">B</div>
+              <div>
+                <h4>Pre-filled from the firm's own corpus</h4>
+                <p>CORE proposes mappings drawn from the firm's documents. The Dev approves and tweaks each one in seconds.</p>
+              </div>
+            </div>
+            <div class="annotation">
+              <div class="marker">C</div>
+              <div>
+                <h4>The flywheel turns here</h4>
+                <p>New aliases and bespoke entities are reviewed for promotion into the next STACK ontology version.</p>
+              </div>
+            </div>
+            <div class="annotation">
+              <div class="marker">D</div>
+              <div>
+                <h4>GraphRAG depends on this</h4>
+                <p>Multi-hop retrieval across documents, parties, and references only works because the ontology is grounded in the firm's terms.</p>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </article>
+
+      <article class="screen-slide" data-title="Rules &amp; Eval Baselines" data-section="Deploy">
+        <header class="screen-head">
+          <p class="eyebrow">Deploy &middot; 08 Rules &amp; Eval Baselines</p>
+          <h2>Quality is a measured number.</h2>
+          <p>Vertical evals run on a curated test set. Rules govern redaction, escalation, and action boundaries. Both must clear thresholds before the Console allows go-live.</p>
+        </header>
+        <div class="screen-body">
+          <div class="app-frame" aria-hidden="true">
+            <div class="app-chrome">
+              <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+              <span class="url">app.reach.au/deploy/evals/acme-legal</span>
+            </div>
+            <div class="app-topbar">
+              <div class="app-brand"><span class="mark">R</span> ReachCore</div>
+              <div class="app-context"><span class="app-chip"><span class="dot-sm"></span>Acme Legal &middot; Eval suite v3.2 &middot; 62 cases</span></div>
+              <div class="app-user"><span class="avatar">DM</span><span>Dev McLean</span></div>
+            </div>
+            <div class="app-shell">
+              <nav class="app-side">
+                <div class="side-section">
+                  <div class="side-label">Practice</div>
+                  <div class="side-item">Dashboard</div>
+                  <div class="side-item">Pipeline</div>
+                </div>
+                <div class="side-section">
+                  <div class="side-label">Deploy</div>
+                  <div class="side-item">Deployment Console</div>
+                  <div class="side-item">Mappings &amp; Vocabulary</div>
+                  <div class="side-item active">Rules &amp; Evals</div>
+                  <div class="side-item">Delivery Checklist</div>
+                </div>
+                <div class="side-section">
+                  <div class="side-label">Operate</div>
+                  <div class="side-item">Live Monitoring</div>
+                </div>
+              </nav>
+              <div class="app-main">
+                <div class="main-head">
+                  <div>
+                    <div class="crumb">Deploy &rsaquo; Rules &amp; Evals</div>
+                    <h3>Baseline before go-live</h3>
+                  </div>
+                  <div class="row">
+                    <span class="badge-soft green">Threshold met on 5 of 6</span>
+                    <button class="btn amber" type="button">Re-run failing</button>
+                  </div>
+                </div>
+                <div class="panel">
+                  <div class="panel-head">
+                    <h4>Eval baseline</h4>
+                    <span class="badge-soft">Document Intake v3.2 &middot; 62 cases</span>
+                  </div>
+                  <table class="mini-table">
+                    <thead><tr><th>Eval</th><th>Threshold</th><th>Result</th><th>Status</th></tr></thead>
+                    <tbody>
+                      <tr><td>Document type classification</td><td>&ge; 95%</td><td>97.1%</td><td><span class="badge-soft green">Pass</span></td></tr>
+                      <tr><td>Party / counter-party extraction</td><td>&ge; 92%</td><td>94.4%</td><td><span class="badge-soft green">Pass</span></td></tr>
+                      <tr><td>Trust account redaction</td><td>100%</td><td>100%</td><td><span class="badge-soft green">Pass</span></td></tr>
+                      <tr><td>Missing-info detection</td><td>&ge; 90%</td><td>91.0%</td><td><span class="badge-soft green">Pass</span></td></tr>
+                      <tr><td>Citation grounding</td><td>&ge; 95%</td><td>96.8%</td><td><span class="badge-soft green">Pass</span></td></tr>
+                      <tr><td>Counsel brief summarisation</td><td>&ge; 90%</td><td>87.4%</td><td><span class="badge-soft red">Below</span></td></tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="panel">
+                  <div class="panel-head">
+                    <h4>Active rules</h4>
+                    <span class="badge-soft dark">Production</span>
+                  </div>
+                  <div class="rule-row">
+                    <span><strong>Redact</strong> &middot; Trust ledger numbers in any extracted text</span>
+                    <span class="badge-soft green">Enforced</span>
+                    <span class="badge-soft">Always</span>
+                  </div>
+                  <div class="rule-row">
+                    <span><strong>Escalate</strong> &middot; Statement of claim &gt; 50 pages or new party detected</span>
+                    <span class="badge-soft green">Enforced</span>
+                    <span class="badge-soft">Partner queue</span>
+                  </div>
+                  <div class="rule-row">
+                    <span><strong>Block action</strong> &middot; Outbound email until partner sign-off on classification</span>
+                    <span class="badge-soft green">Enforced</span>
+                    <span class="badge-soft">Pre go-live</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <aside class="annotations">
+            <div class="annotation">
+              <div class="marker">A</div>
+              <div>
+                <h4>Vertical eval suites are owned by Reach</h4>
+                <p>The 62-case Document Intake suite is maintained centrally. Failed cases feed back into the next STACK release.</p>
+              </div>
+            </div>
+            <div class="annotation">
+              <div class="marker">B</div>
+              <div>
+                <h4>Below-threshold blocks the gate</h4>
+                <p>The brief summarisation eval is below threshold, so the Console will not let the Dev pass the partner sign-off gate.</p>
+              </div>
+            </div>
+            <div class="annotation">
+              <div class="marker">C</div>
+              <div>
+                <h4>Rules are observable</h4>
+                <p>Every redaction, escalation, and blocked action is logged and visible to the SMB. Audit trails are part of the product.</p>
+              </div>
+            </div>
+            <div class="annotation">
+              <div class="marker">D</div>
+              <div>
+                <h4>This is the durable IP</h4>
+                <p>Rules and eval libraries compound across deployments. They are the part the SMB cannot self-build.</p>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </article>
+
+      <article class="screen-slide" data-title="Delivery Checklist" data-section="Deploy">
+        <header class="screen-head">
+          <p class="eyebrow">Deploy &middot; 09 Delivery Checklist</p>
+          <h2>Go-live readiness, evidence-backed.</h2>
+          <p>The Checklist enforces every artifact a Document Intake deployment needs to be safely live. Each item links to evidence captured during the sprint. Approval gates require named owners on the SMB side.</p>
+        </header>
+        <div class="screen-body">
+          <div class="app-frame" aria-hidden="true">
+            <div class="app-chrome">
+              <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+              <span class="url">app.reach.au/deploy/checklist/acme-legal</span>
+            </div>
+            <div class="app-topbar">
+              <div class="app-brand"><span class="mark">R</span> ReachCore</div>
+              <div class="app-context"><span class="app-chip"><span class="dot-sm"></span>Acme Legal &middot; Day 17 of 21</span></div>
+              <div class="app-user"><span class="avatar">DM</span><span>Dev McLean</span></div>
+            </div>
+            <div class="app-shell">
+              <nav class="app-side">
+                <div class="side-section">
+                  <div class="side-label">Practice</div>
+                  <div class="side-item">Dashboard</div>
+                  <div class="side-item">Pipeline</div>
+                </div>
+                <div class="side-section">
+                  <div class="side-label">Deploy</div>
+                  <div class="side-item">Deployment Console</div>
+                  <div class="side-item">Mappings &amp; Vocabulary</div>
+                  <div class="side-item">Rules &amp; Evals</div>
+                  <div class="side-item active">Delivery Checklist</div>
+                </div>
+                <div class="side-section">
+                  <div class="side-label">Operate</div>
+                  <div class="side-item">Live Monitoring</div>
+                </div>
+              </nav>
+              <div class="app-main">
+                <div class="main-head">
+                  <div>
+                    <div class="crumb">Deploy &rsaquo; Delivery Checklist</div>
+                    <h3>Document Intake go-live readiness</h3>
+                  </div>
+                  <div class="row">
+                    <span class="badge-soft amber">2 gates pending sign-off</span>
+                    <button class="btn" type="button">Request go-live &rarr;</button>
+                  </div>
+                </div>
+                <div class="panel" style="padding:6px 0;">
+                  <div class="checklist-row"><span class="tick">&#10003;</span><span><strong>Diagnostic completed</strong></span><span class="badge-soft green" style="margin-left:auto;">Day 1</span></div>
+                  <div class="checklist-row"><span class="tick">&#10003;</span><span><strong>SOW counter-signed</strong></span><span class="badge-soft green" style="margin-left:auto;">Day 2</span></div>
+                  <div class="checklist-row"><span class="tick">&#10003;</span><span><strong>Connectors live</strong> &middot; Karbon, LEAP, SharePoint</span><span class="badge-soft green" style="margin-left:auto;">Day 5</span></div>
+                  <div class="checklist-row"><span class="tick">&#10003;</span><span><strong>Ontology mapped</strong> &middot; 18 of 18 entities</span><span class="badge-soft green" style="margin-left:auto;">Day 9</span></div>
+                  <div class="checklist-row"><span class="tick gate">!</span><span><strong>Eval baseline above threshold</strong> &middot; 5 of 6 passing</span><span class="badge-soft amber" style="margin-left:auto;">Action: re-run brief summarisation</span></div>
+                  <div class="checklist-row"><span class="tick">&#10003;</span><span><strong>Trust account redaction enforced</strong></span><span class="badge-soft green" style="margin-left:auto;">Compliance</span></div>
+                  <div class="checklist-row"><span class="tick gate">!</span><span><strong>Partner sign-off on sample matters</strong></span><span class="badge-soft amber" style="margin-left:auto;">Owner: M. Tran</span></div>
+                  <div class="checklist-row"><span class="tick">&#10003;</span><span><strong>Branded client portal published</strong> &middot; portal.acmelegal.com.au</span><span class="badge-soft green" style="margin-left:auto;">Day 14</span></div>
+                  <div class="checklist-row"><span class="tick">&#10003;</span><span><strong>Staff training completed</strong> &middot; 6 of 6 staff</span><span class="badge-soft green" style="margin-left:auto;">Day 15</span></div>
+                  <div class="checklist-row"><span class="tick empty">&middot;</span><span><strong>Cutover scheduled</strong> &middot; observability armed</span><span class="badge-soft" style="margin-left:auto;">Day 18</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <aside class="annotations">
+            <div class="annotation">
+              <div class="marker">A</div>
+              <div>
+                <h4>Evidence on every line</h4>
+                <p>Each item links to the artifact that proves it. The deployment record stays auditable post go-live.</p>
+              </div>
+            </div>
+            <div class="annotation">
+              <div class="marker">B</div>
+              <div>
+                <h4>Gates name owners</h4>
+                <p>The amber items show the partner whose sign-off the Console is waiting on, with auto-reminders driven from CORE.</p>
+              </div>
+            </div>
+            <div class="annotation">
+              <div class="marker">C</div>
+              <div>
+                <h4>Compliance is a checklist item</h4>
+                <p>Redaction, residency, and audit trail readiness are checklist gates. Australian SMBs see this language clearly.</p>
+              </div>
+            </div>
+            <div class="annotation">
+              <div class="marker">D</div>
+              <div>
+                <h4>Why investors care</h4>
+                <p>Standardising readiness collapses the cost of every deployment and lets non-founder Devs ship at quality.</p>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </article>
+
+      <!-- =====================================================
+           OPERATE
+           ===================================================== -->
+
+      <article class="screen-slide" data-title="Live Monitoring" data-section="Operate">
+        <header class="screen-head">
+          <p class="eyebrow">Operate &middot; 10 Live Monitoring</p>
+          <h2>Usage, quality, and cost in one dashboard.</h2>
+          <p>Once the deployment is live, the Operate dashboard tracks volume, quality, escalation, and run cost in real time. The Dev gets early signal on retainer triggers and expansion conversations.</p>
+        </header>
+        <div class="screen-body">
+          <div class="app-frame" aria-hidden="true">
+            <div class="app-chrome">
+              <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+              <span class="url">app.reach.au/operate/monitor/acme-legal</span>
+            </div>
+            <div class="app-topbar">
+              <div class="app-brand"><span class="mark">R</span> ReachCore</div>
+              <div class="app-context"><span class="app-chip"><span class="dot-sm"></span>Acme Legal &middot; Live 14 days</span></div>
+              <div class="app-user"><span class="avatar">DM</span><span>Dev McLean</span></div>
+            </div>
+            <div class="app-shell">
+              <nav class="app-side">
+                <div class="side-section">
+                  <div class="side-label">Practice</div>
+                  <div class="side-item">Dashboard</div>
+                  <div class="side-item">Pipeline</div>
+                </div>
+                <div class="side-section">
+                  <div class="side-label">Deploy</div>
+                  <div class="side-item">Deployment Console</div>
+                </div>
+                <div class="side-section">
+                  <div class="side-label">Operate</div>
+                  <div class="side-item active">Live Monitoring</div>
+                  <div class="side-item">Retainer Builder</div>
+                  <div class="side-item">Case Study Generator</div>
+                </div>
+              </nav>
+              <div class="app-main">
+                <div class="main-head">
+                  <div>
+                    <div class="crumb">Operate &rsaquo; Live Monitoring</div>
+                    <h3>Acme Legal &middot; last 14 days</h3>
+                  </div>
+                  <div class="row">
+                    <span class="badge-soft green">Above baseline on quality</span>
+                    <button class="btn ghost" type="button">Share with SMB</button>
+                  </div>
+                </div>
+                <div class="kpi-row">
+                  <div class="stat"><strong>1,247</strong><span>Docs processed</span></div>
+                  <div class="stat"><strong>96.4%</strong><span>Eval pass (rolling)</span></div>
+                  <div class="stat"><strong>9 hrs</strong><span>Avg matter handover</span></div>
+                  <div class="stat"><strong>$184</strong><span>Run cost (period)</span></div>
+                </div>
+                <div class="grid two" style="gap:12px;">
+                  <div class="panel">
+                    <div class="panel-head">
+                      <h4>Daily volume</h4>
+                      <span class="badge-soft">Docs / day</span>
+                    </div>
+                    <div class="chart-bars" aria-hidden="true">
+                      <div class="bar" style="height:30%"></div>
+                      <div class="bar" style="height:55%"></div>
+                      <div class="bar" style="height:48%"></div>
+                      <div class="bar" style="height:68%"></div>
+                      <div class="bar" style="height:62%"></div>
+                      <div class="bar" style="height:24%"></div>
+                      <div class="bar" style="height:18%"></div>
+                      <div class="bar" style="height:42%"></div>
+                      <div class="bar" style="height:78%"></div>
+                      <div class="bar" style="height:88%"></div>
+                      <div class="bar" style="height:74%"></div>
+                      <div class="bar" style="height:92%"></div>
+                      <div class="bar" style="height:60%"></div>
+                      <div class="bar" style="height:34%"></div>
+                    </div>
+                  </div>
+                  <div class="panel">
+                    <div class="panel-head">
+                      <h4>Eval pass rate</h4>
+                      <span class="badge-soft green">Trending up</span>
+                    </div>
+                    <div class="chart-line" aria-hidden="true">
+                      <svg viewBox="0 0 200 60" preserveAspectRatio="none">
+                        <path d="M0,40 L20,38 L40,42 L60,30 L80,32 L100,26 L120,22 L140,24 L160,18 L180,16 L200,14"
+                              stroke="#388648" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M0,40 L20,38 L40,42 L60,30 L80,32 L100,26 L120,22 L140,24 L160,18 L180,16 L200,14 L200,60 L0,60 Z"
+                              fill="rgba(56,134,72,0.14)" stroke="none"/>
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+                <div class="panel">
+                  <div class="panel-head">
+                    <h4>Activity feed</h4>
+                    <span class="badge-soft">Last 24h</span>
+                  </div>
+                  <div class="activity">
+                    <div class="act"><span class="dot-sm"></span><span><strong>Escalation</strong> &middot; new opposing party detected on matter ACL-1042</span><span class="ts">12:14</span></div>
+                    <div class="act"><span class="dot-sm"></span><span><strong>Eval flag</strong> &middot; brief summarisation slipped to 88% on litigation set</span><span class="ts">09:40</span></div>
+                    <div class="act"><span class="dot-sm"></span><span><strong>Run cost</strong> &middot; daily $14.20, on track for monthly $420</span><span class="ts">08:02</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <aside class="annotations">
+            <div class="annotation">
+              <div class="marker">A</div>
+              <div>
+                <h4>One dashboard for the SMB and the Dev</h4>
+                <p>The same view is shareable. Partners see what the Dev sees, which becomes the basis of the monthly check-in.</p>
+              </div>
+            </div>
+            <div class="annotation">
+              <div class="marker">B</div>
+              <div>
+                <h4>Quality is tracked continuously</h4>
+                <p>Rolling eval pass rate keeps drift detection running, and feeds the Retainer Builder when intervention is needed.</p>
+              </div>
+            </div>
+            <div class="annotation">
+              <div class="marker">C</div>
+              <div>
+                <h4>Cost is in the dashboard</h4>
+                <p>Run cost is visible alongside volume so unit economics stay legible to the Dev and to Reach centrally.</p>
+              </div>
+            </div>
+            <div class="annotation">
+              <div class="marker">D</div>
+              <div>
+                <h4>Drives the data flywheel</h4>
+                <p>Escalations, drift, and edge cases stream into vertical eval suites and the next STACK release.</p>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </article>
+
+      <article class="screen-slide" data-title="Retainer Builder" data-section="Operate">
+        <header class="screen-head">
+          <p class="eyebrow">Operate &middot; 11 Retainer Builder</p>
+          <h2>Convert a successful go-live into recurring Dev income.</h2>
+          <p>The Retainer Builder reads live operate signals and proposes the right retainer shape: tuning hours, escalation cover, expansion preparation. The Dev sends a one-click offer to the SMB, signed in CORE.</p>
+        </header>
+        <div class="screen-body">
+          <div class="app-frame" aria-hidden="true">
+            <div class="app-chrome">
+              <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+              <span class="url">app.reach.au/operate/retainer/acme-legal</span>
+            </div>
+            <div class="app-topbar">
+              <div class="app-brand"><span class="mark">R</span> ReachCore</div>
+              <div class="app-context"><span class="app-chip"><span class="dot-sm"></span>Acme Legal &middot; Live 14 days</span></div>
+              <div class="app-user"><span class="avatar">DM</span><span>Dev McLean</span></div>
+            </div>
+            <div class="app-shell">
+              <nav class="app-side">
+                <div class="side-section">
+                  <div class="side-label">Practice</div>
+                  <div class="side-item">Dashboard</div>
+                  <div class="side-item">Pipeline</div>
+                </div>
+                <div class="side-section">
+                  <div class="side-label">Operate</div>
+                  <div class="side-item">Live Monitoring</div>
+                  <div class="side-item active">Retainer Builder</div>
+                  <div class="side-item">Case Study Generator</div>
+                </div>
+              </nav>
+              <div class="app-main">
+                <div class="main-head">
+                  <div>
+                    <div class="crumb">Operate &rsaquo; Retainer Builder</div>
+                    <h3>Propose retainer to Acme Legal</h3>
+                  </div>
+                  <div class="row">
+                    <span class="badge-soft green">Recommended: Practice retainer</span>
+                    <button class="btn" type="button">Send offer &rarr;</button>
+                  </div>
+                </div>
+                <div class="grid three" style="gap:10px;">
+                  <div class="price-card">
+                    <div class="name">Light</div>
+                    <div class="price">$350<small>/mo</small></div>
+                    <div class="meta">2h tuning &middot; quarterly review &middot; eval drift alerts only</div>
+                  </div>
+                  <div class="price-card featured">
+                    <div class="name">Practice &middot; recommended</div>
+                    <div class="price">$750<small>/mo</small></div>
+                    <div class="meta">5h tuning &middot; monthly review &middot; escalation cover &middot; expansion sessions</div>
+                  </div>
+                  <div class="price-card">
+                    <div class="name">Embedded</div>
+                    <div class="price">$1,800<small>/mo</small></div>
+                    <div class="meta">Weekly working session &middot; co-author of next vertical &middot; SLA on response</div>
+                  </div>
+                </div>
+                <div class="panel">
+                  <div class="panel-head">
+                    <h4>Why Practice fits Acme Legal</h4>
+                    <span class="badge-soft">From Live Monitoring</span>
+                  </div>
+                  <ul class="check-list" style="margin: 4px 0 0;">
+                    <li>Litigation set drift trending toward 88%, will need monthly tuning</li>
+                    <li>Two escalation queues already created &middot; partner wants visibility</li>
+                    <li>Customer Support STACK signaled as natural expansion in 90 days</li>
+                  </ul>
+                </div>
+                <div class="row spread" style="margin-top:14px;">
+                  <span class="badge-soft green">Dev recurring: $750/mo</span>
+                  <span class="badge-soft">Reach lifetime commission continues at 15%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <aside class="annotations">
+            <div class="annotation">
+              <div class="marker">A</div>
+              <div>
+                <h4>Three pre-shaped retainers</h4>
+                <p>Devs do not negotiate retainer shapes from scratch. CORE proposes one matched to the SMB's operate profile.</p>
+              </div>
+            </div>
+            <div class="annotation">
+              <div class="marker">B</div>
+              <div>
+                <h4>Evidence-driven recommendation</h4>
+                <p>Drift, escalation queues, and expansion signals come straight from Live Monitoring, with citations the SMB can verify.</p>
+              </div>
+            </div>
+            <div class="annotation">
+              <div class="marker">C</div>
+              <div>
+                <h4>Two layers of recurring income</h4>
+                <p>The Dev earns the retainer and keeps the lifetime STACK commission. CORE keeps both flows visible.</p>
+              </div>
+            </div>
+            <div class="annotation">
+              <div class="marker">D</div>
+              <div>
+                <h4>Why investors care</h4>
+                <p>Retainer Builder is what turns Reach from a deployment business into a recurring practice ecosystem.</p>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </article>
+
+      <article class="screen-slide" data-title="Case Study Generator" data-section="Operate">
+        <header class="screen-head">
+          <p class="eyebrow">Operate &middot; 12 Case Study Generator</p>
+          <h2>Every live deployment becomes the next pitch artifact.</h2>
+          <p>CORE assembles a case study draft from diagnostic figures, eval results, and operate metrics. The Dev approves wording with the SMB, publishes it to their Capability Profile, and Reach uses it across the marketplace.</p>
+        </header>
+        <div class="screen-body">
+          <div class="app-frame" aria-hidden="true">
+            <div class="app-chrome">
+              <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+              <span class="url">app.reach.au/operate/case-study/acme-legal</span>
+            </div>
+            <div class="app-topbar">
+              <div class="app-brand"><span class="mark">R</span> ReachCore</div>
+              <div class="app-context"><span class="app-chip"><span class="dot-sm"></span>Acme Legal &middot; Case study v0.2</span></div>
+              <div class="app-user"><span class="avatar">DM</span><span>Dev McLean</span></div>
+            </div>
+            <div class="app-shell">
+              <nav class="app-side">
+                <div class="side-section">
+                  <div class="side-label">Practice</div>
+                  <div class="side-item">Dashboard</div>
+                  <div class="side-item">Pipeline</div>
+                </div>
+                <div class="side-section">
+                  <div class="side-label">Operate</div>
+                  <div class="side-item">Live Monitoring</div>
+                  <div class="side-item">Retainer Builder</div>
+                  <div class="side-item active">Case Study Generator</div>
+                </div>
+              </nav>
+              <div class="app-main">
+                <div class="main-head">
+                  <div>
+                    <div class="crumb">Operate &rsaquo; Case Study Generator</div>
+                    <h3>Acme Legal &middot; Document Intake outcomes</h3>
+                  </div>
+                  <div class="row">
+                    <button class="btn ghost" type="button">Send to SMB for approval</button>
+                    <button class="btn" type="button">Publish to profile</button>
+                  </div>
+                </div>
+                <div class="kpi-row">
+                  <div class="stat"><strong>72h &rarr; 9h</strong><span>Matter handover</span></div>
+                  <div class="stat"><strong>22% &rarr; 6%</strong><span>Missing-info rework</span></div>
+                  <div class="stat"><strong>6 staff</strong><span>Freed from manual classification</span></div>
+                  <div class="stat"><strong>96.4%</strong><span>Eval pass, rolling</span></div>
+                </div>
+                <div class="doc-preview">
+                  <div class="doc-h">Case study draft</div>
+                  <div class="doc-title">Acme Legal cuts matter handover from three days to under one shift.</div>
+                  <p class="small" style="margin:0;">Document Intake STACK &middot; deployed by Dev McLean &middot; Brisbane, AU</p>
+                  <div class="doc-section">
+                    <h5>Outcome</h5>
+                    <p>A 25-person commercial-litigation firm reduced matter handover from 72 hours to under 9 hours, freed six staff from manual classification, and cut missing-information rework from 22% to 6% in the first 14 days of go-live.</p>
+                  </div>
+                  <div class="doc-section">
+                    <h5>How</h5>
+                    <p>Document Intake STACK Growth tier, configured against the firm's litigation ontology with trust account redaction enforced. Branded client portal published, partner sign-off gates kept enforcement on quality before scale.</p>
+                  </div>
+                  <div class="doc-section">
+                    <h5>Quote</h5>
+                    <p>"We got partner time back in week one. The handover queue stopped being the bottleneck of our practice." &mdash; M. Tran, Managing Partner.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <aside class="annotations">
+            <div class="annotation">
+              <div class="marker">A</div>
+              <div>
+                <h4>Numbers come from CORE itself</h4>
+                <p>Diagnostic baselines and operate metrics are the inputs. The Dev edits wording. Figures stay locked to CORE.</p>
+              </div>
+            </div>
+            <div class="annotation">
+              <div class="marker">B</div>
+              <div>
+                <h4>SMB approval is built in</h4>
+                <p>Case studies cannot publish until the SMB owner approves the draft, removing the awkward "is this OK to share" loop.</p>
+              </div>
+            </div>
+            <div class="annotation">
+              <div class="marker">C</div>
+              <div>
+                <h4>Two flywheels at once</h4>
+                <p>The Dev gets a marketing artifact for their Capability Profile. Reach gets vertical proof points for the marketplace.</p>
+              </div>
+            </div>
+            <div class="annotation">
+              <div class="marker">D</div>
+              <div>
+                <h4>Why investors care</h4>
+                <p>Every successful deployment manufactures the social proof that lowers acquisition cost for the next one.</p>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </article>
+
+      <!-- =====================================================
+           CLOSE
+           ===================================================== -->
+
+      <article class="screen-slide" data-title="On any device" data-section="Close">
+        <header class="screen-head">
+          <p class="eyebrow">Designed for in-person work</p>
+          <h2>CORE is mobile responsive end to end.</h2>
+          <p>Discovery happens at the SMB's desk. Sign-off happens on the partner's phone. Cutover happens on the office floor. Every CORE surface reshapes for tablet and phone so the Dev runs the practice from wherever they are sitting with the SMB.</p>
+        </header>
+        <div class="phones-grid">
+          <div class="phone-stage">
+            <p class="stage-label">In-take &middot; on the SMB's desk</p>
+            <p class="stage-copy">Dev sits with the partner and runs the SMB Diagnostic on a tablet or phone.</p>
+            <div class="phone-frame" aria-hidden="true">
+              <div class="phone-screen">
+                <div class="phone-status"><span>09:42</span><span>5G &middot; 86%</span></div>
+                <div class="phone-topbar">
+                  <span class="ham"><span></span><span></span><span></span></span>
+                  <span>SMB Diagnostic</span>
+                  <span class="pavatar">DM</span>
+                </div>
+                <div class="phone-body">
+                  <p class="phone-section">Acme Legal &middot; Document Intake</p>
+                  <div class="phone-stat">
+                    <div class="pstat"><strong>1,800</strong><span>Docs / mo</span></div>
+                    <div class="pstat"><strong>6</strong><span>Staff impacted</span></div>
+                    <div class="pstat"><strong>72h</strong><span>Avg handover</span></div>
+                    <div class="pstat"><strong>22%</strong><span>Rework</span></div>
+                  </div>
+                  <div class="phone-card">
+                    <h6>Where partners want time back</h6>
+                    <p class="small-q">"Stop being asked the same matter status questions. Get matter packs ready before the partner reads them."</p>
+                  </div>
+                  <div class="phone-card">
+                    <h6>CORE inference</h6>
+                    <p class="small-q">Tier recommendation: <strong>Growth</strong> &middot; Activation: ~30 hrs.</p>
+                  </div>
+                  <div class="phone-button">Save &amp; share scope</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="phone-stage">
+            <p class="stage-label">Roll-out &middot; on-site cutover</p>
+            <p class="stage-copy">Dev walks the office floor on go-live day, ticking off the Delivery Checklist live.</p>
+            <div class="phone-frame" aria-hidden="true">
+              <div class="phone-screen">
+                <div class="phone-status"><span>14:08</span><span>Wi-Fi &middot; 64%</span></div>
+                <div class="phone-topbar">
+                  <span class="ham"><span></span><span></span><span></span></span>
+                  <span>Go-live readiness</span>
+                  <span class="pavatar">DM</span>
+                </div>
+                <div class="phone-body">
+                  <p class="phone-section">Acme Legal &middot; Day 17 of 21</p>
+                  <div class="phone-card" style="padding:6px 10px;">
+                    <div class="phone-row"><span class="phone-tick">&#10003;</span><span>Connectors live</span></div>
+                    <div class="phone-row"><span class="phone-tick">&#10003;</span><span>Ontology mapped</span></div>
+                    <div class="phone-row"><span class="phone-tick gate">!</span><span>Eval baseline below threshold</span></div>
+                    <div class="phone-row"><span class="phone-tick gate">!</span><span>Partner sign-off needed</span></div>
+                    <div class="phone-row"><span class="phone-tick">&#10003;</span><span>Staff training done</span></div>
+                    <div class="phone-row"><span class="phone-tick">&#10003;</span><span>Branded portal published</span></div>
+                    <div class="phone-row"><span class="phone-tick empty">&middot;</span><span>Cutover scheduled</span></div>
+                  </div>
+                  <div class="phone-button">Request go-live</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="phone-stage">
+            <p class="stage-label">Live check &middot; between meetings</p>
+            <p class="stage-copy">Dev opens CORE on the train. Quality and run-cost in five seconds.</p>
+            <div class="phone-frame" aria-hidden="true">
+              <div class="phone-screen">
+                <div class="phone-status"><span>17:21</span><span>4G &middot; 41%</span></div>
+                <div class="phone-topbar">
+                  <span class="ham"><span></span><span></span><span></span></span>
+                  <span>Acme Legal &middot; live</span>
+                  <span class="pavatar">DM</span>
+                </div>
+                <div class="phone-body">
+                  <p class="phone-section">Last 14 days</p>
+                  <div class="phone-stat">
+                    <div class="pstat"><strong>1,247</strong><span>Docs</span></div>
+                    <div class="pstat"><strong>96.4%</strong><span>Eval pass</span></div>
+                    <div class="pstat"><strong>9 hrs</strong><span>Handover</span></div>
+                    <div class="pstat"><strong>$184</strong><span>Run cost</span></div>
+                  </div>
+                  <div class="phone-card" style="padding:6px 10px;">
+                    <div class="phone-act"><span class="pdot amber"></span><span>New opposing party on ACL-1042<br><span class="pts">12:14</span></span></div>
+                    <div class="phone-act"><span class="pdot amber"></span><span>Brief summarisation slipped to 88%<br><span class="pts">09:40</span></span></div>
+                    <div class="phone-act"><span class="pdot"></span><span>Daily run cost on track for $420/mo<br><span class="pts">08:02</span></span></div>
+                  </div>
+                  <div class="phone-button">Open Acme Legal</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="slide" data-title="Recap" data-section="Close">
+        <div class="content wide">
+          <p class="eyebrow">Recap</p>
+          <h2>What CORE compounds for the three sides.</h2>
+          <p class="lead lede-tight">Sixteen screens, one Dev-facing app, three sides of the deal. Practice holds the book; Sell, Deploy, and Operate carry every client through. CORE earns its monthly subscription by collapsing what each side has to do alone.</p>
+          <div class="grid three" style="margin-top: 30px;">
+            <div class="tile">
+              <h3><span class="number">Dev</span>For the consultant</h3>
+              <ul class="check-list">
+                <li>Verifiable practice page from day one</li>
+                <li>Pre-shaped sprints and proposals</li>
+                <li>Approval gates that hold the sprint to scope</li>
+                <li>Live operate dashboard for every client</li>
+                <li>Retainer offers driven by real signal</li>
+              </ul>
+            </div>
+            <div class="tile dark">
+              <h3><span class="number">SMB</span>For the buyer</h3>
+              <ul class="check-list">
+                <li>Concrete sprint shapes priced in the room</li>
+                <li>One named owner, evidence on every gate</li>
+                <li>Branded portal, audit trail, AU residency</li>
+                <li>Same dashboard the Dev sees</li>
+                <li>Quality measured continuously and visibly</li>
+              </ul>
+            </div>
+            <div class="tile">
+              <h3><span class="number">Reach</span>For the platform</h3>
+              <ul class="check-list">
+                <li>STACK activations and recurring MRR</li>
+                <li>Vertical eval failures feed the next release</li>
+                <li>Ontology suggestions promoted into the moat</li>
+                <li>Case studies stocked from real deployments</li>
+                <li>CORE subscription pays for the surface</li>
+              </ul>
+            </div>
+          </div>
+          <p class="thesis-line">CORE is the surface that lets Devs ship Reach-quality deployments at SMB scale, and the place where every deployment makes the next one easier to sell, deliver, and operate.</p>
+        </div>
+      </article>
+
+      <article class="slide center" data-title="Closing" data-section="Close">
+        <div class="content">
+          <p class="eyebrow">Where to next</p>
+          <h2>Build CORE around the screens that earn the subscription.</h2>
+          <p class="lead">Capability Profile, Sprint Selector, Diagnostic, Scope &amp; Quote, and Live Monitoring carry the most weight in this story. Building these five at production quality first turns CORE into a marketable surface in time for the first paid Document Intake deployments.</p>
+          <p class="thesis-line">Discussion: which screens warrant the deepest investment for the launch wedge, and what is the smallest shippable surface that keeps the consultant promise honest?</p>
+        </div>
+      </article>
+
+    </section>
+
+    <div class="controls" aria-label="Slide controls">
+      <button class="arrow" type="button" data-prev aria-label="Previous slide">&larr;</button>
+      <div class="counter" aria-live="polite">01 / 23</div>
+      <button class="arrow" type="button" data-next aria-label="Next slide">&rarr;</button>
+    </div>
+
+    <aside class="menu" id="menu" aria-hidden="true">
+      <div class="menu-panel" role="dialog" aria-modal="true" aria-labelledby="menu-title">
+        <div class="menu-head">
+          <h2 id="menu-title">Slide menu</h2>
+          <button class="menu-close" type="button" aria-label="Close menu">&times;</button>
+        </div>
+        <ol class="menu-list"></ol>
+      </div>
+    </aside>
+  </main>
+
+  <script>
+    // Embed mode: when loaded with ?embed=1, hide deck chrome so the slide
+    // content fills the viewport for iframe embedding inside another deck.
+    // ?embed=1&view=phone strips everything except the phone-mini mockup.
+    {
+      const params = new URLSearchParams(window.location.search);
+      if (params.has('embed')) document.body.classList.add('embed');
+      if (params.get('view') === 'phone') document.body.classList.add('view-phone');
+    }
+
+    const slides = Array.from(document.querySelectorAll(".slide, .screen-slide"));
+    const prevButton = document.querySelector("[data-prev]");
+    const nextButton = document.querySelector("[data-next]");
+    const counter = document.querySelector(".counter");
+    const menu = document.querySelector("#menu");
+    const menuToggle = document.querySelector(".menu-toggle");
+    const menuClose = document.querySelector(".menu-close");
+    const menuList = document.querySelector(".menu-list");
+    const sectionButtons = Array.from(document.querySelectorAll("[data-section-jump]"));
+    let current = 0;
+
+    function pad(num) { return String(num).padStart(2, "0"); }
+
+    function syncHash(index) {
+      const nextHash = `slide-${index + 1}`;
+      if (window.location.hash.slice(1) !== nextHash) {
+        history.replaceState(null, "", `#${nextHash}`);
+      }
+    }
+
+    function goTo(index, options = {}) {
+      current = Math.max(0, Math.min(index, slides.length - 1));
+      slides.forEach((slide, idx) => {
+        slide.classList.toggle("active", idx === current);
+        if (idx === current) slide.scrollTop = 0;
+      });
+
+      prevButton.disabled = current === 0;
+      nextButton.disabled = current === slides.length - 1;
+      counter.textContent = `${pad(current + 1)} / ${pad(slides.length)}`;
+
+      const section = slides[current].dataset.section;
+      sectionButtons.forEach((button) => {
+        button.classList.toggle("active", button.dataset.sectionJump === section);
+      });
+
+      Array.from(menuList.querySelectorAll("button")).forEach((button, idx) => {
+        button.classList.toggle("active", idx === current);
+      });
+
+      if (!options.silentHash) syncHash(current);
+    }
+
+    function openMenu() {
+      menu.classList.add("open");
+      menu.setAttribute("aria-hidden", "false");
+      menuToggle.setAttribute("aria-expanded", "true");
+      const active = menuList.querySelector("button.active") || menuList.querySelector("button");
+      if (active) active.focus();
+    }
+
+    function closeMenu() {
+      menu.classList.remove("open");
+      menu.setAttribute("aria-hidden", "true");
+      menuToggle.setAttribute("aria-expanded", "false");
+      menuToggle.focus();
+    }
+
+    function buildMenu() {
+      slides.forEach((slide, index) => {
+        const item = document.createElement("li");
+        const button = document.createElement("button");
+        button.type = "button";
+        button.innerHTML = `
+          <span class="idx">${pad(index + 1)}</span>
+          <span>
+            <span class="title">${slide.dataset.title}</span>
+            <span class="section">${slide.dataset.section}</span>
+          </span>
+        `;
+        button.addEventListener("click", () => {
+          goTo(index);
+          closeMenu();
+        });
+        item.appendChild(button);
+        menuList.appendChild(item);
+      });
+    }
+
+    // Inject a compact phone mockup into every screen-slide so each CORE
+    // surface demonstrates its mobile responsive equivalent next to the desktop view.
+    (function injectMobile() {
+      const phone = (title, body) => `
+        <div class="phone-frame"><div class="phone-screen">
+          <div class="phone-status"><span>09:42</span><span>5G</span></div>
+          <div class="phone-topbar">
+            <span class="ham"><span></span><span></span><span></span></span>
+            <span>${title}</span>
+            <span class="pavatar">DM</span>
+          </div>
+          <div class="phone-body">${body}</div>
+        </div></div>`;
+
+      const PHONES = {
+        "Dashboard": phone("Practice", `
+          <p class="phone-section">3 active clients</p>
+          <div class="phone-stat">
+            <div class="pstat"><strong>3</strong><span>Active</span></div>
+            <div class="pstat"><strong>2</strong><span>Open</span></div>
+            <div class="pstat"><strong>$13.4k</strong><span>This month</span></div>
+            <div class="pstat"><strong>$374/mo</strong><span>STACK MRR</span></div>
+          </div>
+          <div class="phone-card">
+            <h6>Action queue &middot; 3 waiting</h6>
+            <p class="small-q">Acme &middot; gates pending<br>Northwind &middot; drift alert<br>Greer &middot; scope sprint</p>
+          </div>
+          <div class="phone-button">View all clients</div>
+        `),
+        "Pipeline": phone("Pipeline", `
+          <p class="phone-section">5 opportunities</p>
+          <div class="phone-stat">
+            <div class="pstat"><strong>$78k</strong><span>Pipeline</span></div>
+            <div class="pstat"><strong>$42.6k</strong><span>Weighted</span></div>
+            <div class="pstat"><strong>$24k</strong><span>Closing</span></div>
+            <div class="pstat"><strong>62%</strong><span>Win rate</span></div>
+          </div>
+          <div class="phone-card">
+            <h6>In sprint</h6>
+            <p class="small-q">Acme Legal &middot; Growth &middot; week 2/3</p>
+          </div>
+          <div class="phone-card">
+            <h6>Up next</h6>
+            <p class="small-q">Sterling Advisors &middot; proposal v0.3 sent</p>
+          </div>
+          <div class="phone-button">+ Add</div>
+        `),
+        "Earnings": phone("Earnings", `
+          <p class="phone-section">FY26 view</p>
+          <div class="phone-stat">
+            <div class="pstat"><strong>$13.4k</strong><span>This month</span></div>
+            <div class="pstat"><strong>$48.7k</strong><span>YTD</span></div>
+            <div class="pstat"><strong>$374/mo</strong><span>Lifetime MRR</span></div>
+            <div class="pstat"><strong>$2,124</strong><span>Next payout</span></div>
+          </div>
+          <div class="phone-card">
+            <h6>Three streams (this mo)</h6>
+            <p class="small-q">Impl $12,000<br>Retainer $1,250<br>Commission $225</p>
+          </div>
+          <div class="phone-button">Export</div>
+        `),
+        "Certifications": phone("Certifications", `
+          <p class="phone-section">Reach-issued</p>
+          <div class="phone-card">
+            <h6>Document Intake</h6>
+            <p class="small-q"><strong>L1</strong> earned &middot; <strong>L2</strong> current &middot; <strong>L3</strong> 3/5 live</p>
+          </div>
+          <div class="phone-card">
+            <h6>Connectors &middot; 4 certified</h6>
+            <p class="small-q">Karbon &middot; LEAP &middot; FYI Docs &middot; SharePoint</p>
+          </div>
+          <div class="phone-card">
+            <h6>CORE tier</h6>
+            <p class="small-q">Starter &middot; 75% to Practice tier (4 active clients)</p>
+          </div>
+        `),
+        "Capability Profile": phone("Profile", `
+          <p class="phone-section">reach.au/dev/mclean</p>
+          <div class="phone-card">
+            <h6>Specialisations</h6>
+            <p class="small-q">Document Intake (verified)</p>
+          </div>
+          <div class="phone-card">
+            <h6>Certifications</h6>
+            <p class="small-q">L2 Practitioner &middot; 96% eval pass &middot; 12 deployments</p>
+          </div>
+          <div class="phone-card">
+            <h6>Practice history &middot; 3</h6>
+            <p class="small-q">Northwind &middot; Globex &middot; Acme Legal</p>
+          </div>
+          <div class="phone-button">Preview public</div>
+        `),
+        "Sprint Selector": phone("Sprint", `
+          <p class="phone-section">Acme Legal &middot; Doc Intake</p>
+          <div class="phone-card" style="border:2px solid var(--green-600);">
+            <h6 style="color:var(--green-700);">Recommended &middot; Growth</h6>
+            <p class="small-q"><strong>$999/mo</strong> &middot; &le;2,000 docs/mo &middot; 3-week sprint</p>
+          </div>
+          <div class="phone-card">
+            <h6>Why this fits</h6>
+            <p class="small-q">~1,800 docs/mo &middot; 3 connectors detected &middot; matter handover SLA pain</p>
+          </div>
+          <div class="phone-button">Continue &rarr;</div>
+        `),
+        "SMB Diagnostic": phone("Diagnostic", `
+          <p class="phone-section">Acme Legal &middot; 9 of 12</p>
+          <div class="phone-stat">
+            <div class="pstat"><strong>1,800</strong><span>Docs / mo</span></div>
+            <div class="pstat"><strong>6</strong><span>Staff</span></div>
+            <div class="pstat"><strong>72h</strong><span>Handover</span></div>
+            <div class="pstat"><strong>22%</strong><span>Rework</span></div>
+          </div>
+          <div class="phone-card">
+            <h6>Where partners want time back</h6>
+            <p class="small-q">"Stop being asked the same matter status questions."</p>
+          </div>
+          <div class="phone-button">Save &amp; continue</div>
+        `),
+        "Scope & Quote": phone("Scope", `
+          <p class="phone-section">Acme &middot; Growth tier</p>
+          <div class="phone-stat">
+            <div class="pstat"><strong>$13.5k</strong><span>SMB Y1</span></div>
+            <div class="pstat"><strong>$21.85k</strong><span>Dev Y1</span></div>
+            <div class="pstat"><strong>$10.5k</strong><span>Reach Y1</span></div>
+            <div class="pstat"><strong>$150/mo</strong><span>Commission</span></div>
+          </div>
+          <div class="phone-card">
+            <h6>Configured</h6>
+            <p class="small-q">3 connectors &middot; 6 staff &middot; trust redaction &middot; branded portal</p>
+          </div>
+          <div class="phone-button">Build proposal &rarr;</div>
+        `),
+        "Proposal & SOW": phone("Proposal v0.4", `
+          <p class="phone-section">Acme &middot; ready for sign-off</p>
+          <div class="phone-card">
+            <h6>Document Intake &middot; 3-week sprint</h6>
+            <p class="small-q">Reduce matter handover from ~72h to under 8h. Halve missing-info rework.</p>
+          </div>
+          <div class="phone-card">
+            <h6>Pricing</h6>
+            <p class="small-q">$12,000 + $1,500 + $999/mo + $750/mo retainer</p>
+          </div>
+          <div class="phone-button">Send for e-sign</div>
+        `),
+        "Deployment Console": phone("Console", `
+          <p class="phone-section">Acme &middot; sprint w2/3</p>
+          <div class="phone-card">
+            <h6>Configure (current)</h6>
+            <p class="small-q">&#10003; Karbon &middot; &#10003; LEAP &middot; Trust account ontology in review</p>
+          </div>
+          <div class="phone-card" style="background: var(--amber-bg); border-color: var(--amber-line);">
+            <h6 style="color:#6b4d10;">2 gates pending</h6>
+            <p class="small-q">Ontology sign-off &middot; Partner sample review</p>
+          </div>
+          <div class="phone-button">Open next gate</div>
+        `),
+        "Mappings & Vocabulary": phone("Mappings", `
+          <p class="phone-section">Doc Intake v3.2 &middot; 14/18</p>
+          <div class="phone-card" style="padding:7px 10px;">
+            <div class="phone-row"><span><strong>Matter</strong> &rarr; Brief / file</span></div>
+            <div class="phone-row"><span><strong>Party</strong> &rarr; Counter-party</span></div>
+            <div class="phone-row"><span><strong>Eng letter</strong> &rarr; Costs agreement</span></div>
+            <div class="phone-row"><span><strong>Trust ref</strong> &rarr; Trust ledger</span></div>
+          </div>
+          <div class="phone-button">Suggest more</div>
+        `),
+        "Rules & Eval Baselines": phone("Evals", `
+          <p class="phone-section">v3.2 &middot; 5 of 6 passing</p>
+          <div class="phone-card" style="padding:5px 9px;">
+            <div class="phone-row"><span class="phone-tick">&#10003;</span><span>Type classification 97%</span></div>
+            <div class="phone-row"><span class="phone-tick">&#10003;</span><span>Party extraction 94%</span></div>
+            <div class="phone-row"><span class="phone-tick">&#10003;</span><span>Trust redaction 100%</span></div>
+            <div class="phone-row"><span class="phone-tick">&#10003;</span><span>Citation grounding 96%</span></div>
+            <div class="phone-row"><span class="phone-tick gate">!</span><span>Brief summary 87%</span></div>
+          </div>
+          <div class="phone-button">Re-run failing</div>
+        `),
+        "Delivery Checklist": phone("Go-live readiness", `
+          <p class="phone-section">Acme &middot; day 17 of 21</p>
+          <div class="phone-card" style="padding:5px 9px;">
+            <div class="phone-row"><span class="phone-tick">&#10003;</span><span>Connectors live</span></div>
+            <div class="phone-row"><span class="phone-tick">&#10003;</span><span>Ontology mapped</span></div>
+            <div class="phone-row"><span class="phone-tick gate">!</span><span>Eval below threshold</span></div>
+            <div class="phone-row"><span class="phone-tick gate">!</span><span>Partner sign-off needed</span></div>
+            <div class="phone-row"><span class="phone-tick">&#10003;</span><span>Staff training done</span></div>
+            <div class="phone-row"><span class="phone-tick empty">&middot;</span><span>Cutover scheduled</span></div>
+          </div>
+          <div class="phone-button">Request go-live</div>
+        `),
+        "Live Monitoring": phone("Acme &middot; live", `
+          <p class="phone-section">Last 14 days</p>
+          <div class="phone-stat">
+            <div class="pstat"><strong>1,247</strong><span>Docs</span></div>
+            <div class="pstat"><strong>96.4%</strong><span>Eval</span></div>
+            <div class="pstat"><strong>9 hrs</strong><span>Handover</span></div>
+            <div class="pstat"><strong>$184</strong><span>Run cost</span></div>
+          </div>
+          <div class="phone-card" style="padding:5px 9px;">
+            <div class="phone-act"><span class="pdot amber"></span><span>Opposing party on ACL-1042<br><span class="pts">12:14</span></span></div>
+            <div class="phone-act"><span class="pdot amber"></span><span>Brief summary at 88%<br><span class="pts">09:40</span></span></div>
+            <div class="phone-act"><span class="pdot"></span><span>Run cost on track<br><span class="pts">08:02</span></span></div>
+          </div>
+        `),
+        "Retainer Builder": phone("Retainer", `
+          <p class="phone-section">Acme &middot; live 14 days</p>
+          <div class="phone-card" style="border:2px solid var(--green-600);">
+            <h6 style="color:var(--green-700);">Recommended &middot; Practice</h6>
+            <p class="small-q"><strong>$750/mo</strong> &middot; 5h tuning &middot; monthly review &middot; expansion sessions</p>
+          </div>
+          <div class="phone-card">
+            <h6>From Live Monitoring</h6>
+            <p class="small-q">Litigation drift toward 88% &middot; 2 escalation queues &middot; Customer Support in 90d</p>
+          </div>
+          <div class="phone-button">Send offer &rarr;</div>
+        `),
+        "Case Study Generator": phone("Case study", `
+          <p class="phone-section">Acme Legal &middot; v0.2</p>
+          <div class="phone-stat">
+            <div class="pstat"><strong>72h&rarr;9h</strong><span>Handover</span></div>
+            <div class="pstat"><strong>22%&rarr;6%</strong><span>Rework</span></div>
+            <div class="pstat"><strong>6 staff</strong><span>Freed</span></div>
+            <div class="pstat"><strong>96.4%</strong><span>Eval</span></div>
+          </div>
+          <div class="phone-card">
+            <h6>Quote</h6>
+            <p class="small-q">"We got partner time back in week one." &mdash; M. Tran</p>
+          </div>
+          <div class="phone-button">Publish to profile</div>
+        `)
+      };
+
+      document.querySelectorAll('.screen-slide').forEach(slide => {
+        const body = slide.querySelector('.screen-body');
+        if (!body) return;
+        const title = slide.dataset.title;
+        const html = PHONES[title];
+        if (!html) return;
+        if (body.querySelector('.phone-mini')) return;
+        const wrap = document.createElement('div');
+        wrap.className = 'phone-mini';
+        wrap.setAttribute('aria-hidden', 'true');
+        wrap.innerHTML = '<span class="phone-mini-label">Mobile</span>' + html;
+        const annotations = body.querySelector('.annotations');
+        if (annotations) {
+          body.insertBefore(wrap, annotations);
+        } else {
+          body.appendChild(wrap);
+        }
+      });
+    })();
+
+    prevButton.addEventListener("click", () => goTo(current - 1));
+    nextButton.addEventListener("click", () => goTo(current + 1));
+    menuToggle.addEventListener("click", openMenu);
+    menuClose.addEventListener("click", closeMenu);
+
+    menu.addEventListener("click", (event) => {
+      if (event.target === menu) closeMenu();
+    });
+
+    sectionButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        const target = slides.findIndex((slide) => slide.dataset.section === button.dataset.sectionJump);
+        if (target >= 0) goTo(target);
+      });
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && menu.classList.contains("open")) {
+        closeMenu();
+        return;
+      }
+      if (menu.classList.contains("open")) return;
+
+      if (event.key === "ArrowRight" || event.key === "PageDown" || event.key === " ") {
+        event.preventDefault();
+        goTo(current + 1);
+      }
+      if (event.key === "ArrowLeft" || event.key === "PageUp") {
+        event.preventDefault();
+        goTo(current - 1);
+      }
+      if (event.key === "Home") { event.preventDefault(); goTo(0); }
+      if (event.key === "End") { event.preventDefault(); goTo(slides.length - 1); }
+    });
+
+    buildMenu();
+
+    const initial = Number((window.location.hash.match(/slide-(\d+)/) || [])[1]);
+    if (Number.isFinite(initial) && initial > 0) {
+      goTo(initial - 1, { silentHash: true });
+    } else {
+      goTo(0);
+    }
+  </script>
+</body>
+</html>

@@ -173,6 +173,10 @@ _What's the next concrete thing each person should work on?_
 | Fi | Add competitive landscape entries we're missing | Not started |
 | Both | Discuss: one product or a suite? What's the MVP wedge? | Not started |
 | Fi | Review all ideas in IDEAS.md — expand, riff, add new ones (divergence step) | Not started |
+| Both | Review DECISION-MATRIX.md Decision 1 and either accept or revise the recommended first wedge | Not started |
+| Gub | Draft the beta offer for a ReachCore Transition Pack / 60-Day Edge concierge MVP | Not started |
+| Both | Find 5-10 mid/senior developers in transition for discovery calls or paid beta packs | Not started |
+| Fi | Challenge whether the first wedge should lean more toward CV/career rewrite or dev-to-consultant packaging | Not started |
 
 ---
 
@@ -184,6 +188,7 @@ _Brief notes after each working session so the other person knows what happened.
 |------|-----|---------------|-------------|
 | 12-04-26 | Session 1 | Initial ideation — problem framing, target user, features, business model, competitive landscape | PLAN sections 1-5,7-8 filled, IDEAS seeded, MINDMAP created, QUESTIONS + ASSUMPTIONS populated |
 | 12-04-26 | Session 2 | Added founding team domain expertise — resume writing, career services, big tech experience | PLAN §8b added, 3 new IDEAS, 4 new ASSUMPTIONS, 4 new QUESTIONS, MINDMAP "Founder Domain Expertise" branch |
+| 09-05-26 | Codex | Synthesised the idea set into a where-to-start-first business analysis | DECISION-MATRIX.md Decision 1 added, next actions expanded around the recommended wedge |
 
 ---
 

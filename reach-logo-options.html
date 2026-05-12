@@ -1,0 +1,557 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Reach Logo Options</title>
+  <style>
+    :root {
+      --ink: #07120a;
+      --ink-2: #102017;
+      --paper: #f4f8f2;
+      --paper-2: #e8f0e6;
+      --white: #ffffff;
+      --line: #c7d7c5;
+      --muted: #526253;
+      --green: #2f7d3d;
+      --green-2: #46a05a;
+      --mint: #a7d7a5;
+      --gold: #b88436;
+      --blue: #477a90;
+      --shadow: 0 22px 70px rgba(7, 18, 10, 0.12);
+      --radius: 8px;
+      --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background:
+        linear-gradient(135deg, rgba(47, 125, 61, 0.08), transparent 28%),
+        linear-gradient(315deg, rgba(184, 132, 54, 0.08), transparent 30%),
+        var(--paper);
+      color: var(--ink);
+      font-family: var(--sans);
+    }
+
+    main {
+      width: min(1480px, calc(100vw - 48px));
+      margin: 0 auto;
+      padding: 38px 0 54px;
+    }
+
+    h1, h2, h3, p {
+      margin-top: 0;
+    }
+
+    h1 {
+      margin-bottom: 16px;
+      font-size: clamp(3rem, 6vw, 5.8rem);
+      line-height: 0.96;
+      letter-spacing: 0;
+    }
+
+    h2 {
+      margin-bottom: 10px;
+      font-size: 2rem;
+      line-height: 1.05;
+      letter-spacing: 0;
+    }
+
+    h3 {
+      margin-bottom: 8px;
+      font-size: 1.05rem;
+      line-height: 1.2;
+    }
+
+    p {
+      color: var(--muted);
+      line-height: 1.48;
+    }
+
+    .eyebrow {
+      margin-bottom: 12px;
+      color: var(--green);
+      font-size: 0.82rem;
+      font-weight: 900;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .hero {
+      padding: 42px;
+      border: 1px solid rgba(16, 32, 23, 0.14);
+      border-radius: 26px;
+      background: rgba(255, 255, 255, 0.68);
+      box-shadow: var(--shadow);
+    }
+
+    .hero p {
+      max-width: 850px;
+      font-size: 1.18rem;
+    }
+
+    .options {
+      display: grid;
+      gap: 22px;
+      margin-top: 24px;
+    }
+
+    .option {
+      border: 1px solid rgba(16, 32, 23, 0.14);
+      border-radius: 26px;
+      display: grid;
+      grid-template-columns: 0.82fr 1.18fr;
+      gap: 0;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.72);
+      box-shadow: 0 12px 40px rgba(7, 18, 10, 0.07);
+    }
+
+    .option-info {
+      padding: 30px;
+      border-right: 1px solid var(--line);
+      background: rgba(244, 248, 242, 0.7);
+    }
+
+    .option-info p {
+      margin-bottom: 18px;
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 18px 0;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      min-height: 30px;
+      padding: 5px 10px;
+      border: 1px solid rgba(47, 125, 61, 0.18);
+      border-radius: 999px;
+      color: var(--green);
+      background: rgba(47, 125, 61, 0.08);
+      font-size: 0.76rem;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .notes {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .notes li {
+      position: relative;
+      padding-left: 18px;
+      margin-top: 9px;
+      color: var(--muted);
+      line-height: 1.38;
+    }
+
+    .notes li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0.58em;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+    }
+
+    .preview {
+      padding: 30px;
+      display: grid;
+      gap: 16px;
+    }
+
+    .logo-stage {
+      min-height: 236px;
+      padding: 26px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      display: grid;
+      place-items: center;
+      background: var(--white);
+    }
+
+    .logo-stage.dark {
+      border-color: rgba(232, 240, 230, 0.14);
+      background: var(--ink);
+    }
+
+    .stage-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .subbrand-row {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .subbrand {
+      min-height: 120px;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      display: grid;
+      align-content: center;
+      gap: 12px;
+      background: var(--white);
+    }
+
+    .subbrand.dark {
+      color: var(--paper);
+      border-color: rgba(232, 240, 230, 0.14);
+      background: var(--ink);
+    }
+
+    .subbrand-label {
+      color: var(--muted);
+      font-size: 0.75rem;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .subbrand.dark .subbrand-label {
+      color: var(--mint);
+    }
+
+    .logo-lock {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      color: var(--ink);
+      font-size: 2.6rem;
+      font-weight: 950;
+      line-height: 1;
+    }
+
+    .logo-lock.dark {
+      color: var(--paper);
+    }
+
+    .mini-lock {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      font-size: 1.08rem;
+      font-weight: 950;
+    }
+
+    .suffix {
+      color: var(--green);
+      font-family: var(--mono);
+      font-size: 0.78em;
+      letter-spacing: 0.08em;
+    }
+
+    .dark .suffix {
+      color: var(--mint);
+    }
+
+    .word {
+      letter-spacing: -0.01em;
+    }
+
+    svg {
+      display: block;
+      flex: 0 0 auto;
+    }
+
+    .mark-large {
+      width: 132px;
+      height: 132px;
+    }
+
+    .mark-small {
+      width: 34px;
+      height: 34px;
+    }
+
+    .mono {
+      font-family: var(--mono);
+    }
+
+    .caption {
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 0.86rem;
+      line-height: 1.35;
+      text-align: center;
+    }
+
+    .dark .caption {
+      color: var(--mint);
+    }
+
+    @media (max-width: 980px) {
+      main {
+        width: min(100vw - 28px, 720px);
+        padding: 24px 0 40px;
+      }
+
+      .option,
+      .stage-row,
+      .subbrand-row {
+        grid-template-columns: 1fr;
+      }
+
+      .option-info {
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .hero,
+      .option-info,
+      .preview {
+        padding: 22px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="hero">
+      <p class="eyebrow">Reach logo exploration</p>
+      <h1>Three parent-brand directions.</h1>
+      <p>Each option treats Reach as the umbrella brand, with CORE and STACK as sub-brands. The shared idea is prehensile reach: a flexible extension that finds, grips, connects, and pulls useful work into range.</p>
+    </section>
+
+    <section class="options">
+      <article class="option">
+        <div class="option-info">
+          <p class="eyebrow">Option 01</p>
+          <h2>The Curl</h2>
+          <p>A custom R-mark where the leg becomes a reaching curl. This is the closest to a prehensile nose or tail: soft enough to feel dexterous, structured enough for B2B trust.</p>
+          <div class="tags">
+            <span class="tag">Organic</span>
+            <span class="tag">Memorable</span>
+            <span class="tag">Best icon</span>
+          </div>
+          <ul class="notes">
+            <li>Strongest standalone app icon.</li>
+            <li>CORE and STACK can use the same mark with dark/light mode switching.</li>
+            <li>Risk: friendlier and more expressive than the current austere deck.</li>
+          </ul>
+        </div>
+        <div class="preview">
+          <div class="stage-row">
+            <div class="logo-stage">
+              <div>
+                <div class="logo-lock">
+                  <svg class="mark-large" viewBox="0 0 120 120" aria-hidden="true">
+                    <circle cx="60" cy="60" r="55" fill="#07120a"/>
+                    <path d="M40 88V30h27c15 0 25 8 25 21 0 10-6 17-15 20l18 17H78L60 72h-6v16H40Zm14-29h13c7 0 11-3 11-8s-4-8-11-8H54v16Z" fill="#f4f8f2"/>
+                    <path d="M68 71c13 3 21 11 21 22 0 8-5 14-13 14-7 0-12-4-12-10 0-5 3-8 8-8 4 0 7 2 8 6 2-1 3-3 3-6 0-8-8-13-23-15" fill="none" stroke="#a7d7a5" stroke-width="8" stroke-linecap="round"/>
+                    <circle cx="74" cy="96" r="4" fill="#f4f8f2"/>
+                  </svg>
+                  <span class="word">Reach</span>
+                </div>
+                <p class="caption">Parent lockup on light surface</p>
+              </div>
+            </div>
+            <div class="logo-stage dark">
+              <div>
+                <div class="logo-lock dark">
+                  <svg class="mark-large" viewBox="0 0 120 120" aria-hidden="true">
+                    <circle cx="60" cy="60" r="55" fill="#a7d7a5"/>
+                    <path d="M40 88V30h27c15 0 25 8 25 21 0 10-6 17-15 20l18 17H78L60 72h-6v16H40Zm14-29h13c7 0 11-3 11-8s-4-8-11-8H54v16Z" fill="#07120a"/>
+                    <path d="M68 71c13 3 21 11 21 22 0 8-5 14-13 14-7 0-12-4-12-10 0-5 3-8 8-8 4 0 7 2 8 6 2-1 3-3 3-6 0-8-8-13-23-15" fill="none" stroke="#2f7d3d" stroke-width="8" stroke-linecap="round"/>
+                    <circle cx="74" cy="96" r="4" fill="#07120a"/>
+                  </svg>
+                  <span class="word">Reach</span>
+                </div>
+                <p class="caption">Parent lockup on CORE dark surface</p>
+              </div>
+            </div>
+          </div>
+          <div class="subbrand-row">
+            <div class="subbrand">
+              <span class="subbrand-label">Parent</span>
+              <div class="mini-lock">
+                <svg class="mark-small" viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="55" fill="#07120a"/><path d="M40 88V30h27c15 0 25 8 25 21 0 10-6 17-15 20l18 17H78L60 72h-6v16H40Zm14-29h13c7 0 11-3 11-8s-4-8-11-8H54v16Z" fill="#f4f8f2"/><path d="M68 71c13 3 21 11 21 22 0 8-5 14-13 14-7 0-12-4-12-10 0-5 3-8 8-8 4 0 7 2 8 6 2-1 3-3 3-6 0-8-8-13-23-15" fill="none" stroke="#a7d7a5" stroke-width="8" stroke-linecap="round"/></svg>
+                <span>Reach</span>
+              </div>
+            </div>
+            <div class="subbrand dark">
+              <span class="subbrand-label">Dark sub-brand</span>
+              <div class="mini-lock">
+                <svg class="mark-small" viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="55" fill="#a7d7a5"/><path d="M40 88V30h27c15 0 25 8 25 21 0 10-6 17-15 20l18 17H78L60 72h-6v16H40Zm14-29h13c7 0 11-3 11-8s-4-8-11-8H54v16Z" fill="#07120a"/><path d="M68 71c13 3 21 11 21 22 0 8-5 14-13 14-7 0-12-4-12-10 0-5 3-8 8-8 4 0 7 2 8 6 2-1 3-3 3-6 0-8-8-13-23-15" fill="none" stroke="#2f7d3d" stroke-width="8" stroke-linecap="round"/></svg>
+                <span>Reach</span><span class="suffix">CORE</span>
+              </div>
+            </div>
+            <div class="subbrand">
+              <span class="subbrand-label">Light sub-brand</span>
+              <div class="mini-lock">
+                <svg class="mark-small" viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="55" fill="#07120a"/><path d="M40 88V30h27c15 0 25 8 25 21 0 10-6 17-15 20l18 17H78L60 72h-6v16H40Zm14-29h13c7 0 11-3 11-8s-4-8-11-8H54v16Z" fill="#f4f8f2"/><path d="M68 71c13 3 21 11 21 22 0 8-5 14-13 14-7 0-12-4-12-10 0-5 3-8 8-8 4 0 7 2 8 6 2-1 3-3 3-6 0-8-8-13-23-15" fill="none" stroke="#a7d7a5" stroke-width="8" stroke-linecap="round"/></svg>
+                <span>Reach</span><span class="suffix">STACK</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="option">
+        <div class="option-info">
+          <p class="eyebrow">Option 02</p>
+          <h2>The Grasp</h2>
+          <p>A reaching loop curls around a node. This option turns the prehensile idea into a product metaphor: identify, wrap, hold, and connect. It is less letter-like and more ownable as a symbol.</p>
+          <div class="tags">
+            <span class="tag">Network</span>
+            <span class="tag">Matchmaking</span>
+            <span class="tag">Most distinctive</span>
+          </div>
+          <ul class="notes">
+            <li>Best fit if Reach Market becomes central to the story.</li>
+            <li>Feels like matching, routing, and controlled handoff.</li>
+            <li>Risk: less obvious as an R unless paired with the wordmark.</li>
+          </ul>
+        </div>
+        <div class="preview">
+          <div class="stage-row">
+            <div class="logo-stage">
+              <div>
+                <div class="logo-lock">
+                  <svg class="mark-large" viewBox="0 0 120 120" aria-hidden="true">
+                    <rect x="8" y="8" width="104" height="104" rx="52" fill="#07120a"/>
+                    <path d="M78 34c-19-10-43 1-48 22-4 18 7 32 24 32h10c13 0 22-8 22-20 0-11-8-18-19-18H54" fill="none" stroke="#f4f8f2" stroke-width="11" stroke-linecap="round"/>
+                    <path d="M54 50c-8 0-14 6-14 14 0 9 7 15 16 15h14" fill="none" stroke="#a7d7a5" stroke-width="11" stroke-linecap="round"/>
+                    <circle cx="82" cy="68" r="9" fill="#a7d7a5"/>
+                    <circle cx="82" cy="68" r="4" fill="#07120a"/>
+                  </svg>
+                  <span class="word">Reach</span>
+                </div>
+                <p class="caption">Parent lockup on light surface</p>
+              </div>
+            </div>
+            <div class="logo-stage dark">
+              <div>
+                <div class="logo-lock dark">
+                  <svg class="mark-large" viewBox="0 0 120 120" aria-hidden="true">
+                    <rect x="8" y="8" width="104" height="104" rx="52" fill="#a7d7a5"/>
+                    <path d="M78 34c-19-10-43 1-48 22-4 18 7 32 24 32h10c13 0 22-8 22-20 0-11-8-18-19-18H54" fill="none" stroke="#07120a" stroke-width="11" stroke-linecap="round"/>
+                    <path d="M54 50c-8 0-14 6-14 14 0 9 7 15 16 15h14" fill="none" stroke="#2f7d3d" stroke-width="11" stroke-linecap="round"/>
+                    <circle cx="82" cy="68" r="9" fill="#2f7d3d"/>
+                    <circle cx="82" cy="68" r="4" fill="#f4f8f2"/>
+                  </svg>
+                  <span class="word">Reach</span>
+                </div>
+                <p class="caption">Parent lockup on CORE dark surface</p>
+              </div>
+            </div>
+          </div>
+          <div class="subbrand-row">
+            <div class="subbrand">
+              <span class="subbrand-label">Parent</span>
+              <div class="mini-lock">
+                <svg class="mark-small" viewBox="0 0 120 120" aria-hidden="true"><rect x="8" y="8" width="104" height="104" rx="52" fill="#07120a"/><path d="M78 34c-19-10-43 1-48 22-4 18 7 32 24 32h10c13 0 22-8 22-20 0-11-8-18-19-18H54" fill="none" stroke="#f4f8f2" stroke-width="11" stroke-linecap="round"/><path d="M54 50c-8 0-14 6-14 14 0 9 7 15 16 15h14" fill="none" stroke="#a7d7a5" stroke-width="11" stroke-linecap="round"/><circle cx="82" cy="68" r="9" fill="#a7d7a5"/></svg>
+                <span>Reach</span>
+              </div>
+            </div>
+            <div class="subbrand dark">
+              <span class="subbrand-label">Dark sub-brand</span>
+              <div class="mini-lock">
+                <svg class="mark-small" viewBox="0 0 120 120" aria-hidden="true"><rect x="8" y="8" width="104" height="104" rx="52" fill="#a7d7a5"/><path d="M78 34c-19-10-43 1-48 22-4 18 7 32 24 32h10c13 0 22-8 22-20 0-11-8-18-19-18H54" fill="none" stroke="#07120a" stroke-width="11" stroke-linecap="round"/><path d="M54 50c-8 0-14 6-14 14 0 9 7 15 16 15h14" fill="none" stroke="#2f7d3d" stroke-width="11" stroke-linecap="round"/><circle cx="82" cy="68" r="9" fill="#2f7d3d"/></svg>
+                <span>Reach</span><span class="suffix">CORE</span>
+              </div>
+            </div>
+            <div class="subbrand">
+              <span class="subbrand-label">Light sub-brand</span>
+              <div class="mini-lock">
+                <svg class="mark-small" viewBox="0 0 120 120" aria-hidden="true"><rect x="8" y="8" width="104" height="104" rx="52" fill="#07120a"/><path d="M78 34c-19-10-43 1-48 22-4 18 7 32 24 32h10c13 0 22-8 22-20 0-11-8-18-19-18H54" fill="none" stroke="#f4f8f2" stroke-width="11" stroke-linecap="round"/><path d="M54 50c-8 0-14 6-14 14 0 9 7 15 16 15h14" fill="none" stroke="#a7d7a5" stroke-width="11" stroke-linecap="round"/><circle cx="82" cy="68" r="9" fill="#a7d7a5"/></svg>
+                <span>Reach</span><span class="suffix">STACK</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="option">
+        <div class="option-info">
+          <p class="eyebrow">Option 03</p>
+          <h2>The Hookline</h2>
+          <p>A precise hook reaches out from the R and returns as an underline. This is the most enterprise-facing direction: less creature-like, more tool-like, with the prehensile idea expressed as controlled extension.</p>
+          <div class="tags">
+            <span class="tag">Enterprise</span>
+            <span class="tag">Precise</span>
+            <span class="tag">Best wordmark</span>
+          </div>
+          <ul class="notes">
+            <li>Feels closest to a premium SaaS identity.</li>
+            <li>Very clean CORE / STACK sub-brand system.</li>
+            <li>Risk: less emotional and less surprising than the other two.</li>
+          </ul>
+        </div>
+        <div class="preview">
+          <div class="stage-row">
+            <div class="logo-stage">
+              <div>
+                <div class="logo-lock">
+                  <svg class="mark-large" viewBox="0 0 120 120" aria-hidden="true">
+                    <rect x="11" y="11" width="98" height="98" rx="24" fill="#07120a"/>
+                    <path d="M35 84V34h28c14 0 23 7 23 19 0 8-4 14-11 17l14 14H72L58 71h-8v13H35Zm15-26h14c5 0 9-2 9-6s-4-6-9-6H50v12Z" fill="#f4f8f2"/>
+                    <path d="M50 91h23c18 0 29-9 29-22 0-9-5-15-15-18" fill="none" stroke="#a7d7a5" stroke-width="8" stroke-linecap="round"/>
+                    <path d="M87 51l10-9" fill="none" stroke="#a7d7a5" stroke-width="8" stroke-linecap="round"/>
+                  </svg>
+                  <span class="word">Reach</span>
+                </div>
+                <p class="caption">Parent lockup on light surface</p>
+              </div>
+            </div>
+            <div class="logo-stage dark">
+              <div>
+                <div class="logo-lock dark">
+                  <svg class="mark-large" viewBox="0 0 120 120" aria-hidden="true">
+                    <rect x="11" y="11" width="98" height="98" rx="24" fill="#a7d7a5"/>
+                    <path d="M35 84V34h28c14 0 23 7 23 19 0 8-4 14-11 17l14 14H72L58 71h-8v13H35Zm15-26h14c5 0 9-2 9-6s-4-6-9-6H50v12Z" fill="#07120a"/>
+                    <path d="M50 91h23c18 0 29-9 29-22 0-9-5-15-15-18" fill="none" stroke="#2f7d3d" stroke-width="8" stroke-linecap="round"/>
+                    <path d="M87 51l10-9" fill="none" stroke="#2f7d3d" stroke-width="8" stroke-linecap="round"/>
+                  </svg>
+                  <span class="word">Reach</span>
+                </div>
+                <p class="caption">Parent lockup on CORE dark surface</p>
+              </div>
+            </div>
+          </div>
+          <div class="subbrand-row">
+            <div class="subbrand">
+              <span class="subbrand-label">Parent</span>
+              <div class="mini-lock">
+                <svg class="mark-small" viewBox="0 0 120 120" aria-hidden="true"><rect x="11" y="11" width="98" height="98" rx="24" fill="#07120a"/><path d="M35 84V34h28c14 0 23 7 23 19 0 8-4 14-11 17l14 14H72L58 71h-8v13H35Zm15-26h14c5 0 9-2 9-6s-4-6-9-6H50v12Z" fill="#f4f8f2"/><path d="M50 91h23c18 0 29-9 29-22 0-9-5-15-15-18" fill="none" stroke="#a7d7a5" stroke-width="8" stroke-linecap="round"/><path d="M87 51l10-9" fill="none" stroke="#a7d7a5" stroke-width="8" stroke-linecap="round"/></svg>
+                <span>Reach</span>
+              </div>
+            </div>
+            <div class="subbrand dark">
+              <span class="subbrand-label">Dark sub-brand</span>
+              <div class="mini-lock">
+                <svg class="mark-small" viewBox="0 0 120 120" aria-hidden="true"><rect x="11" y="11" width="98" height="98" rx="24" fill="#a7d7a5"/><path d="M35 84V34h28c14 0 23 7 23 19 0 8-4 14-11 17l14 14H72L58 71h-8v13H35Zm15-26h14c5 0 9-2 9-6s-4-6-9-6H50v12Z" fill="#07120a"/><path d="M50 91h23c18 0 29-9 29-22 0-9-5-15-15-18" fill="none" stroke="#2f7d3d" stroke-width="8" stroke-linecap="round"/><path d="M87 51l10-9" fill="none" stroke="#2f7d3d" stroke-width="8" stroke-linecap="round"/></svg>
+                <span>Reach</span><span class="suffix">CORE</span>
+              </div>
+            </div>
+            <div class="subbrand">
+              <span class="subbrand-label">Light sub-brand</span>
+              <div class="mini-lock">
+                <svg class="mark-small" viewBox="0 0 120 120" aria-hidden="true"><rect x="11" y="11" width="98" height="98" rx="24" fill="#07120a"/><path d="M35 84V34h28c14 0 23 7 23 19 0 8-4 14-11 17l14 14H72L58 71h-8v13H35Zm15-26h14c5 0 9-2 9-6s-4-6-9-6H50v12Z" fill="#f4f8f2"/><path d="M50 91h23c18 0 29-9 29-22 0-9-5-15-15-18" fill="none" stroke="#a7d7a5" stroke-width="8" stroke-linecap="round"/><path d="M87 51l10-9" fill="none" stroke="#a7d7a5" stroke-width="8" stroke-linecap="round"/></svg>
+                <span>Reach</span><span class="suffix">STACK</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+    </section>
+  </main>
+</body>
+</html>

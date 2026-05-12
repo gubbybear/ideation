@@ -1,0 +1,3131 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Reach | Internal Pitch</title>
+  <style>
+    :root {
+      --cream: #ffffff;
+      --cream-2: #f5f5f5;
+      --cream-3: #fafafa;
+      --ink: #0a0a0a;
+      --muted: #6b6b6b;
+      --green-900: #0a0a0a;
+      --green-800: #141414;
+      --green-700: #1c1c1c;
+      --green-600: #15803d;
+      --green-100: #ecfdf5;
+      --line: #ececec;
+      --gold: #c08e3a;
+      --white: #ffffff;
+      --shadow: 0 22px 70px rgba(0, 0, 0, 0.08);
+      --radius: 26px;
+      --radius-small: 8px;
+      --mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+      background: var(--cream);
+      color: var(--ink);
+      font-family: var(--sans);
+    }
+
+    body {
+      overflow: hidden;
+    }
+
+    button {
+      font: inherit;
+    }
+
+    .deck {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      padding: 24px 24px 96px;
+      background:
+        linear-gradient(135deg, rgba(56, 134, 72, 0.08), transparent 28%),
+        linear-gradient(315deg, rgba(168, 122, 49, 0.08), transparent 30%),
+        var(--cream);
+    }
+
+    .topbar {
+      position: fixed;
+      top: 24px;
+      left: 36px;
+      right: 36px;
+      z-index: 40;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      pointer-events: none;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--green-900);
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      pointer-events: auto;
+    }
+
+    .mark {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      color: var(--cream-3);
+      background: var(--green-800);
+      font-weight: 900;
+    }
+
+    .section-nav {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px;
+      border: 1px solid rgba(23, 55, 27, 0.14);
+      border-radius: 999px;
+      background: rgba(248, 251, 247, 0.72);
+      box-shadow: 0 8px 30px rgba(9, 30, 12, 0.08);
+      backdrop-filter: blur(10px);
+      pointer-events: auto;
+    }
+
+    .section-nav button,
+    .menu-toggle,
+    .arrow,
+    .menu-close {
+      border: 0;
+      cursor: pointer;
+      color: var(--green-900);
+      background: transparent;
+    }
+
+    .section-nav button {
+      min-width: 72px;
+      min-height: 34px;
+      padding: 0 14px;
+      border-radius: 999px;
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 750;
+    }
+
+    .section-nav button.active {
+      color: var(--cream-3);
+      background: var(--green-800);
+    }
+
+    .menu-toggle {
+      min-width: 92px;
+      min-height: 42px;
+      padding: 0 18px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border: 1px solid rgba(23, 55, 27, 0.16);
+      background: rgba(248, 251, 247, 0.82);
+      box-shadow: 0 8px 30px rgba(9, 30, 12, 0.08);
+      font-weight: 800;
+      pointer-events: auto;
+    }
+
+    .menu-lines {
+      width: 18px;
+      display: grid;
+      gap: 4px;
+    }
+
+    .menu-lines span {
+      height: 2px;
+      border-radius: 999px;
+      background: var(--green-800);
+    }
+
+    .slides {
+      height: 100%;
+      width: 100%;
+    }
+
+    .slide {
+      display: none;
+      height: calc(100vh - 120px);
+      width: 100%;
+      overflow: hidden;
+      border: 1px solid rgba(23, 55, 27, 0.16);
+      border-radius: var(--radius);
+      background: rgba(248, 251, 247, 0.78);
+      box-shadow: var(--shadow);
+      padding: 88px 76px 52px;
+    }
+
+    .slide.active {
+      display: flex;
+    }
+
+    .slide.center {
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .slide.split {
+      gap: 64px;
+      align-items: stretch;
+    }
+
+    .slide.dark-left {
+      padding: 0;
+      background: var(--cream-3);
+      overflow: hidden;
+    }
+
+    .dark-panel {
+      flex: 0 0 39%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-width: 340px;
+      padding: 76px;
+      color: var(--cream-3);
+      background: var(--green-900);
+    }
+
+    .dark-panel .eyebrow {
+      color: #9bd39f;
+    }
+
+    .dark-panel .lead {
+      color: #e6f1e5;
+    }
+
+    .light-panel {
+      flex: 1;
+      padding: 88px 76px 52px;
+      overflow: hidden;
+    }
+
+    .content {
+      width: min(1180px, 100%);
+      margin: 0 auto;
+    }
+
+    .content.wide {
+      width: min(1380px, 100%);
+    }
+
+    .eyebrow {
+      margin: 0 0 14px;
+      color: var(--green-600);
+      font-size: 0.92rem;
+      font-weight: 850;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin-top: 0;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      font-size: 4.8rem;
+      line-height: 0.98;
+      letter-spacing: 0;
+    }
+
+    h2 {
+      margin-bottom: 18px;
+      font-size: 3.25rem;
+      line-height: 1.04;
+      letter-spacing: 0;
+    }
+
+    h3 {
+      margin-bottom: 10px;
+      font-size: 1.35rem;
+      line-height: 1.2;
+      letter-spacing: 0;
+    }
+
+    .lead {
+      max-width: 930px;
+      margin: 0 auto;
+      color: var(--muted);
+      font-size: 1.32rem;
+      line-height: 1.45;
+    }
+
+    .slide:not(.center) .lead {
+      margin-left: 0;
+    }
+
+    .lede-tight {
+      max-width: 780px;
+    }
+
+    .small {
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    .grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    .grid.two {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .grid.three {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .grid.four {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .tile,
+    .metric,
+    .quote-block,
+    .table-wrap,
+    .diagram,
+    .decision {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-small);
+      background: rgba(255, 255, 255, 0.58);
+    }
+
+    .tile {
+      padding: 20px;
+    }
+
+    .tile.dark {
+      color: var(--cream-3);
+      border-color: transparent;
+      background: var(--green-900);
+    }
+
+    .tile h3 {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .tile p,
+    .tile li {
+      color: var(--muted);
+      font-size: 0.98rem;
+      line-height: 1.48;
+    }
+
+    .tile.dark p,
+    .tile.dark li {
+      color: #dce8dc;
+    }
+
+    .number {
+      flex: 0 0 auto;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      display: inline-grid;
+      place-items: center;
+      color: var(--cream-3);
+      background: var(--green-600);
+      font-family: var(--mono);
+      font-weight: 900;
+      font-size: 0.9rem;
+    }
+
+    .agenda-list {
+      display: grid;
+      gap: 18px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .agenda-list li {
+      display: grid;
+      grid-template-columns: 64px 1fr;
+      gap: 22px;
+      align-items: center;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .agenda-list li:last-child {
+      border-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .agenda-num {
+      color: var(--green-600);
+      font-family: var(--mono);
+      font-size: 1.6rem;
+      font-weight: 900;
+    }
+
+    .agenda-title {
+      display: block;
+      font-size: 1.45rem;
+      font-weight: 900;
+    }
+
+    .agenda-copy {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1.4;
+    }
+
+    .thesis-line {
+      max-width: 1080px;
+      margin: 26px auto 0;
+      padding-top: 22px;
+      border-top: 1px solid var(--line);
+      color: var(--green-900);
+      font-size: 1.25rem;
+      line-height: 1.55;
+      font-weight: 750;
+    }
+
+    .flow {
+      display: grid;
+      grid-template-columns: 1fr 78px 1fr 78px 1fr;
+      gap: 14px;
+      align-items: center;
+      margin-top: 28px;
+    }
+
+    .flow-node {
+      min-height: 148px;
+      padding: 20px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-small);
+      background: var(--white);
+    }
+
+    .flow-node.strong {
+      color: var(--cream-3);
+      background: var(--green-900);
+      border-color: var(--green-900);
+    }
+
+    .flow-node.strong .small {
+      color: #e6f1e5;
+    }
+
+    .flow-arrow {
+      color: var(--green-600);
+      font-size: 2.6rem;
+      font-weight: 900;
+      text-align: center;
+    }
+
+    .split-diagram {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+      margin-top: 28px;
+    }
+
+    .layer {
+      min-height: 360px;
+      padding: 24px;
+      border-radius: var(--radius-small);
+      border: 1px solid var(--line);
+      background: var(--white);
+    }
+
+    .layer.stack {
+      color: var(--cream-3);
+      background: var(--green-900);
+      border-color: var(--green-900);
+    }
+
+    .layer .label {
+      margin-bottom: 18px;
+      font-family: var(--mono);
+      font-size: 0.88rem;
+      color: var(--green-600);
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .layer.stack .label,
+    .layer.stack .small,
+    .layer.stack li {
+      color: #dce8dc;
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 20px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 30px;
+      padding: 4px 10px;
+      border: 1px solid rgba(56, 134, 72, 0.24);
+      border-radius: 999px;
+      color: var(--green-900);
+      background: var(--cream-2);
+      font-size: 0.78rem;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .stack .pill {
+      color: var(--cream-3);
+      border-color: rgba(248, 251, 247, 0.18);
+      background: rgba(248, 251, 247, 0.1);
+    }
+
+    .check-list {
+      margin: 16px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .check-list li {
+      position: relative;
+      padding: 0 0 10px 22px;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    .check-list li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0.65em;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--green-600);
+    }
+
+    .matrix {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      border: 1px solid var(--line);
+      border-radius: var(--radius-small);
+      overflow: hidden;
+      margin-top: 26px;
+      background: var(--white);
+    }
+
+    .matrix-cell {
+      min-height: 126px;
+      padding: 18px;
+      border-right: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .matrix-cell:nth-child(4n) {
+      border-right: 0;
+    }
+
+    .matrix-cell:nth-last-child(-n + 4) {
+      border-bottom: 0;
+    }
+
+    .matrix-cell strong {
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .matrix-cell span {
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.4;
+    }
+
+    .metric {
+      padding: 20px;
+    }
+
+    .metric strong {
+      display: block;
+      font-size: 1.95rem;
+      line-height: 1;
+      color: var(--green-800);
+    }
+
+    .metric span {
+      display: block;
+      margin-top: 8px;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    .finance-kpis {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .finance-kpi {
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-small);
+      background: var(--white);
+    }
+
+    .finance-kpi strong {
+      display: block;
+      color: var(--green-800);
+      font-family: var(--mono);
+      font-size: 1.55rem;
+      line-height: 1;
+    }
+
+    .finance-kpi span {
+      display: block;
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 0.84rem;
+      line-height: 1.35;
+    }
+
+    .finance-layout {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 18px;
+      align-items: start;
+      margin-top: 20px;
+    }
+
+    .finance-layout table {
+      min-width: 0;
+    }
+
+    .finance-layout th,
+    .finance-layout td {
+      font-size: 0.86rem;
+    }
+
+    .adoption-charts {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      margin-top: 20px;
+    }
+
+    .adoption-panel {
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-small);
+      background: rgba(255, 255, 255, 0.72);
+    }
+
+    .adoption-panel h3 {
+      margin-bottom: 14px;
+      font-size: 1.18rem;
+    }
+
+    .adoption-row {
+      display: grid;
+      grid-template-columns: 154px 1fr 84px;
+      gap: 12px;
+      align-items: center;
+      margin-top: 12px;
+    }
+
+    .adoption-label strong,
+    .adoption-label span {
+      display: block;
+    }
+
+    .adoption-label strong {
+      color: var(--green-900);
+      font-size: 0.96rem;
+    }
+
+    .adoption-label span {
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 0.76rem;
+      line-height: 1.25;
+    }
+
+    .bar-track {
+      height: 36px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--cream-2);
+    }
+
+    .bar-fill {
+      height: 100%;
+      min-width: 42px;
+      border-radius: 999px;
+      background: var(--green-700);
+    }
+
+    .bar-fill.base {
+      background: var(--green-600);
+    }
+
+    .bar-fill.strong {
+      background: var(--green-900);
+    }
+
+    .adoption-value {
+      color: var(--green-900);
+      font-family: var(--mono);
+      font-size: 0.98rem;
+      font-weight: 950;
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .adoption-assumptions {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .assumption-chip {
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-small);
+      background: var(--white);
+    }
+
+    .assumption-chip strong {
+      display: block;
+      color: var(--green-900);
+      font-family: var(--mono);
+      font-size: 0.94rem;
+    }
+
+    .assumption-chip span {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 0.78rem;
+      line-height: 1.28;
+    }
+
+    .scenario-table table {
+      min-width: 0;
+    }
+
+    .scenario-table th,
+    .scenario-table td {
+      font-size: 0.82rem;
+      padding: 10px 12px;
+    }
+
+    .finance-note {
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 0.88rem;
+      line-height: 1.4;
+    }
+
+    .earnings-table-wrap {
+      margin-top: 16px;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-small);
+      background:
+        linear-gradient(180deg, rgba(56, 134, 72, 0.07), transparent 42%),
+        rgba(255, 255, 255, 0.72);
+    }
+
+    .earnings-table {
+      min-width: 0;
+      border-collapse: separate;
+      border-spacing: 0 6px;
+    }
+
+    .earnings-table th {
+      padding: 6px 12px;
+      border: 0;
+      color: var(--green-700);
+      background: transparent;
+      font-size: 0.72rem;
+      font-weight: 950;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .earnings-table th.amount,
+    .earnings-table td.amount {
+      text-align: right;
+    }
+
+    .earnings-table td {
+      padding: 15px 12px;
+      border-bottom: 0;
+      background: rgba(255, 255, 255, 0.92);
+      font-size: 0.92rem;
+    }
+
+    .earnings-table td:first-child {
+      width: 78px;
+      border-radius: var(--radius-small) 0 0 var(--radius-small);
+      color: var(--green-800);
+      font-family: var(--mono);
+      font-weight: 900;
+    }
+
+    .earnings-table td:last-child {
+      border-radius: 0 var(--radius-small) var(--radius-small) 0;
+    }
+
+    .earnings-table td.amount {
+      font-family: var(--mono);
+      font-weight: 850;
+    }
+
+    .earnings-table .income {
+      color: var(--green-800);
+    }
+
+    .earnings-table .outgoing {
+      color: #b83a2e;
+    }
+
+    .earnings-table td.activity {
+      color: var(--muted);
+      line-height: 1.35;
+    }
+
+    .earnings-table td.net-cash {
+      color: var(--green-900);
+      background: var(--cream-2);
+      font-weight: 950;
+    }
+
+    .earnings-table tbody tr:nth-child(3n) td {
+      box-shadow: inset 0 -1px 0 rgba(56, 134, 72, 0.18);
+    }
+
+    .earnings-table .total-row td {
+      color: var(--cream-3);
+      background: var(--green-900);
+      font-weight: 950;
+    }
+
+    .earnings-table .total-row td.net-cash,
+    .earnings-table .total-row .money,
+    .earnings-table .total-row .income,
+    .earnings-table .total-row .outgoing {
+      color: var(--cream-3);
+      background: var(--green-900);
+    }
+
+    .table-wrap {
+      overflow: hidden;
+      margin-top: 18px;
+      background: var(--white);
+    }
+
+    .table-wrap.compact table {
+      min-width: 0;
+    }
+
+    .table-wrap.compact th,
+    .table-wrap.compact td {
+      font-size: 0.86rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 760px;
+    }
+
+    th,
+    td {
+      padding: 11px 14px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+      font-size: 0.88rem;
+      line-height: 1.35;
+    }
+
+    th {
+      color: var(--green-900);
+      background: var(--cream-2);
+      font-weight: 900;
+    }
+
+    tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .money {
+      font-family: var(--mono);
+      color: var(--green-800);
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .quote-block {
+      margin-top: 22px;
+      padding: 22px;
+      background: var(--green-900);
+      color: var(--cream-3);
+    }
+
+    .slide:not(.center) .quote-block:last-child,
+    .slide:not(.center) .table-wrap:last-child,
+    .slide:not(.center) .matrix:last-child,
+    .slide:not(.center) .grid:last-child {
+      margin-bottom: 18px;
+    }
+
+    .quote-block p {
+      margin-bottom: 0;
+      color: #eef7ee;
+      font-size: 1.16rem;
+      line-height: 1.45;
+      font-weight: 750;
+    }
+
+    .economics-grid {
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 18px;
+      align-items: start;
+      margin-top: 18px;
+    }
+
+    .model-layout {
+      display: grid;
+      grid-template-columns: 1.18fr 0.82fr;
+      gap: 18px;
+      align-items: stretch;
+      margin-top: 22px;
+    }
+
+    .flow-panel,
+    .economics-panel {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-small);
+      background: rgba(255, 255, 255, 0.68);
+      padding: 20px;
+    }
+
+    .panel-label {
+      margin: 0 0 14px;
+      color: var(--green-600);
+      font-size: 0.76rem;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .money-flow-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .money-flow-card {
+      min-height: 150px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-small);
+      background: var(--white);
+    }
+
+    .money-flow-card.primary {
+      color: var(--cream-3);
+      border-color: var(--green-900);
+      background: var(--green-900);
+    }
+
+    .money-flow-card.primary p,
+    .money-flow-card.primary .flow-route,
+    .money-flow-card.primary .flow-index,
+    .money-flow-card.primary .money {
+      color: #e6f1e5;
+    }
+
+    .flow-index {
+      display: block;
+      margin-bottom: 12px;
+      color: var(--green-600);
+      font-family: var(--mono);
+      font-weight: 900;
+      font-size: 0.82rem;
+    }
+
+    .flow-route {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+      color: var(--green-900);
+      font-size: 1.06rem;
+      font-weight: 900;
+    }
+
+    .flow-route span {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      color: var(--cream-3);
+      background: var(--green-600);
+      font-size: 0.92rem;
+    }
+
+    .money-flow-card h3 {
+      margin-bottom: 6px;
+      font-size: 1.05rem;
+    }
+
+    .money-flow-card p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.42;
+      font-size: 0.92rem;
+    }
+
+    .economics-panel {
+      color: var(--cream-3);
+      background: var(--green-900);
+      border-color: var(--green-900);
+    }
+
+    .economics-panel .panel-label,
+    .economics-panel h3,
+    .economics-panel .money {
+      color: var(--cream-3);
+    }
+
+    .economics-panel .check-list li {
+      color: #e6f1e5;
+    }
+
+    .economics-panel .check-list li::before {
+      background: #9bd39f;
+    }
+
+    .economics-panel h3 {
+      font-size: 1.45rem;
+    }
+
+    .fee-drop-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 22px;
+    }
+
+    .fee-drop-card {
+      min-height: 292px;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-small);
+      background: var(--white);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .fee-drop-card.featured {
+      color: var(--cream-3);
+      border-color: var(--green-900);
+      background: var(--green-900);
+    }
+
+    .fee-drop-card.featured p,
+    .fee-drop-card.featured li,
+    .fee-drop-card.featured .fee-amount,
+    .fee-drop-card.featured .flow-index {
+      color: #e6f1e5;
+    }
+
+    .fee-drop-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .fee-amount {
+      color: var(--green-800);
+      font-family: var(--mono);
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .fee-drop-card h3 {
+      margin-bottom: 8px;
+      font-size: 1.05rem;
+    }
+
+    .fee-drop-card p {
+      margin-bottom: 12px;
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.42;
+    }
+
+    .fee-drop-card .check-list {
+      margin-top: auto;
+    }
+
+    .fee-drop-card .check-list li {
+      padding-bottom: 7px;
+      font-size: 0.88rem;
+      line-height: 1.35;
+    }
+
+    .fee-principles {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .principle {
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-small);
+      background: rgba(255, 255, 255, 0.68);
+    }
+
+    .principle strong {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--green-900);
+    }
+
+    .principle span {
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.35;
+    }
+
+    .cash-flow {
+      display: grid;
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .cash-row {
+      display: grid;
+      grid-template-columns: 1.1fr 52px 1fr;
+      gap: 12px;
+      align-items: center;
+      padding: 11px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-small);
+      background: var(--white);
+    }
+
+    .cash-row b {
+      color: var(--green-900);
+    }
+
+    .cash-row span {
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .arrow-token {
+      display: grid;
+      place-items: center;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      color: var(--cream-3);
+      background: var(--green-600);
+      font-weight: 900;
+    }
+
+    .ladder {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 26px;
+      align-items: end;
+    }
+
+    .rung {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      min-height: 170px;
+      padding: 12px;
+      border-radius: var(--radius-small);
+      color: var(--cream-3);
+      background: var(--green-800);
+    }
+
+    .rung:nth-child(1) { min-height: 244px; background: var(--green-900); }
+    .rung:nth-child(2) { min-height: 230px; }
+    .rung:nth-child(3) { min-height: 216px; }
+    .rung:nth-child(4) { min-height: 202px; background: #286536; }
+    .rung:nth-child(5) { min-height: 188px; background: #327642; }
+    .rung:nth-child(6) { min-height: 174px; background: #438250; }
+    .rung:nth-child(7) { min-height: 160px; background: #567c5d; }
+
+    .rung small {
+      color: #dce8dc;
+      font-family: var(--mono);
+      font-weight: 900;
+    }
+
+    .rung strong {
+      display: block;
+      margin-top: 8px;
+      line-height: 1.15;
+    }
+
+    .decision {
+      padding: 20px;
+      background: var(--white);
+    }
+
+    .decision h3 {
+      color: var(--green-800);
+    }
+
+    .controls {
+      position: fixed;
+      right: 36px;
+      bottom: 24px;
+      z-index: 45;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .counter {
+      min-width: 88px;
+      min-height: 44px;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(23, 55, 27, 0.16);
+      border-radius: 999px;
+      color: var(--green-900);
+      background: rgba(248, 251, 247, 0.82);
+      box-shadow: 0 8px 30px rgba(9, 30, 12, 0.08);
+      font-family: var(--mono);
+      font-size: 0.86rem;
+      font-weight: 900;
+      backdrop-filter: blur(10px);
+    }
+
+    .arrow {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      color: var(--cream-3);
+      background: var(--green-900);
+      box-shadow: 0 8px 30px rgba(9, 30, 12, 0.16);
+      font-size: 1.3rem;
+      font-weight: 900;
+    }
+
+    .arrow:disabled {
+      opacity: 0.35;
+      cursor: default;
+    }
+
+    .menu {
+      position: fixed;
+      inset: 0;
+      z-index: 80;
+      display: none;
+      padding: 28px;
+      background: rgba(7, 18, 10, 0.42);
+      backdrop-filter: blur(8px);
+    }
+
+    .menu.open {
+      display: grid;
+      place-items: center;
+    }
+
+    .menu-panel {
+      width: min(1040px, 100%);
+      max-height: calc(100vh - 56px);
+      overflow: auto;
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      background: var(--cream-3);
+      box-shadow: var(--shadow);
+      padding: 28px;
+    }
+
+    .menu-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 18px;
+    }
+
+    .menu-head h2 {
+      margin: 0;
+      font-size: 2rem;
+    }
+
+    .menu-close {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      color: var(--cream-3);
+      background: var(--green-900);
+      font-size: 1.2rem;
+      font-weight: 900;
+    }
+
+    .menu-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .menu-list button {
+      width: 100%;
+      min-height: 74px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-small);
+      display: grid;
+      grid-template-columns: 48px 1fr;
+      gap: 12px;
+      align-items: center;
+      text-align: left;
+      background: var(--white);
+      color: var(--ink);
+      cursor: pointer;
+    }
+
+    .menu-list button.active {
+      border-color: var(--green-600);
+      box-shadow: inset 0 0 0 2px rgba(56, 134, 72, 0.16);
+    }
+
+    .menu-list .idx {
+      color: var(--green-600);
+      font-family: var(--mono);
+      font-weight: 900;
+    }
+
+    .menu-list .title {
+      display: block;
+      font-weight: 900;
+    }
+
+    .menu-list .section {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    @media (max-width: 1100px) {
+      .deck {
+        padding: 12px 12px 86px;
+      }
+
+      .topbar {
+        top: 16px;
+        left: 18px;
+        right: 18px;
+      }
+
+      .section-nav {
+        display: none;
+      }
+
+      .slide {
+        height: calc(100vh - 98px);
+        padding: 82px 26px 42px;
+      }
+
+      .slide.split,
+      .split-diagram,
+      .economics-grid,
+      .model-layout,
+      .fee-drop-grid,
+      .fee-principles,
+      .finance-kpis,
+      .finance-layout,
+      .adoption-charts,
+      .adoption-assumptions {
+        grid-template-columns: 1fr;
+      }
+
+      .slide.split {
+        display: none;
+      }
+
+      .slide.split.active {
+        display: block;
+      }
+
+      .slide.dark-left.active {
+        display: block;
+        overflow: hidden;
+      }
+
+      .dark-panel {
+        min-width: 0;
+        padding: 82px 34px 42px;
+      }
+
+      .light-panel {
+        padding: 42px 34px;
+      }
+
+      h1 {
+        font-size: 3.3rem;
+      }
+
+      h2 {
+        font-size: 2.35rem;
+      }
+
+      .lead {
+        font-size: 1.18rem;
+      }
+
+      .grid.two,
+      .grid.three,
+      .grid.four,
+      .matrix,
+      .flow {
+        grid-template-columns: 1fr;
+      }
+
+      .flow-arrow {
+        transform: rotate(90deg);
+      }
+
+      .matrix-cell,
+      .matrix-cell:nth-child(4n),
+      .matrix-cell:nth-last-child(-n + 4) {
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .matrix-cell:last-child {
+        border-bottom: 0;
+      }
+
+      .ladder {
+        grid-template-columns: 1fr;
+      }
+
+      .rung,
+      .rung:nth-child(n) {
+        min-height: 92px;
+      }
+
+      .menu-list {
+        grid-template-columns: 1fr;
+      }
+
+      .controls {
+        right: 18px;
+        bottom: 18px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .brand span:last-child {
+        display: none;
+      }
+
+      .menu-toggle {
+        min-width: 48px;
+        width: 48px;
+        padding: 0;
+      }
+
+      .menu-toggle .menu-word {
+        display: none;
+      }
+
+      .slide {
+        border-radius: 18px;
+        padding: 76px 18px 34px;
+      }
+
+      .dark-panel,
+      .light-panel {
+        padding-left: 22px;
+        padding-right: 22px;
+      }
+
+      h1 {
+        font-size: 2.55rem;
+      }
+
+      h2 {
+        font-size: 2rem;
+      }
+
+      .agenda-list li,
+      .cash-row {
+        grid-template-columns: 1fr;
+      }
+
+      .arrow-token {
+        transform: rotate(90deg);
+      }
+    }
+
+    @media print {
+      body {
+        overflow: visible;
+        background: var(--white);
+      }
+
+      .deck {
+        height: auto;
+        padding: 0;
+        background: var(--white);
+      }
+
+      .topbar,
+      .controls,
+      .menu {
+        display: none !important;
+      }
+
+      .slide,
+      .slide.active,
+      .slide.split,
+      .slide.dark-left {
+        display: flex !important;
+        height: 100vh;
+        page-break-after: always;
+        box-shadow: none;
+        border-radius: 0;
+      }
+    }
+
+    /* =====================================================
+       Brand System v2 — clean white & black with semantic
+       accents. Reach is white-label, so the deck surface
+       defers and colour earns its place.
+         Live green       passing / healthy
+         Gate amber       pending / review
+         Value gold       money / commercial
+         Evidence blue    audit / source
+         Failure red      eval failure / blocked
+       ===================================================== */
+
+    .deck {
+      background:
+        linear-gradient(135deg, rgba(0, 0, 0, 0.018), transparent 30%),
+        linear-gradient(315deg, rgba(0, 0, 0, 0.018), transparent 30%),
+        #ffffff;
+    }
+
+    .slide {
+      background: #ffffff;
+      border-color: #ececec;
+    }
+
+    /* Top chrome */
+    .brand { color: #0a0a0a; }
+    .mark { background: #0a0a0a; color: #ffffff; }
+    .menu-lines span { background: #0a0a0a; }
+
+    .section-nav {
+      background: rgba(255, 255, 255, 0.85);
+      border-color: #ececec;
+    }
+    .section-nav button { color: #6b6b6b; }
+    .section-nav button.active {
+      background: #0a0a0a;
+      color: #ffffff;
+    }
+    .menu-toggle {
+      background: rgba(255, 255, 255, 0.85);
+      border-color: #ececec;
+    }
+
+    /* Controls */
+    .arrow { background: #0a0a0a; }
+    .counter {
+      background: rgba(255, 255, 255, 0.85);
+      border-color: #ececec;
+      color: #0a0a0a;
+    }
+
+    /* Eyebrow neutralised. Live green only on semantic chips. */
+    .eyebrow { color: #6b6b6b; }
+    .lead { color: #555; }
+
+    /* Dark surfaces — pure black */
+    .tile.dark,
+    .dark-panel,
+    .quote-block,
+    .flow-node.strong,
+    .layer.stack {
+      background: #0a0a0a;
+      color: #ffffff;
+      border-color: #0a0a0a;
+    }
+
+    .tile.dark p, .tile.dark li,
+    .layer.stack .label, .layer.stack .small, .layer.stack li,
+    .flow-node.strong .small,
+    .dark-panel .lead {
+      color: #d4d4d4;
+    }
+
+    .dark-panel .eyebrow,
+    .tile.dark .eyebrow {
+      color: #888;
+    }
+
+    .quote-block p { color: #f5f5f5; }
+
+    .layer.stack .pill {
+      background: rgba(255, 255, 255, 0.06);
+      border-color: rgba(255, 255, 255, 0.16);
+      color: #ffffff;
+    }
+
+    /* Number bullets and primary action chrome */
+    .number {
+      background: #0a0a0a;
+      color: #ffffff;
+    }
+    /* Invert when on a dark surface so the circle stays visible */
+    .tile.dark .number,
+    .dark-panel .number,
+    .quote-block .number,
+    .flow-node.strong .number,
+    .layer.stack .number {
+      background: #ffffff;
+      color: #0a0a0a;
+    }
+
+    /* Money figures pop in Value Gold — sparingly used so money stands out */
+    .money,
+    .metric strong,
+    .cash-row b,
+    .fee-amount {
+      color: #c08e3a;
+    }
+    .decision h3 { color: #0a0a0a; }
+    /* Money on dark surfaces stays white for readability */
+    .economics-panel .money,
+    .fee-drop-card.featured .fee-amount,
+    .money-flow-card.primary .money,
+    .tile.dark .money,
+    .quote-block .money {
+      color: #ffffff;
+    }
+
+    /* Tables & metric cards */
+    th { background: #fafafa; color: #0a0a0a; }
+    .metric { background: #ffffff; border-color: #ececec; }
+
+    /* Pills — neutral surface, semantic exceptions only */
+    .pill {
+      background: #f5f5f5;
+      color: #0a0a0a;
+      border-color: #ececec;
+    }
+    .stack .pill {
+      background: rgba(255, 255, 255, 0.06);
+      border-color: rgba(255, 255, 255, 0.16);
+      color: #ffffff;
+    }
+
+    /* Bullet on check-list */
+    .check-list li::before { background: #0a0a0a; }
+
+    /* Flow arrows and money-route tokens carry Live Green —
+       directional flow reads as "live movement" semantically */
+    .flow-arrow { color: #15803d; }
+    .arrow-token { background: #15803d; color: #ffffff; }
+    .flow-route span { background: #15803d; color: #ffffff; }
+
+    /* Defensibility ladder — grayscale staircase */
+    .rung,
+    .rung:nth-child(n) { background: #2a2a2a; color: #ffffff; }
+    .rung:nth-child(1) { background: #0a0a0a; }
+    .rung:nth-child(2) { background: #1a1a1a; }
+    .rung:nth-child(3) { background: #2a2a2a; }
+    .rung:nth-child(4) { background: #3a3a3a; }
+    .rung:nth-child(5) { background: #4a4a4a; }
+    .rung:nth-child(6) { background: #5a5a5a; }
+    .rung:nth-child(7) { background: #6a6a6a; }
+    .rung small { color: #d4d4d4; }
+
+    /* Menu */
+    .menu { background: rgba(0, 0, 0, 0.32); }
+    .menu-panel { background: #ffffff; border-color: #ececec; }
+    .menu-list button { background: #ffffff; border-color: #ececec; }
+    .menu-list button.active {
+      border-color: #0a0a0a;
+      box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.12);
+    }
+    .menu-list .idx { color: #0a0a0a; }
+    .menu-close { background: #0a0a0a; }
+
+    /* Matrix rows / cells */
+    .matrix { border-color: #ececec; background: #ffffff; }
+    .matrix-cell { border-color: #ececec; }
+    .matrix-cell strong { color: #0a0a0a; }
+    .matrix-cell span { color: #6b6b6b; }
+
+    /* Tile defaults — keep white, neutral border */
+    .tile,
+    .quote-block,
+    .table-wrap,
+    .diagram,
+    .decision {
+      border-color: #ececec;
+    }
+
+    /* Layer cards (split-diagram on Two-Layer Product slide) */
+    .layer { background: #ffffff; border-color: #ececec; }
+    .layer .label { color: #6b6b6b; }
+
+    /* Flow nodes (Strategic Thesis slide) */
+    .flow-node { background: #ffffff; border-color: #ececec; }
+
+    /* Cash flow rows (Pricing Model slide) */
+    .cash-row { background: #ffffff; border-color: #ececec; }
+    .cash-row span { color: #6b6b6b; }
+
+    /* Decision tiles (Discussion slide) */
+    .decision { background: #ffffff; }
+
+    /* Hide the deck chrome on the embedded brand iframe so the
+       brand-system page reads as the full surface */
+    .slide[data-section="Brand"] iframe { background: #ffffff; }
+
+    /* Decorative chrome — strip remaining green tints */
+    .agenda-num { color: #0a0a0a; }
+    .panel-label { color: #6b6b6b; }
+    .flow-index { color: #6b6b6b; }
+
+    /* Accent stripes for info grids — cycle four accents (green, gold,
+       blue, amber). Failure red is reserved so it stays meaningful.
+       Inset box-shadow keeps the stripe in-frame without shifting layout. */
+    .matrix-cell:nth-child(4n+1) { box-shadow: inset 3px 0 0 #15803d; }
+    .matrix-cell:nth-child(4n+2) { box-shadow: inset 3px 0 0 #c08e3a; }
+    .matrix-cell:nth-child(4n+3) { box-shadow: inset 3px 0 0 #1e6f8a; }
+    .matrix-cell:nth-child(4n+4) { box-shadow: inset 3px 0 0 #b45309; }
+
+    .grid.three > .tile:not(.dark):nth-child(3n+1) { box-shadow: inset 3px 0 0 #15803d; }
+    .grid.three > .tile:not(.dark):nth-child(3n+2) { box-shadow: inset 3px 0 0 #c08e3a; }
+    .grid.three > .tile:not(.dark):nth-child(3n+3) { box-shadow: inset 3px 0 0 #1e6f8a; }
+
+    .grid.four > .tile:not(.dark):nth-child(4n+1) { box-shadow: inset 3px 0 0 #15803d; }
+    .grid.four > .tile:not(.dark):nth-child(4n+2) { box-shadow: inset 3px 0 0 #c08e3a; }
+    .grid.four > .tile:not(.dark):nth-child(4n+3) { box-shadow: inset 3px 0 0 #1e6f8a; }
+    .grid.four > .tile:not(.dark):nth-child(4n+4) { box-shadow: inset 3px 0 0 #b45309; }
+
+    /* Money-flow card glyph circles — black instead of green */
+    .money-flow-card .flow-glyph,
+    .money-flow-card .flow-mark,
+    .money-flow-card-glyph,
+    .money-flow-card [class*="-glyph"]:not(.dot-sm) {
+      background: #0a0a0a;
+      color: #ffffff;
+    }
+
+    /* Bar-fill components (used in any bar-chart visualisation) */
+    .bar-fill { background: #ececec; }
+    .bar-fill.base { background: #6b6b6b; }
+    .bar-fill.strong { background: #0a0a0a; }
+
+    /* Thesis-line — accent green top border so the slide's takeaway carries
+       a small "key signal" mark instead of a plain rule */
+    .thesis-line {
+      border-top: 2px solid #15803d;
+      padding-top: 24px;
+    }
+
+    /* Quote-block — green left stripe so quotes read as a live takeaway */
+    .quote-block {
+      box-shadow: inset 4px 0 0 #15803d;
+    }
+
+    /* Section nav button hover — subtle gray fill, no colour shift */
+    .section-nav button:not(.active):hover {
+      background: #f5f5f5;
+      color: #0a0a0a;
+    }
+
+    /* Discussion decision tiles — cycle accents like the matrix grid above */
+    .grid.three > .decision:nth-child(3n+1) { box-shadow: inset 3px 0 0 #15803d; }
+    .grid.three > .decision:nth-child(3n+2) { box-shadow: inset 3px 0 0 #c08e3a; }
+    .grid.three > .decision:nth-child(3n+3) { box-shadow: inset 3px 0 0 #1e6f8a; }
+
+    /* Earnings — green for income (positive), red for outgoing (failure/cost) */
+    .earnings-table .income { color: #15803d; }
+    .earnings-table .outgoing { color: #dc2626; }
+
+    /* Money-flow card (dark "primary" variant) */
+    .money-flow-card.primary {
+      background: #0a0a0a;
+      border-color: #0a0a0a;
+      color: #ffffff;
+    }
+    .money-flow-card.primary p,
+    .money-flow-card.primary .flow-route,
+    .money-flow-card.primary .flow-index,
+    .money-flow-card.primary .money {
+      color: #d4d4d4;
+    }
+    .money-flow-card.primary .money { color: #ffffff; }
+
+    /* Economics panel (dark variant) */
+    .economics-panel {
+      background: #0a0a0a;
+      border-color: #0a0a0a;
+      color: #ffffff;
+    }
+    .economics-panel .panel-label,
+    .economics-panel h3,
+    .economics-panel .money {
+      color: #ffffff;
+    }
+    .economics-panel .check-list li { color: #d4d4d4; }
+    .economics-panel .check-list li::before { background: #ffffff; }
+
+    /* Fee-drop card (featured / dark variant) */
+    .fee-drop-card.featured {
+      background: #0a0a0a;
+      border-color: #0a0a0a;
+      color: #ffffff;
+    }
+    .fee-drop-card.featured p,
+    .fee-drop-card.featured li,
+    .fee-drop-card.featured .fee-amount,
+    .fee-drop-card.featured .flow-index {
+      color: #d4d4d4;
+    }
+    .fee-drop-card.featured .fee-amount { color: #ffffff; }
+
+    /* Print: white-on-black inversions translate cleanly */
+    @media print {
+      .deck { background: #ffffff; }
+      .slide { background: #ffffff; }
+    }
+  </style>
+</head>
+<body>
+  <main class="deck" aria-label="Reach internal pitch deck">
+    <header class="topbar">
+      <div class="brand" aria-label="Reach">
+        <span class="mark">R</span>
+        <span>Reach</span>
+      </div>
+      <nav class="section-nav" aria-label="Section navigation">
+        <button type="button" data-section-jump="Opening">Opening</button>
+        <button type="button" data-section-jump="Why">Why</button>
+        <button type="button" data-section-jump="What">What</button>
+        <button type="button" data-section-jump="Verticals">Verticals</button>
+        <button type="button" data-section-jump="How">How</button>
+        <button type="button" data-section-jump="CORE">CORE</button>
+        <button type="button" data-section-jump="STACK">STACK</button>
+        <button type="button" data-section-jump="Market">Market</button>
+        <button type="button" data-section-jump="Brand">Brand</button>
+        <button type="button" data-section-jump="Discuss">Discuss</button>
+      </nav>
+      <button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false">
+        <span class="menu-lines" aria-hidden="true"><span></span><span></span><span></span></span>
+        <span class="menu-word">Menu</span>
+      </button>
+    </header>
+
+    <section class="slides">
+      <article class="slide center active" data-title="Cover" data-section="Opening">
+        <div class="content">
+          <h1>Reach</h1>
+          <p class="lead">Productized AI capability that trusted technical specialists deploy at Australian SMBs.</p>
+          <p class="thesis-line">SMBs need reliable AI capability, installed by someone they trust, with product-grade infrastructure behind the work.</p>
+        </div>
+      </article>
+
+      <article class="slide" data-title="Executive summary" data-section="Opening">
+        <div class="content wide">
+          <p class="eyebrow">Executive summary</p>
+          <h2>Reach is how Australian SMBs adopt reliable AI.</h2>
+          <p class="lead lede-tight">Two waves are colliding. AU SMBs feel pressure to adopt AI but have no reliable way to deploy it. At the same time, capable software engineers are being force-exited from big tech in record numbers and looking for a way to build an independent practice. Reach is the platform that turns those engineers into a trusted, branded delivery network for SMB AI &mdash; with product-grade infrastructure behind every deployment.</p>
+          <div class="grid four" style="margin-top: 28px;">
+            <div class="tile">
+              <h3>Why now</h3>
+              <p>Off-the-shelf AI is already good enough for a large class of SMB workflows. The missing layer is a repeatable way to scope, configure, evaluate, brand, monitor, and support those systems in firms without internal AI teams.</p>
+            </div>
+            <div class="tile">
+              <h3>Who delivers</h3>
+              <p>Software engineers force-exiting big tech &mdash; technically credible, commercially under-equipped, looking for an independent practice. Reach gives them the surface to sell, deliver, and operate AI capability at SMB scale.</p>
+            </div>
+            <div class="tile">
+              <h3>Who buys</h3>
+              <p>Australian SMBs in three launch verticals: Document Intake (legal, accounting, migration), Customer Support (ecommerce, SaaS, services), and HR (20&ndash;500 staff, no dedicated HR leadership).</p>
+            </div>
+            <div class="tile">
+              <h3>What we ship</h3>
+              <p><strong>CORE</strong> &middot; the Dev-facing app for the practice<br><strong>STACK</strong> &middot; AI tooling shipped at the SMB<br><strong>Market</strong> &middot; public surface where SMBs find Devs</p>
+            </div>
+          </div>
+          <div class="grid four" style="margin-top: 16px;">
+            <div class="metric"><strong>3</strong><span>Launch verticals, AU SMB-tier tuned</span></div>
+            <div class="metric"><strong>3-week</strong><span>Standard sprint shape, scoped via CORE</span></div>
+            <div class="metric"><strong>$8&ndash;20k</strong><span>Typical Dev implementation income per sprint</span></div>
+            <div class="metric"><strong>15&ndash;25%</strong><span>Lifetime STACK commission to the Dev</span></div>
+          </div>
+          <p class="thesis-line">Pre-launch. Building toward first paid Document Intake deployments. The deck that follows walks the bet, the supply, the verticals, the product, and the commercial model.</p>
+        </div>
+      </article>
+
+      <article class="slide dark-left" data-title="Agenda" data-section="Opening">
+        <aside class="dark-panel">
+          <p class="eyebrow">Today</p>
+          <h2>Agenda</h2>
+          <p class="lead">A dense walkthrough for sense-checking the opportunity, the product shape, and the commercial model.</p>
+        </aside>
+        <div class="light-panel">
+          <ol class="agenda-list">
+            <li><span class="agenda-num">01</span><span><span class="agenda-title">Why this exists</span><span class="agenda-copy">The converging realities that make the wedge plausible now.</span></span></li>
+            <li><span class="agenda-num">02</span><span><span class="agenda-title">What Reach is</span><span class="agenda-copy">A two-layer product: STACK as deployment IP, CORE as consultant operating system.</span></span></li>
+            <li><span class="agenda-num">03</span><span><span class="agenda-title">Launch verticals</span><span class="agenda-copy">Document Intake, Customer Support, and HR, in order.</span></span></li>
+            <li><span class="agenda-num">04</span><span><span class="agenda-title">How the money works</span><span class="agenda-copy">Pricing, cash flow, consultant incentives, and a worked deployment example.</span></span></li>
+            <li><span class="agenda-num">05</span><span><span class="agenda-title">Discussion</span><span class="agenda-copy">What to challenge, what to validate, and what decision comes next.</span></span></li>
+          </ol>
+        </div>
+      </article>
+
+      <article class="slide center" data-title="Strategic Thesis" data-section="Why">
+        <div class="content">
+          <p class="eyebrow">Why now</p>
+          <h2>Reliable delivery is the bottleneck.</h2>
+          <p class="lead">Off-the-shelf AI is already good enough for a large class of SMB workflows. The missing layer is a repeatable way to scope, configure, evaluate, brand, monitor, and support those systems in businesses without internal AI teams.</p>
+          <div class="flow">
+            <div class="flow-node">
+              <h3>SMBs feel the pressure</h3>
+              <p class="small">They know AI should reduce admin, response time, missed leads, and repeated questions.</p>
+            </div>
+            <div class="flow-arrow" aria-hidden="true">&rarr;</div>
+            <div class="flow-node strong">
+              <h3>Trust is the buying constraint</h3>
+              <p class="small">The buyer needs a credible guide, a concrete offer, and a practical path to implementation.</p>
+            </div>
+            <div class="flow-arrow" aria-hidden="true">&rarr;</div>
+            <div class="flow-node">
+              <h3>Deployment needs productization</h3>
+              <p class="small">Generic templates are too thin. Bespoke builds are too slow, risky, and uneven.</p>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="slide split" data-title="Market Gap" data-section="Why">
+        <div class="content wide">
+          <p class="eyebrow">The gap</p>
+          <h2>Two realities are colliding.</h2>
+          <p class="lead lede-tight">A high-density group of capable technical specialists wants independent practice. A large base of SMBs wants AI outcomes packaged as concrete, safe-to-buy capability.</p>
+          <div class="grid two" style="margin-top: 34px;">
+            <div class="tile dark">
+              <h3><span class="number">01</span>Technical specialists</h3>
+              <ul class="check-list">
+                <li>Recently exited, or exiting, big tech and adjacent technical roles.</li>
+                <li>Credible with APIs, data, platforms, security, and production systems.</li>
+                <li>Missing repeatable scoping, branded delivery, and a quality surface to sell.</li>
+              </ul>
+            </div>
+            <div class="tile">
+              <h3><span class="number">02</span>SMB buyers</h3>
+              <ul class="check-list">
+                <li>Buy fewer missed leads, faster handovers, and less manual admin.</li>
+                <li>Have fewer technical experts, so the consultant often becomes the trusted translator.</li>
+                <li>Need disciplined under-scoping: what the business can absorb first, then expand.</li>
+              </ul>
+            </div>
+          </div>
+          <div class="quote-block">
+            <p>Reach exists to make each engagement a reliable repeat motion: human trust and change management on the front end, productized AI capability underneath.</p>
+          </div>
+        </div>
+      </article>
+
+      <article class="slide" data-title="Buyer Reality" data-section="Why">
+        <div class="content wide">
+          <p class="eyebrow">SMB buyer reality</p>
+          <h2>The sell has to anchor to measurable operational pain.</h2>
+          <div class="grid four" style="margin-top: 34px;">
+            <div class="metric"><strong>20 -> 5</strong><span>The win is moving a manual workflow from 20 hours a week to 5 with dependable execution.</span></div>
+            <div class="metric"><strong>1 room</strong><span>The consultant is often the most technical person in the room, including with executives.</span></div>
+            <div class="metric"><strong>Fixed sprint</strong><span>Scope follows buyer appetite for change. Under-scope first, then expand from proof.</span></div>
+            <div class="metric"><strong>Outcome</strong><span>Cleaner handovers, faster file preparation, faster responses, fewer repeated questions.</span></div>
+          </div>
+          <div class="matrix">
+            <div class="matrix-cell"><strong>Abstract categories</strong><span>Agents, RAG, graphs, orchestration, and prompt engineering stay behind the commercial story.</span></div>
+            <div class="matrix-cell"><strong>They do buy</strong><span>Less chasing, shorter queues, faster first response, lower admin load.</span></div>
+            <div class="matrix-cell"><strong>They need</strong><span>Auditability, permission boundaries, escalation rules, training, and support.</span></div>
+            <div class="matrix-cell"><strong>They trust</strong><span>A credible person who understands their workflow and can own the change.</span></div>
+          </div>
+        </div>
+      </article>
+
+      <article class="slide" data-title="Two-Layer Product" data-section="What">
+        <div class="content wide">
+          <p class="eyebrow">What Reach is</p>
+          <h2>A two-layer product: STACK plus CORE.</h2>
+          <p class="lead lede-tight">Reach separates implementation IP from relationship ownership. The consultant remains the trusted owner of the account, with a repeatable and defensible delivery surface behind them.</p>
+          <div class="split-diagram">
+            <div class="layer stack">
+              <div class="label">STACK</div>
+              <h3>Vertical AI capability deployed at the SMB</h3>
+              <p class="small">Pre-built, pre-tuned, deployment-ready components that run the actual work: connectors, agents, retrievers, ontologies, evals, guardrails, observability, and branded end-user UI.</p>
+              <div class="pill-row">
+                <span class="pill">Licensed per deployment</span>
+                <span class="pill">Usage metering</span>
+                <span class="pill">Versioned upgrades</span>
+                <span class="pill">Core IP</span>
+              </div>
+            </div>
+            <div class="layer">
+              <div class="label">CORE</div>
+              <h3>The PWA the consultant lives in</h3>
+              <p class="small">The commercial wrapper and deployment console used to profile the consultant, diagnose the prospect, shape the sprint, generate sales artifacts, configure the STACK, and monitor the live deployment.</p>
+              <div class="pill-row">
+                <span class="pill">Monthly subscription</span>
+                <span class="pill">Scoping surface</span>
+                <span class="pill">Deployment console</span>
+                <span class="pill">Retainer engine</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="slide" data-title="STACK Components" data-section="What">
+        <div class="content wide">
+          <p class="eyebrow">STACK</p>
+          <h2>The defensible deployment IP.</h2>
+          <p class="lead lede-tight">Each vertical STACK is assembled from reusable production-grade components, then tuned by the consultant for the specific SMB's vocabulary, systems, rules, and escalation paths.</p>
+          <div class="matrix">
+            <div class="matrix-cell"><strong>Connector pack</strong><span>Integrations to the SMB tools the vertical already uses.</span></div>
+            <div class="matrix-cell"><strong>Pre-tuned components</strong><span>Agents, classifiers, retrievers, and generators tuned for vertical language.</span></div>
+            <div class="matrix-cell"><strong>Configuration surface</strong><span>Vocabulary, taxonomies, rules, permissions, and escalation paths.</span></div>
+            <div class="matrix-cell"><strong>Evaluations</strong><span>Vertical-specific checks before go-live and on a recurring basis.</span></div>
+            <div class="matrix-cell"><strong>Guardrails</strong><span>Redaction, PII handling, residency controls, and action boundaries.</span></div>
+            <div class="matrix-cell"><strong>Observability</strong><span>Metrics, logs, audit trails, cost, quality, and drift detection.</span></div>
+            <div class="matrix-cell"><strong>Branded UI</strong><span>White-label widgets and portals the SMB's end users interact with.</span></div>
+            <div class="matrix-cell"><strong>Upgrade path</strong><span>Versioned components the consultant can roll forward without rebuilding.</span></div>
+          </div>
+        </div>
+      </article>
+
+      <article class="slide" data-title="CORE Modules" data-section="What">
+        <div class="content wide">
+          <p class="eyebrow">CORE</p>
+          <h2>The operating system for the practitioner.</h2>
+          <div class="grid three" style="margin-top: 34px;">
+            <div class="tile">
+              <h3>Sell</h3>
+              <ul class="check-list">
+                <li>Capability Profile</li>
+                <li>Sprint Selector</li>
+                <li>SMB Diagnostic</li>
+                <li>Scope & Quote</li>
+                <li>Proposal & SOW</li>
+              </ul>
+            </div>
+            <div class="tile">
+              <h3>Deploy</h3>
+              <ul class="check-list">
+                <li>Deployment Console</li>
+                <li>Mappings and vocabulary</li>
+                <li>Rules and eval baselines</li>
+                <li>Delivery Checklist</li>
+                <li>Approval gates and evidence capture</li>
+              </ul>
+            </div>
+            <div class="tile">
+              <h3>Operate</h3>
+              <ul class="check-list">
+                <li>Live Monitoring</li>
+                <li>Usage, cost, and quality dashboards</li>
+                <li>Retainer Builder</li>
+                <li>Case Study Generator</li>
+                <li>Expansion prompts from real deployment data</li>
+              </ul>
+            </div>
+          </div>
+          <div class="quote-block">
+            <p>CORE makes the consultant credible before the sale, disciplined during delivery, and commercially attached after go-live.</p>
+          </div>
+        </div>
+      </article>
+
+      <article class="slide" data-title="Reach Market" data-section="What">
+        <div class="content wide">
+          <p class="eyebrow">Reach Market</p>
+          <h2>The matching layer for demand, reputation, and delivery teams.</h2>
+          <p class="lead lede-tight">Reach Market turns live consultant capability into a discoverable network: high-rated Devs are matched with SMB opportunities, and consultants can find trusted collaborators when a deployment needs paired services.</p>
+          <div class="grid four" style="margin-top: 34px;">
+            <div class="tile dark">
+              <h3><span class="number">01</span>SMB matching</h3>
+              <p>SMB demand routes to Devs with the right vertical fit, geography, STACK experience, capacity, and delivery record.</p>
+            </div>
+            <div class="tile">
+              <h3><span class="number">02</span>Reputation</h3>
+              <p>Ratings compound from real deployment outcomes: eval health, client feedback, response time, renewal quality, and support hygiene.</p>
+            </div>
+            <div class="tile">
+              <h3><span class="number">03</span>Subcontracting</h3>
+              <p>Devs can source UI/UX, integration, data cleanup, security, workflow mapping, training, and change support from vetted colleagues.</p>
+            </div>
+            <div class="tile">
+              <h3><span class="number">04</span>Team formation</h3>
+              <p>CORE scopes the sprint, Reach Market suggests the delivery bench, and the lead Dev owns the client relationship.</p>
+            </div>
+          </div>
+          <div class="quote-block">
+            <p>Reach Market gives the network memory: who is trusted, who has shipped in this vertical, and who can be pulled in when the work needs a second specialist.</p>
+          </div>
+        </div>
+      </article>
+
+      <article class="slide split" data-title="Role Split" data-section="What">
+        <div class="content wide">
+          <p class="eyebrow">Operating principle</p>
+          <h2>Productize the build. Keep the relationship human-owned.</h2>
+          <div class="grid two" style="margin-top: 34px;">
+            <div class="tile">
+              <h3><span class="number">Dev</span>Consultant owns</h3>
+              <ul class="check-list">
+                <li>Discovery and trust</li>
+                <li>Buyer language and change appetite</li>
+                <li>Configuration and integration details</li>
+                <li>Staff training and adoption</li>
+                <li>Iteration from user feedback</li>
+                <li>Account ownership and retainer</li>
+              </ul>
+            </div>
+            <div class="tile dark">
+              <h3><span class="number">IP</span>Reach owns</h3>
+              <ul class="check-list">
+                <li>Vertical STACK architecture</li>
+                <li>Connector inventory and maintained integrations</li>
+                <li>Ontologies, evals, guardrails, observability</li>
+                <li>Branded end-user surfaces</li>
+                <li>Versioning and upgrade path</li>
+                <li>Deployment data flywheel</li>
+              </ul>
+            </div>
+          </div>
+          <p class="thesis-line">The consultant brings context and trust. Reach brings the implementation IP. Together they ship working AI capability faster, more reliably, and with a defensible quality bar.</p>
+        </div>
+      </article>
+
+      <article class="slide" data-title="Vertical 1: Document Intake" data-section="Verticals">
+        <div class="content wide">
+          <p class="eyebrow">Launch vertical 01</p>
+          <h2>Document Intake STACK</h2>
+          <p class="lead lede-tight">Outcome sold: reduce the time staff spend chasing, reading, classifying, and summarising client documents.</p>
+          <div class="grid three" style="margin-top: 32px;">
+            <div class="tile">
+              <h3>Buyers</h3>
+              <p>Accounting firms, legal firms, insurance brokers, migration agents, and health admin teams.</p>
+            </div>
+            <div class="tile">
+              <h3>Core capability</h3>
+              <p>Classification, extraction, redaction, missing-information detection, audit trails, and branded client upload portal.</p>
+            </div>
+            <div class="tile">
+              <h3>Why first</h3>
+              <p>Visible outcome within days, acknowledged pain, regulatory wrapper, and naturally graph-shaped workflows.</p>
+            </div>
+          </div>
+          <div class="matrix">
+            <div class="matrix-cell"><strong>AU connectors</strong><span>Xero, MYOB, FYI Docs, Karbon, LEAP, Smokeball, ActionStep, Migration Manager, and cloud storage.</span></div>
+            <div class="matrix-cell"><strong>Ontology</strong><span>Clients, matters, parties, references, regulations, prior decisions, and completeness rules.</span></div>
+            <div class="matrix-cell"><strong>GraphRAG</strong><span>Multi-hop retrieval across documents, parties, references, and prior matters with auditable paths.</span></div>
+            <div class="matrix-cell"><strong>Compounding edge</strong><span>Taxonomies and eval failures improve with every deployment in a regulated document-heavy workflow.</span></div>
+          </div>
+        </div>
+      </article>
+
+      <article class="slide" data-title="Vertical 2: Customer Support" data-section="Verticals">
+        <div class="content wide">
+          <p class="eyebrow">Launch vertical 02</p>
+          <h2>Customer Support STACK</h2>
+          <p class="lead lede-tight">Outcome sold: reduce repetitive support load and improve first-response speed.</p>
+          <div class="grid three" style="margin-top: 32px;">
+            <div class="tile">
+              <h3>Buyers</h3>
+              <p>Ecommerce brands, SaaS companies, and services businesses with enough ticket volume to make time-to-response visible.</p>
+            </div>
+            <div class="tile">
+              <h3>Core capability</h3>
+              <p>RAG over knowledge base, FAQs, and past tickets; draft replies; triage classifier; escalation; review queue.</p>
+            </div>
+            <div class="tile">
+              <h3>Why second</h3>
+              <p>Universally recognised pain, usage-based pricing logic, and staged rollout from drafts to low-risk autonomous replies.</p>
+            </div>
+          </div>
+          <div class="matrix">
+            <div class="matrix-cell"><strong>Connectors</strong><span>Common helpdesks, storefronts, knowledge bases, and customer communication tools.</span></div>
+            <div class="matrix-cell"><strong>Optional graph</strong><span>Product and policy ontology for catalogs, entitlements, troubleshooting trees, and compatibility constraints.</span></div>
+            <div class="matrix-cell"><strong>Control surface</strong><span>Tone configuration, escalation rules, approval thresholds, and human review.</span></div>
+            <div class="matrix-cell"><strong>Evaluation</strong><span>Response quality, policy compliance, escalation accuracy, CSAT, and cost per resolved ticket.</span></div>
+          </div>
+        </div>
+      </article>
+
+      <article class="slide" data-title="Vertical 3: HR" data-section="Verticals">
+        <div class="content wide">
+          <p class="eyebrow">Launch vertical 03</p>
+          <h2>HR STACK</h2>
+          <p class="lead lede-tight">Outcome sold: reduce HR admin load and answer routine employee, compliance, and onboarding questions without consuming senior leadership time.</p>
+          <div class="grid three" style="margin-top: 32px;">
+            <div class="tile">
+              <h3>Buyers</h3>
+              <p>SMBs with 20-500 employees without dedicated HR leadership: professional services, agencies, clinics, retail, hospitality, trades, and growing tech companies.</p>
+            </div>
+            <div class="tile">
+              <h3>Core capability</h3>
+              <p>Policy assistant, onboarding workflow, compliance tracking, recruiting support, and branded employee and manager portals.</p>
+            </div>
+            <div class="tile">
+              <h3>Why third</h3>
+              <p>HR expertise gives eval edge. Awards and EBA configuration make activation heavier and implementation risk higher.</p>
+            </div>
+          </div>
+          <div class="matrix">
+            <div class="matrix-cell"><strong>AU connectors</strong><span>Employment Hero, KeyPay, Xero Payroll, MYOB, Deputy, Tanda, ELMO, JobAdder, and similar.</span></div>
+            <div class="matrix-cell"><strong>Ontology</strong><span>Employees, roles, managers, contracts, awards, leave entitlements, policies, locations, and training records.</span></div>
+            <div class="matrix-cell"><strong>Compliance posture</strong><span>Fair Work Act, Modern Awards, STP, superannuation, long-service leave, Privacy Act, APP-aligned PII handling.</span></div>
+            <div class="matrix-cell"><strong>Evaluation</strong><span>Cited answers, escalation paths, entitlement reasoning, renewal tracking, and auditability.</span></div>
+          </div>
+        </div>
+      </article>
+
+      <article class="slide" data-title="Build Approach" data-section="How">
+        <div class="content wide">
+          <p class="eyebrow">Build approach</p>
+          <h2>Use the OSS substrate. Accumulate IP above it.</h2>
+          <p class="lead lede-tight">STACKs should assemble from production-grade open-source architectures wherever the commodity layer is already good, while reserving proprietary effort for domain-specific deployment advantage.</p>
+          <div class="grid two" style="margin-top: 34px;">
+            <div class="tile">
+              <h3>Commodity substrate</h3>
+              <ul class="check-list">
+                <li>Orchestration frameworks</li>
+                <li>Vector and graph stores</li>
+                <li>Evaluation harnesses</li>
+                <li>Observability</li>
+                <li>OCR and document AI</li>
+                <li>Self-hosted inference for cost-sensitive workloads</li>
+              </ul>
+            </div>
+            <div class="tile dark">
+              <h3>Proprietary layers</h3>
+              <ul class="check-list">
+                <li>Vertical ontologies</li>
+                <li>Evaluation suites and failure libraries</li>
+                <li>Connector inventory and deployment patterns</li>
+                <li>Branded UX and workflow surfaces</li>
+                <li>Compliance posture</li>
+                <li>Deployment data flywheel</li>
+              </ul>
+            </div>
+          </div>
+          <p class="thesis-line">Frontier proprietary models are used selectively where accuracy-critical reasoning warrants the cost. The default bias is workable SMB unit economics.</p>
+        </div>
+      </article>
+
+      <article class="slide" data-title="Pricing Model" data-section="How">
+        <div class="content wide">
+          <p class="eyebrow">Commercial model</p>
+          <h2>Four money flows keep incentives aligned.</h2>
+          <p class="lead lede-tight">The consultant earns upfront implementation income, recurring commission, and optional retainer. Reach earns CORE subscription plus STACK activation and MRR.</p>
+          <div class="model-layout">
+            <section class="flow-panel">
+              <p class="panel-label">Cash movement</p>
+              <div class="money-flow-grid">
+                <div class="money-flow-card primary">
+                  <span class="flow-index">01</span>
+                  <div class="flow-route"><strong>SMB</strong><span>&rarr;</span><strong>Dev</strong></div>
+                  <h3>Staged sprint fee</h3>
+                  <p>Milestone payments tied to value drops; typically <span class="money">$8,000-$20,000</span> total.</p>
+                </div>
+                <div class="money-flow-card">
+                  <span class="flow-index">02</span>
+                  <div class="flow-route"><strong>SMB</strong><span>&rarr;</span><strong>Reach</strong></div>
+                  <h3>STACK revenue</h3>
+                  <p>Activation plus monthly subscription for the deployed vertical capability.</p>
+                </div>
+                <div class="money-flow-card">
+                  <span class="flow-index">03</span>
+                  <div class="flow-route"><strong>Reach</strong><span>&rarr;</span><strong>Dev</strong></div>
+                  <h3>Lifetime commission</h3>
+                  <p>Ongoing share of STACK MRR while the deployment remains active.</p>
+                </div>
+                <div class="money-flow-card">
+                  <span class="flow-index">04</span>
+                  <div class="flow-route"><strong>Dev</strong><span>&rarr;</span><strong>Reach</strong></div>
+                  <h3>CORE subscription</h3>
+                  <p>Monthly access to the scoping, delivery, monitoring, and practice tooling.</p>
+                </div>
+              </div>
+            </section>
+            <aside class="economics-panel">
+              <p class="panel-label">Consultant economics</p>
+              <h3>Enough upside to build a practice, with Reach attached to product revenue.</h3>
+              <ul class="check-list">
+                <li>STACK commission: <span class="money">15%</span> Starter, <span class="money">20%</span> Practice, <span class="money">25%</span> Studio.</li>
+                <li>Optional retainer: <span class="money">$500-$2,000/mo</span> for tuning, escalations, and expansion.</li>
+                <li>SMB relationship stays with the Dev; product revenue and deployment telemetry stay with Reach.</li>
+                <li>Wholesale billing path is a Phase-2 option for established Studio-tier consultants.</li>
+              </ul>
+            </aside>
+          </div>
+        </div>
+      </article>
+
+      <article class="slide" data-title="Sprint Value Drops" data-section="How">
+        <div class="content wide">
+          <p class="eyebrow">Sprint fee structure</p>
+          <h2>Small payments, clear value drops.</h2>
+          <p class="lead lede-tight">The Dev is paid at the start of each step, then delivers a concrete artefact the SMB can inspect, use, or stop on. The total sprint can still reach <span class="money">$8,000-$20,000</span>, without any single stage feeling like a cliff.</p>
+          <div class="fee-drop-grid">
+            <div class="fee-drop-card featured">
+              <div class="fee-drop-head"><span class="flow-index">01</span><span class="fee-amount">$1k-$2.5k</span></div>
+              <h3>Diagnostic</h3>
+              <p>Paid intake that turns interest into a scoped business problem.</p>
+              <ul class="check-list">
+                <li>Workflow map</li>
+                <li>Readiness and risk view</li>
+                <li>Value hypothesis</li>
+              </ul>
+            </div>
+            <div class="fee-drop-card">
+              <div class="fee-drop-head"><span class="flow-index">02</span><span class="fee-amount">$2k-$4k</span></div>
+              <h3>Scope and proof</h3>
+              <p>Small proof using sample data, with success criteria and fixed sprint shape.</p>
+              <ul class="check-list">
+                <li>Prototype or demo</li>
+                <li>SOW and eval plan</li>
+                <li>Go/no-go decision</li>
+              </ul>
+            </div>
+            <div class="fee-drop-card">
+              <div class="fee-drop-head"><span class="flow-index">03</span><span class="fee-amount">$3k-$7k</span></div>
+              <h3>Configuration</h3>
+              <p>The STACK is configured against the client's systems, vocabulary, rules, and approval paths.</p>
+              <ul class="check-list">
+                <li>Connector setup</li>
+                <li>Rules and mappings</li>
+                <li>Pilot-ready workflow</li>
+              </ul>
+            </div>
+            <div class="fee-drop-card">
+              <div class="fee-drop-head"><span class="flow-index">04</span><span class="fee-amount">$2k-$6.5k</span></div>
+              <h3>Go-live</h3>
+              <p>Launch, handover, and monitoring baseline, with the retainer offer grounded in live usage.</p>
+              <ul class="check-list">
+                <li>Staff training</li>
+                <li>Go-live evidence</li>
+                <li>Retainer proposal</li>
+              </ul>
+            </div>
+          </div>
+          <div class="fee-principles">
+            <div class="principle"><strong>Paid early</strong><span>The Dev avoids long unpaid discovery and funds the work as risk increases.</span></div>
+            <div class="principle"><strong>No large bill shock</strong><span>The SMB buys the next visible step with a defined deliverable.</span></div>
+            <div class="principle"><strong>Stop points</strong><span>Each stage leaves behind a useful artefact even if the client pauses.</span></div>
+          </div>
+        </div>
+      </article>
+
+      <article class="slide" data-title="CORE Pricing" data-section="How">
+        <div class="content wide" style="display: grid; grid-template-columns: 1.15fr 1fr; gap: 32px; align-items: stretch;">
+          <div>
+            <p class="eyebrow">Pricing detail</p>
+            <h2>CORE is paid by the consultant.</h2>
+            <p class="lead lede-tight">CORE is the front door. The STACK is where unit economics compound.</p>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Tier</th>
+                    <th>Price/mo</th>
+                    <th>Who</th>
+                    <th>Commercial logic</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Launch</strong></td>
+                    <td class="money">$0</td>
+                    <td>Pre-revenue consultant</td>
+                    <td>Capped activity, Reach-branded artifacts, early proof before paid deployment.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Starter</strong></td>
+                    <td class="money">$79</td>
+                    <td>First paying client</td>
+                    <td>One active deployment, 15% STACK commission, low-friction conversion into practice.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Practice</strong></td>
+                    <td class="money">$199</td>
+                    <td>Multiple active deployments</td>
+                    <td>Priority support, 20% commission, practical solo-consultant operating tier.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Studio</strong></td>
+                    <td class="money">$499</td>
+                    <td>Small group</td>
+                    <td>Three seats included, +$129/seat, team analytics, 25% commission, wholesale path later.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <aside style="display: flex; flex-direction: column; gap: 8px; min-height: 0;">
+            <span style="font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: #6b6b6b; font-weight: 800;">Live in CORE &middot; Certifications</span>
+            <div style="flex: 1; min-height: 520px; border-radius: 8px; overflow: hidden; border: 1px solid #ececec; background: #ffffff;">
+              <iframe
+                src="CORE-app-v2.html?embed=1&amp;view=phone#slide-8"
+                title="ReachCore Certifications &mdash; mobile"
+                loading="lazy"
+                scrolling="no"
+                style="width: 100%; height: 100%; min-height: 520px; border: 0; display: block; background: #ffffff;"
+              ></iframe>
+            </div>
+          </aside>
+        </div>
+      </article>
+
+      <article class="slide" data-title="STACK Pricing" data-section="How">
+        <div class="content wide">
+          <p class="eyebrow">Pricing detail</p>
+          <h2>STACK is paid by the SMB.</h2>
+          <p class="lead lede-tight">All amounts AUD ex-GST. Activation covers ontology configuration, connector setup, and eval baselining.</p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>STACK</th>
+                  <th>Activation</th>
+                  <th>Foundation</th>
+                  <th>Growth</th>
+                  <th>Scale</th>
+                  <th>Enterprise</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Document Intake</strong></td>
+                  <td class="money">$1,500</td>
+                  <td><span class="money">$499/mo</span><br>&lt;=500 docs/mo</td>
+                  <td><span class="money">$999/mo</span><br>&lt;=2,000 docs/mo</td>
+                  <td><span class="money">$1,999/mo</span><br>&lt;=5,000 docs/mo</td>
+                  <td>Custom</td>
+                </tr>
+                <tr>
+                  <td><strong>Customer Support</strong></td>
+                  <td class="money">$1,500</td>
+                  <td><span class="money">$399/mo</span><br>&lt;=500 tickets/mo</td>
+                  <td><span class="money">$799/mo</span><br>&lt;=2,000 tickets/mo</td>
+                  <td><span class="money">$1,599/mo</span><br>&lt;=5,000 tickets/mo</td>
+                  <td>Custom</td>
+                </tr>
+                <tr>
+                  <td><strong>HR</strong></td>
+                  <td class="money">$2,500</td>
+                  <td><span class="money">$399/mo</span><br>&lt;=30 employees</td>
+                  <td><span class="money">$799/mo</span><br>&lt;=100 employees</td>
+                  <td><span class="money">$1,599/mo</span><br>&lt;=250 employees</td>
+                  <td>Custom</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="small" style="margin-top: 14px;">HR activation is higher because awards and EBA configuration make baselining heavier.</p>
+        </div>
+      </article>
+
+      <article class="slide" data-title="Worked Example" data-section="How">
+        <div class="content wide">
+          <p class="eyebrow">Worked example</p>
+          <h2>First deployment: 25-person legal firm.</h2>
+          <p class="lead lede-tight">Document Intake STACK, Growth tier, consultant on Starter CORE.</p>
+          <div class="grid two" style="margin-top: 28px;">
+            <div class="table-wrap compact" style="margin-top: 0;">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Cash flow</th>
+                    <th>Amount</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td>SMB -> Dev staged sprint fees</td><td class="money">$12,000 total</td></tr>
+                  <tr><td>Value-drop schedule</td><td>$1.5k diagnostic, $2.5k scope/proof, $5k configuration, $3k go-live</td></tr>
+                  <tr><td>SMB -> Reach activation</td><td class="money">$1,500 once</td></tr>
+                  <tr><td>SMB -> Reach STACK Growth</td><td class="money">$999/mo</td></tr>
+                  <tr><td>Reach -> Dev commission at 15%</td><td class="money">$150/mo lifetime</td></tr>
+                  <tr><td>Dev -> Reach CORE Starter</td><td class="money">$79/mo</td></tr>
+                  <tr><td>SMB -> Dev optional retainer</td><td class="money">$750/mo</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="grid two">
+              <div class="metric"><strong>$21.85k</strong><span>Approx. Dev year-one net from one client after CORE subscription.</span></div>
+              <div class="metric"><strong>$12.64k</strong><span>Approx. Reach year-one revenue from this deployment, after commission plus CORE.</span></div>
+              <div class="metric"><strong>$9.85k</strong><span>Approx. Dev year-two steady-state net at Starter tier with retainer.</span></div>
+              <div class="metric"><strong>$10.2k</strong><span>Approx. Reach year-two STACK revenue after commission, plus CORE subscription.</span></div>
+            </div>
+          </div>
+          <p class="thesis-line">The key question: are these numbers compelling enough for the consultant while leaving Reach enough margin to maintain product quality?</p>
+        </div>
+      </article>
+
+      <article class="slide" data-title="Dev Earnings Model" data-section="How">
+        <div class="content wide">
+          <p class="eyebrow">Dev earnings</p>
+          <h2>Realistic overlapping first year.</h2>
+          <p class="lead lede-tight">Illustrative solo Dev: five staged sprints started in year one, max two active sprints at once, Practice tier from month five, retainers and STACK commissions beginning after go-live.</p>
+          <div class="finance-kpis">
+            <div class="finance-kpi"><strong>5</strong><span>Engagements started</span></div>
+            <div class="finance-kpi"><strong>$60.0k</strong><span>Staged sprint fees paid during year</span></div>
+            <div class="finance-kpi"><strong>$15.6k</strong><span>Retainer income after go-live</span></div>
+            <div class="finance-kpi"><strong>$3.7k</strong><span>STACK commission income</span></div>
+            <div class="finance-kpi"><strong>$77.4k</strong><span>Net after CORE subscription</span></div>
+          </div>
+          <div class="table-wrap earnings-table-wrap">
+            <table class="earnings-table">
+              <thead>
+                <tr>
+                  <th>Period</th>
+                  <th>Active work</th>
+                  <th class="amount">Sprint fees</th>
+                  <th class="amount">Retainer + commission</th>
+                  <th class="amount">CORE</th>
+                  <th class="amount">Net cash</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>Q1</td><td class="activity">Client A through configuration; Client B diagnostic starts.</td><td class="amount money income">$10.0k</td><td class="amount income">$0.0k</td><td class="amount outgoing">-$0.2k</td><td class="amount net-cash money">$9.8k</td></tr>
+                <tr><td>Q2</td><td class="activity">Client A go-live; Client B delivery; Client C starts.</td><td class="amount money income">$16.0k</td><td class="amount income">$2.0k</td><td class="amount outgoing">-$0.6k</td><td class="amount net-cash money">$17.4k</td></tr>
+                <tr><td>Q3</td><td class="activity">Clients C and D overlap; two live retainers compound.</td><td class="amount money income">$22.5k</td><td class="amount income">$6.2k</td><td class="amount outgoing">-$0.6k</td><td class="amount net-cash money">$28.1k</td></tr>
+                <tr><td>Q4</td><td class="activity">Client E starts; four live clients contribute recurring income.</td><td class="amount money income">$11.5k</td><td class="amount income">$11.2k</td><td class="amount outgoing">-$0.6k</td><td class="amount net-cash money">$22.1k</td></tr>
+                <tr class="total-row"><td>Y1</td><td>Total paid and recurring income during the first year.</td><td class="amount money income">$60.0k</td><td class="amount income">$19.4k</td><td class="amount outgoing">-$2.0k</td><td class="amount net-cash money">$77.4k</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="finance-note">Year exits at about <span class="money">$4.0k/mo</span> recurring net before any new sprint work: $3.45k retainers + $0.72k STACK commission - $0.20k CORE.</p>
+        </div>
+      </article>
+
+      <article class="slide" data-title="Reach Earnings Model" data-section="How">
+        <div class="content wide">
+          <p class="eyebrow">Reach earnings</p>
+          <h2>Reach revenue by adoption rate.</h2>
+          <p class="lead lede-tight">Total annual Reach revenue before infra, model costs, support, sales, tax, and failed deployments. Scenarios vary only by number of consultants and rollouts per consultant.</p>
+          <div class="adoption-charts">
+            <div class="adoption-panel">
+              <h3>Year 1 total revenue</h3>
+              <div class="adoption-row">
+                <div class="adoption-label"><strong>Conservative</strong><span>20 Devs x 2.0 rollouts</span></div>
+                <div class="bar-track"><div class="bar-fill" style="width: 14.3%;"></div></div>
+                <div class="adoption-value">$313k</div>
+              </div>
+              <div class="adoption-row">
+                <div class="adoption-label"><strong>Base</strong><span>40 Devs x 3.0 rollouts</span></div>
+                <div class="bar-track"><div class="bar-fill base" style="width: 41.0%;"></div></div>
+                <div class="adoption-value">$895k</div>
+              </div>
+              <div class="adoption-row">
+                <div class="adoption-label"><strong>Strong</strong><span>75 Devs x 4.0 rollouts</span></div>
+                <div class="bar-track"><div class="bar-fill strong" style="width: 100%;"></div></div>
+                <div class="adoption-value">$2.18m</div>
+              </div>
+            </div>
+            <div class="adoption-panel">
+              <h3>Year 2 total revenue</h3>
+              <div class="adoption-row">
+                <div class="adoption-label"><strong>Conservative</strong><span>35 Devs x 2.5 rollouts</span></div>
+                <div class="bar-track"><div class="bar-fill" style="width: 14.2%;"></div></div>
+                <div class="adoption-value">$1.04m</div>
+              </div>
+              <div class="adoption-row">
+                <div class="adoption-label"><strong>Base</strong><span>75 Devs x 3.5 rollouts</span></div>
+                <div class="bar-track"><div class="bar-fill base" style="width: 41.6%;"></div></div>
+                <div class="adoption-value">$3.04m</div>
+              </div>
+              <div class="adoption-row">
+                <div class="adoption-label"><strong>Strong</strong><span>140 Devs x 4.5 rollouts</span></div>
+                <div class="bar-track"><div class="bar-fill strong" style="width: 100%;"></div></div>
+                <div class="adoption-value">$7.31m</div>
+              </div>
+            </div>
+          </div>
+          <div class="adoption-assumptions">
+            <div class="assumption-chip"><strong>$960</strong><span>Average STACK MRR per deployment</span></div>
+            <div class="assumption-chip"><strong>80%</strong><span>Reach keeps after 20% Dev commission</span></div>
+            <div class="assumption-chip"><strong>$1.75k</strong><span>Average activation fee per rollout</span></div>
+            <div class="assumption-chip"><strong>$180/mo</strong><span>Average paid CORE revenue per consultant</span></div>
+          </div>
+          <div class="table-wrap scenario-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>Scenario</th>
+                  <th>Y1 rollouts</th>
+                  <th>Y1 revenue</th>
+                  <th>Y2 new rollouts</th>
+                  <th>Deployments live by Y2 end</th>
+                  <th>Y2 revenue</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>Conservative</td><td>40</td><td class="money">$313k</td><td>88</td><td>128</td><td class="money">$1.04m</td></tr>
+                <tr><td>Base</td><td>120</td><td class="money">$895k</td><td>263</td><td>383</td><td class="money">$3.04m</td></tr>
+                <tr><td>Strong</td><td>300</td><td class="money">$2.18m</td><td>630</td><td>930</td><td class="money">$7.31m</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </article>
+
+      <article class="slide" data-title="Defensibility" data-section="How">
+        <div class="content wide">
+          <p class="eyebrow">Defensibility</p>
+          <h2>Seven layers, strongest first.</h2>
+          <p class="lead lede-tight">A motivated developer with ChatGPT and a template can copy the surface. The moat is running real deployments and turning the residue into better product.</p>
+          <div class="ladder" aria-label="Defensibility layers">
+            <div class="rung"><small>01</small><strong>Deployment data flywheel</strong></div>
+            <div class="rung"><small>02</small><strong>Vertical ontologies</strong></div>
+            <div class="rung"><small>03</small><strong>Vertical evals</strong></div>
+            <div class="rung"><small>04</small><strong>Two-sided lock-in</strong></div>
+            <div class="rung"><small>05</small><strong>Connector inventory</strong></div>
+            <div class="rung"><small>06</small><strong>Compliance posture</strong></div>
+            <div class="rung"><small>07</small><strong>Branded end-user UI</strong></div>
+          </div>
+          <div class="quote-block">
+            <p>The hard-to-copy part is knowing what "good" looks like in a vertical, proving it repeatedly, and using every deployment to make the next one better.</p>
+          </div>
+        </div>
+      </article>
+
+      <article class="slide" data-title="Category Focus" data-section="How">
+        <div class="content wide">
+          <p class="eyebrow">Boundaries</p>
+          <h2>Sharpening the category around trusted deployment.</h2>
+          <div class="grid three" style="margin-top: 34px;">
+            <div class="tile"><h3>Practitioner infrastructure</h3><p>CORE gives technical specialists the scoping, delivery, monitoring, and commercial surface for an independent practice.</p></div>
+            <div class="tile"><h3>Production capability</h3><p>STACK packages the reusable components, quality checks, connectors, UX, and compliance posture needed for live deployments.</p></div>
+            <div class="tile"><h3>Channel-led delivery</h3><p>Consultants deliver client work directly. Reach supplies the product layer they configure, deploy, operate, and stand behind.</p></div>
+          </div>
+          <div class="quote-block">
+            <p>Reach is infrastructure for trusted practitioners: production-grade capability they can sell, configure, deploy, operate, and stand behind.</p>
+          </div>
+        </div>
+      </article>
+
+      <article class="slide" data-title="What CORE is" data-section="CORE" style="padding: 0; overflow: hidden;">
+        <iframe src="CORE-app-v2.html?embed=1#slide-3" title="CORE: What CORE is" loading="lazy" scrolling="no" style="flex: 1; width: 100%; height: 100%; border: 0; display: block; background: #ffffff;"></iframe>
+      </article>
+
+      <article class="slide" data-title="Scenario" data-section="CORE" style="padding: 0; overflow: hidden;">
+        <iframe src="CORE-app-v2.html?embed=1#slide-4" title="CORE: Scenario" loading="lazy" scrolling="no" style="flex: 1; width: 100%; height: 100%; border: 0; display: block; background: #ffffff;"></iframe>
+      </article>
+
+      <article class="slide" data-title="Dashboard" data-section="CORE" style="padding: 0; overflow: hidden;">
+        <iframe src="CORE-app-v2.html?embed=1#slide-5" title="CORE: Dashboard" loading="lazy" scrolling="no" style="flex: 1; width: 100%; height: 100%; border: 0; display: block; background: #ffffff;"></iframe>
+      </article>
+
+      <article class="slide" data-title="Pipeline" data-section="CORE" style="padding: 0; overflow: hidden;">
+        <iframe src="CORE-app-v2.html?embed=1#slide-6" title="CORE: Pipeline" loading="lazy" scrolling="no" style="flex: 1; width: 100%; height: 100%; border: 0; display: block; background: #ffffff;"></iframe>
+      </article>
+
+      <article class="slide" data-title="Earnings" data-section="CORE" style="padding: 0; overflow: hidden;">
+        <iframe src="CORE-app-v2.html?embed=1#slide-7" title="CORE: Earnings" loading="lazy" scrolling="no" style="flex: 1; width: 100%; height: 100%; border: 0; display: block; background: #ffffff;"></iframe>
+      </article>
+
+      <article class="slide" data-title="Certifications" data-section="CORE" style="padding: 0; overflow: hidden;">
+        <iframe src="CORE-app-v2.html?embed=1#slide-8" title="CORE: Certifications" loading="lazy" scrolling="no" style="flex: 1; width: 100%; height: 100%; border: 0; display: block; background: #ffffff;"></iframe>
+      </article>
+
+      <article class="slide" data-title="Capability Profile" data-section="CORE" style="padding: 0; overflow: hidden;">
+        <iframe src="CORE-app-v2.html?embed=1#slide-9" title="CORE: Capability Profile" loading="lazy" scrolling="no" style="flex: 1; width: 100%; height: 100%; border: 0; display: block; background: #ffffff;"></iframe>
+      </article>
+
+      <article class="slide" data-title="Sprint Selector" data-section="CORE" style="padding: 0; overflow: hidden;">
+        <iframe src="CORE-app-v2.html?embed=1#slide-10" title="CORE: Sprint Selector" loading="lazy" scrolling="no" style="flex: 1; width: 100%; height: 100%; border: 0; display: block; background: #ffffff;"></iframe>
+      </article>
+
+      <article class="slide" data-title="SMB Diagnostic" data-section="CORE" style="padding: 0; overflow: hidden;">
+        <iframe src="CORE-app-v2.html?embed=1#slide-11" title="CORE: SMB Diagnostic" loading="lazy" scrolling="no" style="flex: 1; width: 100%; height: 100%; border: 0; display: block; background: #ffffff;"></iframe>
+      </article>
+
+      <article class="slide" data-title="Scope &amp; Quote" data-section="CORE" style="padding: 0; overflow: hidden;">
+        <iframe src="CORE-app-v2.html?embed=1#slide-12" title="CORE: Scope &amp; Quote" loading="lazy" scrolling="no" style="flex: 1; width: 100%; height: 100%; border: 0; display: block; background: #ffffff;"></iframe>
+      </article>
+
+      <article class="slide" data-title="Proposal &amp; SOW" data-section="CORE" style="padding: 0; overflow: hidden;">
+        <iframe src="CORE-app-v2.html?embed=1#slide-13" title="CORE: Proposal &amp; SOW" loading="lazy" scrolling="no" style="flex: 1; width: 100%; height: 100%; border: 0; display: block; background: #ffffff;"></iframe>
+      </article>
+
+      <article class="slide" data-title="Deployment Console" data-section="CORE" style="padding: 0; overflow: hidden;">
+        <iframe src="CORE-app-v2.html?embed=1#slide-14" title="CORE: Deployment Console" loading="lazy" scrolling="no" style="flex: 1; width: 100%; height: 100%; border: 0; display: block; background: #ffffff;"></iframe>
+      </article>
+
+      <article class="slide" data-title="Mappings &amp; Vocabulary" data-section="CORE" style="padding: 0; overflow: hidden;">
+        <iframe src="CORE-app-v2.html?embed=1#slide-15" title="CORE: Mappings &amp; Vocabulary" loading="lazy" scrolling="no" style="flex: 1; width: 100%; height: 100%; border: 0; display: block; background: #ffffff;"></iframe>
+      </article>
+
+      <article class="slide" data-title="Rules &amp; Eval Baselines" data-section="CORE" style="padding: 0; overflow: hidden;">
+        <iframe src="CORE-app-v2.html?embed=1#slide-16" title="CORE: Rules &amp; Eval Baselines" loading="lazy" scrolling="no" style="flex: 1; width: 100%; height: 100%; border: 0; display: block; background: #ffffff;"></iframe>
+      </article>
+
+      <article class="slide" data-title="Delivery Checklist" data-section="CORE" style="padding: 0; overflow: hidden;">
+        <iframe src="CORE-app-v2.html?embed=1#slide-17" title="CORE: Delivery Checklist" loading="lazy" scrolling="no" style="flex: 1; width: 100%; height: 100%; border: 0; display: block; background: #ffffff;"></iframe>
+      </article>
+
+      <article class="slide" data-title="Live Monitoring" data-section="CORE" style="padding: 0; overflow: hidden;">
+        <iframe src="CORE-app-v2.html?embed=1#slide-18" title="CORE: Live Monitoring" loading="lazy" scrolling="no" style="flex: 1; width: 100%; height: 100%; border: 0; display: block; background: #ffffff;"></iframe>
+      </article>
+
+      <article class="slide" data-title="Retainer Builder" data-section="CORE" style="padding: 0; overflow: hidden;">
+        <iframe src="CORE-app-v2.html?embed=1#slide-19" title="CORE: Retainer Builder" loading="lazy" scrolling="no" style="flex: 1; width: 100%; height: 100%; border: 0; display: block; background: #ffffff;"></iframe>
+      </article>
+
+      <article class="slide" data-title="Case Study Generator" data-section="CORE" style="padding: 0; overflow: hidden;">
+        <iframe src="CORE-app-v2.html?embed=1#slide-20" title="CORE: Case Study Generator" loading="lazy" scrolling="no" style="flex: 1; width: 100%; height: 100%; border: 0; display: block; background: #ffffff;"></iframe>
+      </article>
+
+      <article class="slide" data-title="On any device" data-section="CORE" style="padding: 0; overflow: hidden;">
+        <iframe src="CORE-app-v2.html?embed=1#slide-21" title="CORE: On any device" loading="lazy" scrolling="no" style="flex: 1; width: 100%; height: 100%; border: 0; display: block; background: #ffffff;"></iframe>
+      </article>
+
+      <article class="slide" data-title="CORE Recap" data-section="CORE" style="padding: 0; overflow: hidden;">
+        <iframe src="CORE-app-v2.html?embed=1#slide-22" title="CORE: Recap" loading="lazy" scrolling="no" style="flex: 1; width: 100%; height: 100%; border: 0; display: block; background: #ffffff;"></iframe>
+      </article>
+
+      <article class="slide" data-title="CORE Close" data-section="CORE" style="padding: 0; overflow: hidden;">
+        <iframe src="CORE-app-v2.html?embed=1#slide-23" title="CORE: Closing" loading="lazy" scrolling="no" style="flex: 1; width: 100%; height: 100%; border: 0; display: block; background: #ffffff;"></iframe>
+      </article>
+
+      <article class="slide" data-title="What STACK is" data-section="STACK">
+        <div class="content wide">
+          <p class="eyebrow">Product walkthrough &middot; STACK</p>
+          <h2>STACK is the capability that ships at the SMB.</h2>
+          <p class="lead lede-tight">STACK is the AI tooling that lives at the SMB. Vertical components configured in CORE, branded under the SMB's identity, with audit-grade evidence on every output.</p>
+          <div class="grid three" style="margin-top: 30px;">
+            <div class="tile">
+              <h3>Vertical capability</h3>
+              <p>Connector packs, ontologies, classifiers, retrievers, and generators tuned for one vertical at a time. Document Intake first, then Customer Support, then HR.</p>
+            </div>
+            <div class="tile dark">
+              <h3>Branded SMB surface</h3>
+              <p>The portal, the admin view, the emails &mdash; all carry the SMB's identity. Reach is invisible to the SMB's own clients. STACK is the product the SMB lives in.</p>
+            </div>
+            <div class="tile">
+              <h3>Audit-grade evidence</h3>
+              <p>Every classification, extraction, redaction, and escalation is logged with source links. Compliance posture and APP-aligned PII handling baked in.</p>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="slide" data-title="STACK in production" data-section="STACK">
+        <div class="content wide">
+          <p class="eyebrow">STACK</p>
+          <h2>What the SMB experiences in production.</h2>
+          <p class="lead lede-tight">Configured once in CORE, lived in by the SMB every day. Their staff process more, their clients get a polished surface, every output is auditable end to end.</p>
+          <div class="grid four" style="margin-top: 30px;">
+            <div class="tile">
+              <h3>Document queue</h3>
+              <p>Recent intake, classified by type, ranked by confidence. SMB staff review only the cases STACK flagged.</p>
+            </div>
+            <div class="tile">
+              <h3>Audit log</h3>
+              <p>Every action timestamped and linked to source. SMB shows it to auditors without prep work.</p>
+            </div>
+            <div class="tile">
+              <h3>Eval health</h3>
+              <p>Rolling pass rate per eval. Drift warnings hit the Dev's CORE dashboard before the SMB sees a problem.</p>
+            </div>
+            <div class="tile">
+              <h3>Branded portal</h3>
+              <p>The SMB's own clients upload to portal.acmelegal.com.au. Reach is invisible. STACK ships under the SMB's brand.</p>
+            </div>
+          </div>
+          <p class="thesis-line">CORE configures it. STACK runs it. Audit travels with every output so the SMB can stand behind the work.</p>
+        </div>
+      </article>
+
+      <article class="slide" data-title="STACK at Acme Legal" data-section="STACK" style="padding: 0; overflow: hidden;">
+        <iframe src="STACK-app.html?embed=1" title="STACK at Acme Legal" loading="lazy" scrolling="no" style="flex: 1; width: 100%; height: 100%; border: 0; display: block; background: #ffffff;"></iframe>
+      </article>
+
+      <article class="slide" data-title="What Market is" data-section="Market">
+        <div class="content wide">
+          <p class="eyebrow">Product walkthrough &middot; Market</p>
+          <h2>Market is the public surface of Reach.</h2>
+          <p class="lead lede-tight">reach.au &mdash; the front door where SMBs browse certified Devs and the STACKs they ship. Devs publish their Capability Profile from CORE; SMBs land on a verified, vertical-specific shortlist.</p>
+          <div class="grid three" style="margin-top: 30px;">
+            <div class="tile">
+              <h3>Find a Dev</h3>
+              <p>SMBs filter by vertical, location, and certification level. Verified profiles, real case studies, sprint-from price.</p>
+            </div>
+            <div class="tile">
+              <h3>Browse capabilities</h3>
+              <p>Public catalogue of STACKs and connectors. SMBs see what is possible before they engage a Dev.</p>
+            </div>
+            <div class="tile dark">
+              <h3>Diagnostic on-ramp</h3>
+              <p>Every profile carries a "start a diagnostic" CTA that flows the SMB straight into the Dev's CORE diagnostic. Lead becomes a scoped sprint.</p>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="slide" data-title="How Market works" data-section="Market">
+        <div class="content wide">
+          <p class="eyebrow">Market</p>
+          <h2>Two sides, one surface.</h2>
+          <p class="lead lede-tight">Devs publish from CORE. SMBs land on a verified shortlist and start a diagnostic. Reach holds the trust contract with certifications, evidence, and case studies on every profile.</p>
+          <div class="grid two" style="margin-top: 30px;">
+            <div class="tile">
+              <h3><span class="number">Dev</span>What practitioners publish</h3>
+              <ul class="check-list">
+                <li>Capability Profile from CORE &mdash; auto-synced</li>
+                <li>STACK certifications and connector list</li>
+                <li>Live deployment count and eval pass rate</li>
+                <li>Reach-issued case studies (SMB-approved)</li>
+                <li>Sprint shapes and price floor</li>
+              </ul>
+            </div>
+            <div class="tile dark">
+              <h3><span class="number">SMB</span>What buyers do</h3>
+              <ul class="check-list">
+                <li>Browse by vertical and AU region</li>
+                <li>Compare verified Devs side by side</li>
+                <li>Read real case studies with measurable outcomes</li>
+                <li>Book a 20-minute diagnostic</li>
+                <li>Receive a scoped sprint quote within 48h</li>
+              </ul>
+            </div>
+          </div>
+          <p class="thesis-line">Market is two-sided distribution. Reach sits in the middle holding the trust contract: certified practitioners, audited evidence, transparent prices.</p>
+        </div>
+      </article>
+
+      <article class="slide" data-title="Dev McLean's profile" data-section="Market" style="padding: 0; overflow: hidden;">
+        <iframe src="Market-app.html?embed=1" title="Dev McLean's public Reach profile" loading="lazy" scrolling="no" style="flex: 1; width: 100%; height: 100%; border: 0; display: block; background: #ffffff;"></iframe>
+      </article>
+
+      <article class="slide" data-title="Brand System v2" data-section="Brand" style="padding: 0; overflow: hidden;">
+        <iframe
+          src="reach-brand-system-v2.html"
+          title="Reach Brand System v2"
+          style="flex: 1; width: 100%; height: 100%; border: 0; display: block; background: #ffffff;"
+        ></iframe>
+      </article>
+
+      <article class="slide" data-title="Discussion" data-section="Discuss">
+        <div class="content wide">
+          <p class="eyebrow">Discussion</p>
+          <h2>What we should pressure-test together.</h2>
+          <div class="grid three" style="margin-top: 34px;">
+            <div class="decision">
+              <h3>1. Wedge confidence</h3>
+              <p class="small">Is Document Intake clearly the right first wedge, or is HR's domain edge worth pulling forward despite heavier activation?</p>
+            </div>
+            <div class="decision">
+              <h3>2. Buyer clarity</h3>
+              <p class="small">Can an SMB buyer understand the outcome quickly enough, and does the consultant have a credible path to trust?</p>
+            </div>
+            <div class="decision">
+              <h3>3. Consultant pull</h3>
+              <p class="small">Is the economic promise strong enough for capable technical people to build a practice on top of it?</p>
+            </div>
+            <div class="decision">
+              <h3>4. Build risk</h3>
+              <p class="small">Which layer is most likely to be harder than expected: connectors, evals, compliance, UX, or operations?</p>
+            </div>
+            <div class="decision">
+              <h3>5. Pricing</h3>
+              <p class="small">Are the activation fees, SMB MRR tiers, and commission rates coherent for both sides of the market?</p>
+            </div>
+            <div class="decision">
+              <h3>6. Next proof</h3>
+              <p class="small">What is the smallest validation artifact: mock CORE flow, vertical diagnostic, paid pilot, or founder-led deployment?</p>
+            </div>
+          </div>
+          <p class="thesis-line">Decision to make: is Reach a real venture thesis, a narrower productized agency tool, or a set of ideas that should be split before building?</p>
+        </div>
+      </article>
+    </section>
+
+    <div class="controls" aria-label="Slide controls">
+      <button class="arrow" type="button" data-prev aria-label="Previous slide">&larr;</button>
+      <div class="counter" aria-live="polite">01 / 53</div>
+      <button class="arrow" type="button" data-next aria-label="Next slide">&rarr;</button>
+    </div>
+
+    <aside class="menu" id="menu" aria-hidden="true">
+      <div class="menu-panel" role="dialog" aria-modal="true" aria-labelledby="menu-title">
+        <div class="menu-head">
+          <h2 id="menu-title">Slide menu</h2>
+          <button class="menu-close" type="button" aria-label="Close menu">&times;</button>
+        </div>
+        <ol class="menu-list"></ol>
+      </div>
+    </aside>
+  </main>
+
+  <script>
+    const slides = Array.from(document.querySelectorAll(".slide"));
+    const prevButton = document.querySelector("[data-prev]");
+    const nextButton = document.querySelector("[data-next]");
+    const counter = document.querySelector(".counter");
+    const menu = document.querySelector("#menu");
+    const menuToggle = document.querySelector(".menu-toggle");
+    const menuClose = document.querySelector(".menu-close");
+    const menuList = document.querySelector(".menu-list");
+    const sectionButtons = Array.from(document.querySelectorAll("[data-section-jump]"));
+    let current = 0;
+    let fitFrame = 0;
+
+    function pad(num) {
+      return String(num).padStart(2, "0");
+    }
+
+    function syncHash(index) {
+      const nextHash = `slide-${index + 1}`;
+      if (window.location.hash.slice(1) !== nextHash) {
+        history.replaceState(null, "", `#${nextHash}`);
+      }
+    }
+
+    function fitTargetFor(slide) {
+      if (slide.classList.contains("dark-left")) return null;
+      return slide.querySelector(":scope > .content");
+    }
+
+    function resetFit(target) {
+      if (!target) return;
+      target.style.transform = "";
+      target.style.transformOrigin = "";
+    }
+
+    function fitActiveSlide() {
+      const slide = slides[current];
+      const target = fitTargetFor(slide);
+      if (!target) return;
+
+      resetFit(target);
+
+      const slideStyle = window.getComputedStyle(slide);
+      const availableHeight = slide.clientHeight
+        - (parseFloat(slideStyle.paddingTop) || 0)
+        - (parseFloat(slideStyle.paddingBottom) || 0);
+      const availableWidth = slide.clientWidth
+        - (parseFloat(slideStyle.paddingLeft) || 0)
+        - (parseFloat(slideStyle.paddingRight) || 0);
+
+      const contentHeight = target.scrollHeight;
+      const contentWidth = target.scrollWidth;
+      if (!availableHeight || !availableWidth || !contentHeight || !contentWidth) return;
+
+      const scale = Math.min(
+        1,
+        (availableHeight - 2) / contentHeight,
+        (availableWidth - 2) / contentWidth
+      );
+
+      target.style.transformOrigin = slide.classList.contains("center") ? "center center" : "top center";
+      target.style.transform = `scale(${Math.max(0.35, scale)})`;
+    }
+
+    function scheduleFit() {
+      cancelAnimationFrame(fitFrame);
+      fitFrame = requestAnimationFrame(() => {
+        fitActiveSlide();
+        setTimeout(fitActiveSlide, 60);
+      });
+    }
+
+    function goTo(index, options = {}) {
+      current = Math.max(0, Math.min(index, slides.length - 1));
+      slides.forEach((slide, idx) => {
+        resetFit(fitTargetFor(slide));
+        slide.classList.toggle("active", idx === current);
+        if (idx === current) {
+          slide.scrollTop = 0;
+        }
+      });
+
+      prevButton.disabled = current === 0;
+      nextButton.disabled = current === slides.length - 1;
+      counter.textContent = `${pad(current + 1)} / ${pad(slides.length)}`;
+
+      const section = slides[current].dataset.section;
+      sectionButtons.forEach((button) => {
+        button.classList.toggle("active", button.dataset.sectionJump === section);
+      });
+
+      Array.from(menuList.querySelectorAll("button")).forEach((button, idx) => {
+        button.classList.toggle("active", idx === current);
+      });
+
+      if (!options.silentHash) {
+        syncHash(current);
+      }
+
+      scheduleFit();
+    }
+
+    function openMenu() {
+      menu.classList.add("open");
+      menu.setAttribute("aria-hidden", "false");
+      menuToggle.setAttribute("aria-expanded", "true");
+      const active = menuList.querySelector("button.active") || menuList.querySelector("button");
+      if (active) active.focus();
+    }
+
+    function closeMenu() {
+      menu.classList.remove("open");
+      menu.setAttribute("aria-hidden", "true");
+      menuToggle.setAttribute("aria-expanded", "false");
+      menuToggle.focus();
+    }
+
+    function buildMenu() {
+      slides.forEach((slide, index) => {
+        const item = document.createElement("li");
+        const button = document.createElement("button");
+        button.type = "button";
+        button.innerHTML = `
+          <span class="idx">${pad(index + 1)}</span>
+          <span>
+            <span class="title">${slide.dataset.title}</span>
+            <span class="section">${slide.dataset.section}</span>
+          </span>
+        `;
+        button.addEventListener("click", () => {
+          goTo(index);
+          closeMenu();
+        });
+        item.appendChild(button);
+        menuList.appendChild(item);
+      });
+    }
+
+    prevButton.addEventListener("click", () => goTo(current - 1));
+    nextButton.addEventListener("click", () => goTo(current + 1));
+    menuToggle.addEventListener("click", openMenu);
+    menuClose.addEventListener("click", closeMenu);
+
+    menu.addEventListener("click", (event) => {
+      if (event.target === menu) closeMenu();
+    });
+
+    sectionButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        const target = slides.findIndex((slide) => slide.dataset.section === button.dataset.sectionJump);
+        if (target >= 0) goTo(target);
+      });
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && menu.classList.contains("open")) {
+        closeMenu();
+        return;
+      }
+
+      if (menu.classList.contains("open")) return;
+
+      if (event.key === "ArrowRight" || event.key === "PageDown" || event.key === " ") {
+        event.preventDefault();
+        goTo(current + 1);
+      }
+
+      if (event.key === "ArrowLeft" || event.key === "PageUp") {
+        event.preventDefault();
+        goTo(current - 1);
+      }
+
+      if (event.key === "Home") {
+        event.preventDefault();
+        goTo(0);
+      }
+
+      if (event.key === "End") {
+        event.preventDefault();
+        goTo(slides.length - 1);
+      }
+    });
+
+    buildMenu();
+    window.addEventListener("resize", scheduleFit);
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(scheduleFit);
+    }
+
+    const initial = Number((window.location.hash.match(/slide-(\d+)/) || [])[1]);
+    if (Number.isFinite(initial) && initial > 0) {
+      goTo(initial - 1, { silentHash: true });
+    } else {
+      goTo(0);
+    }
+  </script>
+</body>
+</html>

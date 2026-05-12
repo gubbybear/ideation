@@ -1,0 +1,604 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Reach STACK &mdash; SMB surface</title>
+  <style>
+    :root {
+      --ink: #0a0a0a;
+      --paper: #ffffff;
+      --mist: #fafafa;
+      --fog: #f3f3f3;
+      --line: #ececec;
+      --line-strong: #d4d4d4;
+      --muted: #6b6b6b;
+      --reach-green: #15803d;
+      --reach-gold: #c08e3a;
+      --reach-blue: #1e6f8a;
+      --reach-amber: #b45309;
+      --reach-red: #dc2626;
+      --acme: #1f3357; /* SMB brand colour for the "Acme Legal" theming */
+      --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--sans);
+    }
+
+    body { padding: 24px; min-height: 100vh; }
+
+    /* App frame */
+    .app-frame {
+      max-width: 1380px;
+      margin: 0 auto;
+      border-radius: 14px;
+      overflow: hidden;
+      background: var(--paper);
+      border: 1px solid var(--line-strong);
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.10);
+    }
+
+    .chrome {
+      height: 32px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0 14px;
+      background: #e8e8e8;
+      border-bottom: 1px solid var(--line);
+    }
+    .chrome .dot { width: 10px; height: 10px; border-radius: 50%; background: #c4c4c4; }
+    .chrome .dot:nth-child(1) { background: #d28a8a; }
+    .chrome .dot:nth-child(2) { background: #d2c08a; }
+    .chrome .dot:nth-child(3) { background: #9ec79e; }
+    .chrome .url {
+      margin-left: 14px;
+      padding: 3px 10px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.85);
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 0.74rem;
+    }
+
+    /* Branded topbar — SMB's identity, with a small "powered by Reach STACK" tag */
+    .smb-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 22px;
+      background: var(--paper);
+      border-bottom: 1px solid var(--line);
+    }
+    .smb-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 900;
+      font-size: 1.05rem;
+      color: var(--acme);
+      letter-spacing: -0.005em;
+    }
+    .smb-brand .smb-mark {
+      width: 30px;
+      height: 30px;
+      border-radius: 6px;
+      display: grid;
+      place-items: center;
+      background: var(--acme);
+      color: var(--paper);
+      font-weight: 900;
+      font-size: 0.78rem;
+      letter-spacing: 0.04em;
+    }
+    .smb-brand small {
+      display: block;
+      font-size: 0.62rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 700;
+      margin-top: 1px;
+    }
+    .powered {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.7rem;
+      color: var(--muted);
+      font-weight: 700;
+    }
+    .powered .r {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: var(--ink);
+      color: var(--paper);
+      font-size: 0.6rem;
+      font-weight: 900;
+    }
+    .smb-user {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.82rem;
+    }
+    .smb-user .avatar {
+      width: 28px; height: 28px; border-radius: 50%;
+      display: grid; place-items: center;
+      background: var(--ink); color: var(--paper);
+      font-weight: 900; font-size: 0.7rem;
+    }
+
+    /* Body shell */
+    .shell {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      min-height: 540px;
+    }
+
+    /* Sidebar — light surface, semantic labels */
+    .side {
+      background: var(--mist);
+      border-right: 1px solid var(--line);
+      padding: 18px 14px;
+    }
+    .side-section { margin-bottom: 14px; }
+    .side-label {
+      font-size: 0.66rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 800;
+      padding: 6px 10px 4px;
+    }
+    .side-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 6px;
+      color: var(--ink);
+      font-size: 0.86rem;
+      font-weight: 600;
+      cursor: default;
+    }
+    .side-item.active {
+      background: var(--paper);
+      box-shadow: inset 3px 0 0 var(--acme);
+      font-weight: 800;
+    }
+    .side-item .badge {
+      min-width: 22px;
+      padding: 1px 7px;
+      border-radius: 4px;
+      background: var(--acme);
+      color: var(--paper);
+      font-size: 0.64rem;
+      font-weight: 800;
+      text-align: center;
+    }
+
+    /* Main area */
+    .main { padding: 22px 26px; background: var(--paper); }
+
+    .main-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+    .main-head h1 {
+      margin: 0;
+      font-size: 1.4rem;
+      letter-spacing: -0.01em;
+      color: var(--ink);
+    }
+    .main-head .crumb {
+      font-size: 0.72rem;
+      color: var(--muted);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+
+    .row { display: flex; align-items: center; gap: 10px; }
+
+    /* Filter bar */
+    .filterbar {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 14px;
+      padding: 4px;
+      background: var(--mist);
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      width: fit-content;
+    }
+    .filterbar button {
+      border: 0;
+      padding: 6px 12px;
+      border-radius: 6px;
+      background: transparent;
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: default;
+    }
+    .filterbar button.active {
+      background: var(--paper);
+      color: var(--ink);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+    }
+
+    /* Layout: doc queue + evidence panel */
+    .work {
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+      gap: 16px;
+      align-items: start;
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--paper);
+      overflow: hidden;
+    }
+
+    .panel-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--line);
+      background: var(--mist);
+    }
+    .panel-head h3 {
+      margin: 0;
+      font-size: 0.86rem;
+      font-weight: 800;
+      color: var(--ink);
+    }
+
+    /* Doc queue table */
+    .qtable { width: 100%; border-collapse: collapse; }
+    .qtable th, .qtable td {
+      padding: 11px 14px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      font-size: 0.84rem;
+      vertical-align: middle;
+    }
+    .qtable th {
+      font-size: 0.66rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      font-weight: 800;
+      background: var(--paper);
+    }
+    .qtable tbody tr { cursor: default; }
+    .qtable tbody tr.selected {
+      background: rgba(31, 51, 87, 0.04);
+      box-shadow: inset 3px 0 0 var(--acme);
+    }
+    .qtable tbody tr:last-child td { border-bottom: 0; }
+    .qtable td.nm { font-weight: 700; }
+    .qtable td.matter { color: var(--muted); font-size: 0.78rem; }
+    .qtable .conf {
+      font-family: var(--mono);
+      font-weight: 800;
+      color: var(--ink);
+      font-size: 0.82rem;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: var(--paper);
+      border: 1px solid var(--line-strong);
+      font-size: 0.7rem;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+    }
+    .pill.live { background: var(--reach-green); color: var(--paper); border-color: var(--reach-green); }
+    .pill.gate { background: var(--reach-amber); color: var(--paper); border-color: var(--reach-amber); }
+    .pill.evidence { background: var(--reach-blue); color: var(--paper); border-color: var(--reach-blue); }
+    .pill.fail { background: var(--reach-red); color: var(--paper); border-color: var(--reach-red); }
+
+    /* Evidence panel */
+    .evidence-body { padding: 14px; }
+    .evidence-body .pre-title {
+      font-size: 0.66rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+    .evidence-body .doc-title {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--ink);
+      margin-bottom: 10px;
+    }
+    .extract-row {
+      display: grid;
+      grid-template-columns: 110px 1fr;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px dashed var(--line);
+      font-size: 0.84rem;
+    }
+    .extract-row:last-child { border-bottom: 0; }
+    .extract-row .k {
+      color: var(--muted);
+      font-size: 0.74rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      font-weight: 800;
+    }
+    .extract-row .v { color: var(--ink); font-weight: 600; }
+    .extract-row .v small {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin-left: 8px;
+      padding: 1px 6px;
+      border-radius: 3px;
+      background: rgba(30, 111, 138, 0.10);
+      color: var(--reach-blue);
+      font-size: 0.66rem;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+    }
+
+    .audit-trail {
+      margin-top: 12px;
+      padding: 12px;
+      background: var(--mist);
+      border-radius: 8px;
+      font-size: 0.78rem;
+    }
+    .audit-trail .hdr {
+      font-size: 0.66rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+    .audit-trail .row-a {
+      display: flex;
+      gap: 10px;
+      padding: 5px 0;
+      align-items: flex-start;
+    }
+    .audit-trail .row-a .ts {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      color: var(--muted);
+      flex-shrink: 0;
+      min-width: 64px;
+    }
+    .audit-trail .row-a .what { color: var(--ink); }
+
+    /* Stats above the work area */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .stat {
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper);
+    }
+    .stat strong {
+      display: block;
+      font-size: 1.4rem;
+      font-weight: 900;
+      color: var(--ink);
+      letter-spacing: -0.015em;
+      line-height: 1;
+    }
+    .stat span {
+      display: block;
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 0.7rem;
+      font-weight: 700;
+    }
+
+    /* Embed mode */
+    body.embed { overflow: hidden !important; padding: 0; min-height: 0; height: 100vh; scrollbar-width: none; -ms-overflow-style: none; }
+    body.embed::-webkit-scrollbar, body.embed *::-webkit-scrollbar { width: 0; height: 0; display: none !important; }
+    body.embed * { scrollbar-width: none; -ms-overflow-style: none; }
+    body.embed .app-frame {
+      max-width: none;
+      height: 100vh;
+      border-radius: 0;
+      border: 0;
+      box-shadow: none;
+      display: flex;
+      flex-direction: column;
+    }
+    body.embed .shell { flex: 1; min-height: 0; }
+  </style>
+</head>
+<body>
+  <div class="app-frame">
+    <div class="chrome">
+      <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+      <span class="url">stack.acmelegal.com.au/queue</span>
+    </div>
+
+    <div class="smb-topbar">
+      <div class="smb-brand">
+        <span class="smb-mark">AL</span>
+        <span>Acme Legal<small>Document Intake</small></span>
+      </div>
+      <span class="powered"><span class="r">R</span>powered by Reach STACK</span>
+      <div class="smb-user"><span class="avatar">MT</span><span>M. Tran</span></div>
+    </div>
+
+    <div class="shell">
+      <nav class="side">
+        <div class="side-section">
+          <div class="side-label">Work</div>
+          <div class="side-item active">Document queue<span class="badge">47</span></div>
+          <div class="side-item">Matters</div>
+          <div class="side-item">Escalations<span class="badge">3</span></div>
+        </div>
+        <div class="side-section">
+          <div class="side-label">Quality</div>
+          <div class="side-item">Audit log</div>
+          <div class="side-item">Eval health</div>
+          <div class="side-item">Compliance</div>
+        </div>
+        <div class="side-section">
+          <div class="side-label">Practice</div>
+          <div class="side-item">People</div>
+          <div class="side-item">Settings</div>
+        </div>
+      </nav>
+
+      <div class="main">
+        <div class="main-head">
+          <div>
+            <div class="crumb">Work &rsaquo; Document queue</div>
+            <h1>47 documents awaiting review</h1>
+          </div>
+          <div class="row">
+            <span class="pill live">Eval pass 96.4%</span>
+            <span class="pill evidence">Audit log open</span>
+          </div>
+        </div>
+
+        <div class="stats">
+          <div class="stat"><strong>1,247</strong><span>Processed this month</span></div>
+          <div class="stat"><strong>9 hrs</strong><span>Avg matter handover</span></div>
+          <div class="stat"><strong>97.1%</strong><span>Type classification</span></div>
+          <div class="stat"><strong>100%</strong><span>Trust account redaction</span></div>
+        </div>
+
+        <div class="filterbar">
+          <button class="active">All</button>
+          <button>Unclassified</button>
+          <button>Needs partner review</button>
+          <button>Complete</button>
+        </div>
+
+        <div class="work">
+          <div class="panel">
+            <div class="panel-head"><h3>Recent intake</h3><span class="pill">Sorted by time</span></div>
+            <table class="qtable">
+              <thead>
+                <tr><th>Document</th><th>Matter</th><th>Type</th><th>Confidence</th><th>State</th></tr>
+              </thead>
+              <tbody>
+                <tr class="selected">
+                  <td class="nm">Smith v Hargrove &mdash; Statement of Claim</td>
+                  <td class="matter">ACL-1042</td>
+                  <td>Pleadings</td>
+                  <td><span class="conf">98.4%</span></td>
+                  <td><span class="pill gate">Partner review</span></td>
+                </tr>
+                <tr>
+                  <td class="nm">Engagement letter &mdash; Brennan Estate</td>
+                  <td class="matter">ACL-1044</td>
+                  <td>Costs agreement</td>
+                  <td><span class="conf">99.1%</span></td>
+                  <td><span class="pill live">Auto-filed</span></td>
+                </tr>
+                <tr>
+                  <td class="nm">Trust ledger &mdash; Q3 reconciliation</td>
+                  <td class="matter">ACL-1027</td>
+                  <td>Trust ref</td>
+                  <td><span class="conf">100%</span></td>
+                  <td><span class="pill evidence">Redacted &amp; logged</span></td>
+                </tr>
+                <tr>
+                  <td class="nm">Search results &mdash; Coastal Holdings</td>
+                  <td class="matter">ACL-1051</td>
+                  <td>Title search</td>
+                  <td><span class="conf">94.4%</span></td>
+                  <td><span class="pill live">Auto-filed</span></td>
+                </tr>
+                <tr>
+                  <td class="nm">Counsel brief &mdash; Smith v Hargrove</td>
+                  <td class="matter">ACL-1042</td>
+                  <td>Brief summary</td>
+                  <td><span class="conf">87.4%</span></td>
+                  <td><span class="pill fail">Below threshold</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head"><h3>Evidence trail</h3><span class="pill evidence">Audit-grade</span></div>
+            <div class="evidence-body">
+              <div class="pre-title">Selected document</div>
+              <div class="doc-title">Smith v Hargrove &mdash; Statement of Claim</div>
+
+              <div class="extract-row">
+                <span class="k">Matter</span>
+                <span class="v">ACL-1042 <small>source &middot; LEAP file 88421</small></span>
+              </div>
+              <div class="extract-row">
+                <span class="k">Parties</span>
+                <span class="v">J. Smith (plaintiff), R. Hargrove (defendant) <small>source &middot; pp. 1&ndash;2</small></span>
+              </div>
+              <div class="extract-row">
+                <span class="k">Counter-party</span>
+                <span class="v">Hargrove Holdings Pty Ltd <small>source &middot; p. 4</small></span>
+              </div>
+              <div class="extract-row">
+                <span class="k">Filed</span>
+                <span class="v">26 May 2026 &middot; QSC <small>source &middot; cover sheet</small></span>
+              </div>
+              <div class="extract-row">
+                <span class="k">Trust refs</span>
+                <span class="v">Redacted (3 entries) <small>source &middot; pp. 12, 14, 19</small></span>
+              </div>
+
+              <div class="audit-trail">
+                <div class="hdr">Audit log &middot; last 24h</div>
+                <div class="row-a"><span class="ts">12:14</span><span class="what"><strong>Escalation</strong> &middot; new opposing party detected, partner queue</span></div>
+                <div class="row-a"><span class="ts">10:02</span><span class="what"><strong>Redaction</strong> &middot; trust ledger references 3x</span></div>
+                <div class="row-a"><span class="ts">09:48</span><span class="what"><strong>Classification</strong> &middot; pleadings (98.4%)</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    if (new URLSearchParams(window.location.search).has('embed')) {
+      document.body.classList.add('embed');
+    }
+  </script>
+</body>
+</html>
