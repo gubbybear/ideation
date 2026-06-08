@@ -1,31 +1,41 @@
 "use client"
 
 import { GlassCard } from "@/components/ui/glass-card"
-import { MetricCard } from "@/components/ui/metric-card"
 import { cn } from "@/lib/utils"
-import { Shield, CheckCircle, AlertTriangle, Download, Filter } from "lucide-react"
+import { Shield, CheckCircle, AlertTriangle, Download, Loader2, AlertCircle } from "lucide-react"
+import { useAuditQuery, type AuditEvent } from "@/lib/api"
+import { formatTimeLong } from "@/lib/format"
 
-const auditLog = [
-  { time: "12:14:32", event: "Classification approved", user: "M. Turner", matter: "ACL-1042", status: "success" },
-  { time: "12:14:28", event: "PII redaction complete", user: "System", matter: "ACL-1042", status: "info" },
-  { time: "11:45:12", event: "Document tokenised", user: "System", matter: "ACL-1039", status: "info" },
-  { time: "11:42:05", event: "Portal upload received", user: "Client", matter: "ACL-1039", status: "success" },
-  { time: "10:53:44", event: "Draft generated", user: "System", matter: "ACL-1038", status: "info" },
-  { time: "10:53:22", event: "Classification complete", user: "System", matter: "ACL-1038", status: "success" },
-  { time: "10:02:11", event: "File logged to DMS", user: "System", matter: "Monthly", status: "success" },
-  { time: "09:36:55", event: "Annexure missing flagged", user: "System", matter: "ACL-1042", status: "warning" },
-  { time: "09:15:33", event: "New matter created", user: "J. Smith", matter: "ACL-1040", status: "success" },
-  { time: "08:44:21", event: "Review requested", user: "System", matter: "ACL-1037", status: "info" },
-]
+function escapeCsv(value: string): string {
+  if (value.includes(",") || value.includes("\"") || value.includes("\n")) {
+    return `"${value.replace(/"/g, '""')}"`
+  }
+  return value
+}
 
-const assuranceMetrics = [
-  { label: "Documents processed", value: "1,247", subtext: "This month" },
-  { label: "PII redaction rate", value: "100%", subtext: "All documents" },
-  { label: "Audit coverage", value: "100%", subtext: "Full traceability" },
-  { label: "Average confidence", value: "96.4%", subtext: "Classification" },
-]
+function downloadAuditCsv(events: AuditEvent[]) {
+  const header = ["time", "event", "user", "record", "status"]
+  const rows = events.map((e) =>
+    [e.time, e.event, e.user, e.matter, e.status].map(escapeCsv).join(","),
+  )
+  const csv = [header.join(","), ...rows].join("\n")
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8" })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement("a")
+  link.href = url
+  const stamp = new Date().toISOString().replace(/[:.]/g, "-")
+  link.download = `audit-log-${stamp}.csv`
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+  URL.revokeObjectURL(url)
+}
 
 export function AuditView() {
+  const { data, isPending, error } = useAuditQuery()
+  const events = data?.events ?? []
+  const metrics = data?.metrics ?? []
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -39,18 +49,30 @@ export function AuditView() {
           </h1>
         </div>
         <div className="flex items-center gap-2">
-          <button className="flex items-center gap-2 px-3 py-2 rounded-lg border border-border/50 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-colors">
-            <Filter className="w-4 h-4" />
-            Filter
-          </button>
-          <button className="flex items-center gap-2 px-3 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors">
+          <button
+            type="button"
+            onClick={() => downloadAuditCsv(events)}
+            disabled={events.length === 0}
+            className="flex items-center gap-2 px-3 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
             <Download className="w-4 h-4" />
             Export log
           </button>
         </div>
       </div>
 
-      {/* Assurance tiles */}
+      {/* Error banner */}
+      {error && (
+        <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-destructive/10 border border-destructive/20">
+          <AlertCircle className="w-5 h-5 text-destructive shrink-0" />
+          <div className="flex-1">
+            <p className="text-sm font-medium text-destructive">Couldn&apos;t load audit log</p>
+            <p className="text-xs text-destructive/70 font-mono">{error.message}</p>
+          </div>
+        </div>
+      )}
+
+      {/* Audit summary */}
       <div className="grid grid-cols-3 gap-4">
         <div className="glass rounded-xl border-glow p-5 col-span-1">
           <div className="flex items-start gap-4">
@@ -65,7 +87,7 @@ export function AuditView() {
           </div>
         </div>
 
-        {assuranceMetrics.slice(0, 2).map((metric) => (
+        {metrics.slice(0, 2).map((metric) => (
           <div key={metric.label} className="glass rounded-xl border-glow p-5">
             <p className="text-2xl font-bold text-foreground">{metric.value}</p>
             <p className="text-sm text-muted-foreground mt-1">{metric.label}</p>
@@ -83,14 +105,32 @@ export function AuditView() {
                 <th className="text-left py-3 px-4 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Time</th>
                 <th className="text-left py-3 px-4 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Event</th>
                 <th className="text-left py-3 px-4 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">User</th>
-                <th className="text-left py-3 px-4 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Matter</th>
+                <th className="text-left py-3 px-4 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Record</th>
                 <th className="text-right py-3 px-4 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Status</th>
               </tr>
             </thead>
             <tbody>
-              {auditLog.map((row, i) => (
-                <tr key={i} className="border-b border-border/20 hover:bg-muted/10 transition-colors">
-                  <td className="py-3 px-4 text-sm text-muted-foreground font-mono">{row.time}</td>
+              {isPending && (
+                <tr>
+                  <td colSpan={5} className="py-12 text-center">
+                    <Loader2 className="w-5 h-5 text-muted-foreground animate-spin inline-block" />
+                    <span className="ml-3 text-sm text-muted-foreground">Loading audit log…</span>
+                  </td>
+                </tr>
+              )}
+              {!isPending && events.length === 0 && !error && (
+                <tr>
+                  <td colSpan={5} className="py-12 text-center text-sm text-muted-foreground">
+                    No audit events yet.
+                  </td>
+                </tr>
+              )}
+              {!isPending && events.map((row, i) => (
+                <tr key={i} className={cn(
+                  "border-b border-border/20 hover:bg-muted/10 transition-colors",
+                  i === 0 && "bg-primary/5"
+                )}>
+                  <td className="py-3 px-4 text-sm text-muted-foreground font-mono">{formatTimeLong(row.time)}</td>
                   <td className="py-3 px-4 text-sm text-foreground">{row.event}</td>
                   <td className="py-3 px-4 text-sm text-muted-foreground">{row.user}</td>
                   <td className="py-3 px-4 text-sm text-muted-foreground font-mono">{row.matter}</td>

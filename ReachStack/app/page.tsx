@@ -1,26 +1,59 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Sidebar } from "@/components/sidebar"
 import { TopBar } from "@/components/top-bar"
 import { DashboardView } from "@/components/views/dashboard-view"
 import { QueueView } from "@/components/views/queue-view"
 import { ReviewView } from "@/components/views/review-view"
+import { CalendarView } from "@/components/views/calendar-view"
+import { ClientsView } from "@/components/views/clients-view"
+import { EngagementsView } from "@/components/views/engagements-view"
+import { DocumentsView } from "@/components/views/documents-view"
+import { TimeView } from "@/components/views/time-view"
+import { TimesheetsView } from "@/components/views/timesheets-view"
+import { RecordsView } from "@/components/views/records-view"
 import { PortalView } from "@/components/views/portal-view"
 import { AuditView } from "@/components/views/audit-view"
 import { BrandingView } from "@/components/views/branding-view"
+import type { PersonaRole } from "@/lib/persona"
 
 export default function ReachStackDashboard() {
   const [activeView, setActiveView] = useState("dashboard")
+  const [persona, setPersona] = useState<PersonaRole>("admin")
+
+  useEffect(() => {
+    setActiveView("dashboard")
+  }, [persona])
 
   const renderView = () => {
     switch (activeView) {
       case "dashboard":
-        return <DashboardView />
+        return (
+          <DashboardView
+            persona={persona}
+            onOpenReview={() => setActiveView("review")}
+            onNavigate={setActiveView}
+          />
+        )
       case "queue":
         return <QueueView />
       case "review":
         return <ReviewView />
+      case "calendar":
+        return <CalendarView />
+      case "clients":
+        return <ClientsView />
+      case "engagements":
+        return <EngagementsView />
+      case "documents":
+        return <DocumentsView />
+      case "time":
+        return <TimeView />
+      case "timesheets":
+        return <TimesheetsView />
+      case "records":
+        return <RecordsView />
       case "portal":
         return <PortalView />
       case "audit":
@@ -28,7 +61,7 @@ export default function ReachStackDashboard() {
       case "branding":
         return <BrandingView />
       default:
-        return <DashboardView />
+        return <DashboardView persona={persona} onOpenReview={() => setActiveView("review")} onNavigate={setActiveView} />
     }
   }
 
@@ -41,10 +74,10 @@ export default function ReachStackDashboard() {
       </div>
 
       <div className="relative z-10 flex h-screen">
-        <Sidebar activeView={activeView} onViewChange={setActiveView} />
+        <Sidebar activeView={activeView} onViewChange={setActiveView} persona={persona} />
         
         <div className="flex-1 flex flex-col overflow-hidden">
-          <TopBar />
+          <TopBar persona={persona} onPersonaChange={setPersona} />
           
           <main className="flex-1 overflow-auto p-6">
             <div className="max-w-[1600px] mx-auto">

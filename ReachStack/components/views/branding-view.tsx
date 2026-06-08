@@ -1,34 +1,60 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { GlassCard } from "@/components/ui/glass-card"
 import { cn } from "@/lib/utils"
-import { Check, Zap } from "lucide-react"
-
-const colorThemes = [
-  { name: "Navy", color: "bg-[#1f3357]", active: true },
-  { name: "Forest", color: "bg-[#15803d]" },
-  { name: "Ocean", color: "bg-[#1e6f8a]" },
-  { name: "Amber", color: "bg-[#9a6a1f]" },
-  { name: "Slate", color: "bg-[#0a0a0a]" },
-]
-
-const densityOptions = [
-  { name: "Compact", description: "Maximum information density" },
-  { name: "Comfortable", description: "Balanced spacing" },
-  { name: "Spacious", description: "More breathing room" },
-]
-
-const privacyOptions = [
-  { name: "Restricted", description: "AU-hosted inference, no training", active: true },
-  { name: "Standard", description: "Global inference, anonymised training" },
-  { name: "Open", description: "Full platform features" },
-]
+import { Check, Zap, Loader2, AlertCircle } from "lucide-react"
+import { useBrandingQuery, useBrandingMutation } from "@/lib/api"
+import { toast } from "sonner"
 
 export function BrandingView() {
+  const { data: branding, isPending, error } = useBrandingQuery()
+  const mutation = useBrandingMutation()
+
   const [selectedTheme, setSelectedTheme] = useState("Navy")
   const [selectedDensity, setSelectedDensity] = useState("Compact")
   const [selectedPrivacy, setSelectedPrivacy] = useState("Restricted")
+
+  useEffect(() => {
+    if (branding) {
+      setSelectedTheme(branding.theme)
+      setSelectedDensity(branding.density)
+      setSelectedPrivacy(branding.privacy_posture)
+    }
+  }, [branding])
+
+  const handleSave = async () => {
+    try {
+      await mutation.mutateAsync({
+        theme: selectedTheme,
+        density: selectedDensity,
+        privacy_posture: selectedPrivacy,
+      })
+      toast.success("Settings saved")
+    } catch (err) {
+      toast.error(`Save failed: ${err instanceof Error ? err.message : "Unknown error"}`)
+    }
+  }
+
+  const colorThemes = branding?.available_themes ?? [
+    { name: "Navy", color: "bg-[#1f3357]" },
+    { name: "Forest", color: "bg-[#15803d]" },
+    { name: "Ocean", color: "bg-[#1e6f8a]" },
+    { name: "Amber", color: "bg-[#9a6a1f]" },
+    { name: "Slate", color: "bg-[#0a0a0a]" },
+  ]
+
+  const densityOptions = branding?.available_densities ?? [
+    { name: "Compact", description: "Maximum information density" },
+    { name: "Comfortable", description: "Balanced spacing" },
+    { name: "Spacious", description: "More breathing room" },
+  ]
+
+  const privacyOptions = branding?.available_privacy_postures ?? [
+    { name: "Restricted", description: "AU-hosted inference, no training" },
+    { name: "Standard", description: "Global inference, anonymised training" },
+    { name: "Open", description: "Full platform features" },
+  ]
 
   return (
     <div className="space-y-6">
@@ -36,16 +62,32 @@ export function BrandingView() {
       <div className="flex items-start justify-between">
         <div>
           <p className="text-[10px] font-semibold tracking-wider text-primary uppercase mb-1">
-            Branding & Settings
+            Settings
           </p>
           <h1 className="text-2xl font-semibold text-foreground">
             Customize your tenant appearance and behavior
           </h1>
         </div>
-        <button className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors">
-          Save changes
+        <button
+          onClick={handleSave}
+          disabled={isPending || mutation.isPending}
+          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        >
+          {mutation.isPending && <Loader2 className="w-4 h-4 animate-spin" />}
+          {!mutation.isPending && "Save changes"}
         </button>
       </div>
+
+      {/* Error banner */}
+      {error && (
+        <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-destructive/10 border border-destructive/20">
+          <AlertCircle className="w-5 h-5 text-destructive shrink-0" />
+          <div className="flex-1">
+            <p className="text-sm font-medium text-destructive">Couldn&apos;t load settings</p>
+            <p className="text-xs text-destructive/70 font-mono">{error.message}</p>
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-12 gap-6">
         {/* Settings */}
@@ -146,7 +188,7 @@ export function BrandingView() {
                   <div className="w-6 h-6 rounded bg-white/20 flex items-center justify-center">
                     <Zap className="w-3.5 h-3.5 text-white" />
                   </div>
-                  <span className="text-xs font-semibold text-white">Acme Legal</span>
+                  <span className="text-xs font-semibold text-white">Acme Advisory</span>
                 </div>
                 <div className="flex gap-3 text-[10px] text-white/70">
                   <span>Docs</span>

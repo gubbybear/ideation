@@ -7,7 +7,7 @@ interface QueueItemProps {
   title: string
   meta: string
   confidence: number
-  status: "partner" | "file" | "draft" | "logged" | "hold"
+  status: "partner" | "file" | "draft" | "logged" | "hold" | "review"
   isSelected?: boolean
   onClick?: () => void
 }
@@ -18,6 +18,7 @@ const statusConfig = {
   draft: { label: "Draft", variant: "info" as const },
   logged: { label: "Logged", variant: "success" as const },
   hold: { label: "Hold", variant: "destructive" as const },
+  review: { label: "Review", variant: "info" as const },
 }
 
 export function QueueItem({ 
