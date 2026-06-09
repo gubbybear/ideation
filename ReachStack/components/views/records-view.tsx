@@ -18,6 +18,7 @@ const typeTone: Record<RecordType, string> = {
   client: "bg-primary/15 text-primary border-primary/20",
   engagement: "bg-success/15 text-success border-success/20",
   document: "bg-warning/15 text-warning border-warning/20",
+  queue: "bg-destructive/10 text-destructive border-destructive/20",
   booking: "bg-primary/10 text-primary border-primary/20",
   time: "bg-muted/50 text-muted-foreground border-border/40",
   note: "bg-muted/50 text-muted-foreground border-border/40",
@@ -105,7 +106,7 @@ export function RecordsView() {
               </button>
               {retrieval.data && (
                 <div className="rounded-lg border border-primary/20 bg-primary/5 p-3">
-                  <p className="text-sm text-foreground leading-relaxed">{retrieval.data.answer}</p>
+                  <p className="whitespace-pre-line text-sm text-foreground leading-relaxed">{retrieval.data.answer}</p>
                   <div className="mt-3 space-y-2">
                     {retrieval.data.citations.map((citation) => (
                       <div key={`${citation.title}-${citation.score}`} className="rounded-md bg-card/50 border border-border/30 p-2">
@@ -124,7 +125,7 @@ export function RecordsView() {
 
           <GlassCard title="Result Types" badge="Search">
             <div className="space-y-3">
-              {(["client", "engagement", "document", "booking", "time", "audit"] as RecordType[]).map((type) => {
+              {(["client", "engagement", "document", "queue", "booking", "time", "audit"] as RecordType[]).map((type) => {
                 const count = results.filter((r) => r.type === type).length
                 return (
                   <div key={type} className="flex items-center justify-between rounded-lg border border-border/30 bg-card/30 px-3 py-2">

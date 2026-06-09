@@ -28,6 +28,7 @@ import {
   useTimeEntriesQuery,
   useTimesheetsQuery,
 } from "@/lib/api"
+import { useBrandingDemo } from "@/lib/branding-demo"
 import type { PersonaRole } from "@/lib/persona"
 
 interface SidebarProps {
@@ -48,8 +49,10 @@ export function Sidebar({ activeView, onViewChange, persona }: SidebarProps) {
   const { data: documents = [] } = useDocumentsQuery()
   const { data: timeEntries = [] } = useTimeEntriesQuery()
   const { data: timesheets = [] } = useTimesheetsQuery()
+  const { branding: brandingDemo } = useBrandingDemo()
 
-  const tenantName = branding?.tenant_name ?? "Acme Advisory"
+  const tenantName =
+    brandingDemo.tenantName.trim() || branding?.tenant_name || "Acme Advisory"
   const reviewCount = queue.filter(
     (q) => q.status === "partner" || q.status === "review" || q.status === "hold",
   ).length
@@ -134,8 +137,22 @@ export function Sidebar({ activeView, onViewChange, persona }: SidebarProps) {
     <aside className="w-64 h-screen flex flex-col border-r border-border/50 bg-sidebar backdrop-blur-xl">
       <div className="p-5 border-b border-border/50">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-lg bg-primary flex items-center justify-center">
-            <Zap className="w-5 h-5 text-primary-foreground" />
+          <div
+            className={cn(
+              "w-9 h-9 rounded-lg flex items-center justify-center overflow-hidden",
+              brandingDemo.logo ? "bg-card border border-border/40" : "bg-primary",
+            )}
+          >
+            {brandingDemo.logo ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={brandingDemo.logo}
+                alt={`${tenantName} logo`}
+                className="w-full h-full object-contain"
+              />
+            ) : (
+              <Zap className="w-5 h-5 text-primary-foreground" />
+            )}
           </div>
           <div>
             <h1 className="text-sm font-semibold text-foreground">{tenantName}</h1>

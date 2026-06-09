@@ -183,7 +183,7 @@ export function ClientsView() {
 
               {retrieval.data && (
                 <div className="rounded-lg border border-primary/20 bg-primary/5 p-3">
-                  <p className="text-sm text-foreground leading-relaxed">{retrieval.data.answer}</p>
+                  <p className="whitespace-pre-line text-sm text-foreground leading-relaxed">{retrieval.data.answer}</p>
                   <div className="mt-3 space-y-2">
                     {retrieval.data.citations.map((citation) => (
                       <div key={`${citation.title}-${citation.score}`} className="rounded-md bg-card/50 border border-border/30 p-2">

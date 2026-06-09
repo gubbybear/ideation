@@ -126,3 +126,28 @@ Initial source system values:
 - Do not make ReachStack the source of truth for records that already have a clear system of record.
 - AI answers should cite the exact document or record used.
 - Document processing actions should appear in audit history.
+
+## Ontology And Frontend Term Mapping
+
+When ReachStack adds a formal ontology, it should include an explicit mapping layer between backend objects, controlled vocabulary terms, and frontend language.
+
+This should be programmed rather than inferred by the model. If a term is part of the controlled vocabulary, the system should resolve it deterministically before AI synthesis happens.
+
+Examples:
+
+- `client_id="client-hargrove"` maps to the frontend term "Hargrove Holdings".
+- `DocumentRecord.status="needs_review"` maps to "Needs review", "need review", and "documents needing review".
+- `DocumentRecord.doc_type="Compliance"` and `subtype="BAS lodgement"` map to user language such as "BAS", "GST lodgement", and "compliance document".
+- `TimeEntryRecord.billable=true` maps to "billable time" but not automatically to "billed" or "invoiced".
+- `source_of_truth="external"` maps to "external source of truth", "owned by Xero/Microsoft/Google", and "edit in source".
+
+The ontology layer should expose:
+
+- canonical backend field names and enum values
+- accepted frontend labels
+- common aliases and plural forms
+- record-type scope rules
+- metric definitions, such as recorded time vs submitted time vs approved time vs invoiced time
+- source-of-truth and mutation rules
+
+AI retrieval should use this layer to constrain search first, then use the model for summarisation, prioritisation, and natural-language explanation. The model should not be responsible for deciding what controlled terms mean.

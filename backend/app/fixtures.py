@@ -10,12 +10,15 @@ them for display. AEST is +10:00; AEDT (DST) is +11:00.
 
 from __future__ import annotations
 
+import uuid
+
 from app.models import (
     AssuranceMetric,
     AuditEvent,
     BookingRecord,
     BrandingConfig,
     BrandingOption,
+    ChangeRecord,
     ClientRecord,
     DocumentRecord,
     DashboardResponse,
@@ -60,11 +63,11 @@ QUEUE_LIST: list[QueueListItem] = [
 ]
 
 QUEUE_DASHBOARD: list[QueueDashboardItem] = [
-    QueueDashboardItem(id="1", title="Statement of claim from Hargrove Holdings", meta="Email · Smith v Hargrove · 12:14", confidence=98.4, status="partner"),
-    QueueDashboardItem(id="2", title="Signed engagement letter for Brennan Estate", meta="Portal upload · new matter · 11:42", confidence=99.1, status="file"),
-    QueueDashboardItem(id="3", title="Client asks for conveyancing settlement status", meta="Shared inbox · Coastal Holdings · 10:53", confidence=94.8, status="draft"),
-    QueueDashboardItem(id="4", title="Trust ledger reconciliation extract", meta="Drive folder · monthly close · 10:02", confidence=100.0, status="logged"),
-    QueueDashboardItem(id="5", title="Counsel brief with incomplete annexures", meta="Email attachment · Smith v Hargrove · 09:36", confidence=87.4, status="hold"),
+    QueueDashboardItem(id="1", title="Statement of claim from Hargrove Holdings", meta="Email - Smith v Hargrove - 12:14", confidence=98.4, status="partner"),
+    QueueDashboardItem(id="2", title="Signed engagement letter for Brennan Estate", meta="Portal upload - new matter - 11:42", confidence=99.1, status="file"),
+    QueueDashboardItem(id="3", title="Client asks for conveyancing settlement status", meta="Shared inbox - Coastal Holdings - 10:53", confidence=94.8, status="draft"),
+    QueueDashboardItem(id="4", title="Trust ledger reconciliation extract", meta="Drive folder - monthly close - 10:02", confidence=100.0, status="logged"),
+    QueueDashboardItem(id="5", title="Counsel brief with incomplete annexures", meta="Email attachment - Smith v Hargrove - 09:36", confidence=87.4, status="hold"),
 ]
 
 DECISION_OPTIONS: list[DecisionRailOption] = [
@@ -134,7 +137,7 @@ QUEUE_DETAILS: dict[str, QueueItemDetail] = {
         document_preview_text=(
             "From: jordan@coastalholdings.com.au\n"
             "Subject: Settlement timing?\n\n"
-            "Hi team — can you confirm when settlement is scheduled and whether the deposit has cleared? "
+            "Hi team - can you confirm when settlement is scheduled and whether the deposit has cleared? "
             "Our buyer is asking for an update."
         ),
         draft_text=(
@@ -155,8 +158,8 @@ QUEUE_DETAILS: dict[str, QueueItemDetail] = {
         confidence=100.0,
         status="logged",
         document_preview_text=(
-            "TRUST LEDGER — MONTHLY CLOSE\n"
-            "Period: 01 Apr – 30 Apr 2026.\n"
+            "TRUST LEDGER - MONTHLY CLOSE\n"
+            "Period: 01 Apr - 30 Apr 2026.\n"
             "Opening: $1,284,302.14. Closing: $1,318,977.02.\n"
             "Reconciliation: balanced. No exceptions."
         ),
@@ -195,7 +198,7 @@ QUEUE_DETAILS: dict[str, QueueItemDetail] = {
     "6": QueueItemDetail(
         id="6",
         matter_code="ACL-1040",
-        title="New matter intake — Parker Industries",
+        title="New matter intake - Parker Industries",
         received_at=_ts("09:15"),
         source="Portal",
         confidence=96.2,
@@ -218,7 +221,7 @@ QUEUE_DETAILS: dict[str, QueueItemDetail] = {
     "7": QueueItemDetail(
         id="7",
         matter_code="ACL-1037",
-        title="Document review request — Wellington Trust",
+        title="Document review request - Wellington Trust",
         received_at=_ts("08:44"),
         source="Email",
         confidence=91.5,
@@ -240,7 +243,7 @@ QUEUE_DETAILS: dict[str, QueueItemDetail] = {
     "8": QueueItemDetail(
         id="8",
         matter_code="ACL-1041",
-        title="Settlement docs — Metro Commercial",
+        title="Settlement docs - Metro Commercial",
         received_at=_ts("08:22"),
         source="Portal",
         confidence=99.8,
@@ -320,6 +323,9 @@ ASSURANCE_METRICS: list[AssuranceMetric] = [
     AssuranceMetric(label="Audit coverage", value="100%", subtext="Full traceability"),
     AssuranceMetric(label="Average confidence", value="96.4%", subtext="Classification"),
 ]
+
+CHANGE_SESSION_ID = f"session-{uuid.uuid4().hex[:8]}"
+CHANGE_RECORDS: list[ChangeRecord] = []
 
 
 # ---------- Branding ----------
@@ -731,6 +737,339 @@ DOCUMENTS: list[DocumentRecord] = [
         tags=["Generated", "Filed", "SharePoint"],
         snippet="Client next-steps letter created in ReachStack and filed to SharePoint after approval.",
     ),
+    DocumentRecord(
+        id="doc-2011",
+        client_id="client-northstar",
+        engagement_id="eng-northstar-monthly",
+        name="NAB_operating_account_May_statement.pdf",
+        doc_type="Financial",
+        subtype="Bank statement",
+        source="Xero",
+        source_of_truth="external",
+        source_system="xero",
+        external_system="xero",
+        external_id="xero-bankfeed-may-2026",
+        external_url="https://go.xero.com/Bank/BankAccounts.aspx",
+        sync_status="synced",
+        local_editing="disabled",
+        uploaded_at=_ts("11:46"),
+        owner="System",
+        status="indexed",
+        tags=["Bank statement", "Xero", "May close"],
+        snippet="NAB operating account statement for May - closing balance reconciles to Xero bank feed with no exceptions.",
+    ),
+    DocumentRecord(
+        id="doc-2012",
+        client_id="client-northstar",
+        engagement_id="eng-northstar-monthly",
+        name="BAS_lodgement_Q3_FY26.pdf",
+        doc_type="Compliance",
+        subtype="BAS lodgement",
+        source="Xero",
+        source_of_truth="external",
+        source_system="xero",
+        external_system="xero",
+        external_id="xero-bas-q3-fy26",
+        external_url="https://go.xero.com/AccountsReceivable/Reports/BAS",
+        sync_status="external_changed",
+        local_editing="disabled",
+        approval_status="review",
+        uploaded_at=_ts("11:18"),
+        owner="M. Turner",
+        status="needs_review",
+        tags=["BAS lodgement", "GST", "Compliance"],
+        snippet="Q3 FY26 BAS lodgement re-issued in Xero after a late supplier invoice - figures now differ from the version partner reviewed yesterday.",
+    ),
+    DocumentRecord(
+        id="doc-2013",
+        client_id="client-northstar",
+        engagement_id="eng-northstar-monthly",
+        name="Chair_cleaning_receipt_supplier_dispute.jpg",
+        doc_type="Financial",
+        subtype="Receipt",
+        source="Manual upload",
+        source_of_truth="reachstack",
+        source_system="manual",
+        sync_status="not_synced",
+        local_editing="enabled",
+        uploaded_at=_ts("10:31"),
+        owner="A. Chen",
+        status="needs_review",
+        tags=["Receipt", "Supplier dispute", "Manual upload"],
+        snippet="Photograph of chair-cleaning receipt that contradicts the supplier invoice amount - flagged for supplier dispute follow-up.",
+    ),
+    DocumentRecord(
+        id="doc-2014",
+        client_id="client-hargrove",
+        engagement_id="eng-hargrove-tax",
+        name="Director_ID_E_Hargrove.pdf",
+        doc_type="Identity",
+        subtype="Director ID",
+        source="Manual upload",
+        source_of_truth="reachstack",
+        source_system="manual",
+        sync_status="sync_failed",
+        local_editing="enabled",
+        approval_status="review",
+        uploaded_at=_ts("09:51"),
+        owner="J. Smith",
+        status="needs_review",
+        tags=["Director ID", "Identity", "ASIC"],
+        snippet="Director ID for Elliot Hargrove captured for ASIC records - push to the compliance register failed and needs a manual retry.",
+    ),
+    DocumentRecord(
+        id="doc-2015",
+        client_id="client-hargrove",
+        engagement_id="eng-hargrove-tax",
+        name="Lease_renewal_42_Wharf_St.docx",
+        doc_type="Contract",
+        subtype="Lease renewal",
+        source="Microsoft 365",
+        source_of_truth="shared",
+        source_system="microsoft_365",
+        external_system="microsoft_365",
+        external_id="sharepoint-lease-renewal-42-wharf",
+        external_url="https://sharepoint.com/sites/hargrove/lease-renewal",
+        sync_status="conflict",
+        local_editing="enabled",
+        approval_status="review",
+        version=5,
+        uploaded_at=_ts("09:24"),
+        owner="J. Smith",
+        status="needs_review",
+        tags=["Lease renewal", "Contract", "Conflict"],
+        snippet="42 Wharf Street lease renewal - landlord edited rent escalation clause in SharePoint while partner was editing the option period locally.",
+    ),
+    DocumentRecord(
+        id="doc-2016",
+        client_id="client-hargrove",
+        engagement_id="eng-hargrove-tax",
+        name="Hargrove_followup_missing_approval.md",
+        doc_type="Email",
+        subtype="Client follow-up",
+        source="ReachStack",
+        source_of_truth="reachstack",
+        source_system="reachstack",
+        external_system="microsoft_365",
+        sync_status="sync_pending",
+        local_editing="enabled",
+        approval_status="review",
+        version=2,
+        generated_by="assistant",
+        based_on_documents=["doc-2003", "doc-2008"],
+        uploaded_at=_ts("09:42"),
+        owner="J. Smith",
+        status="needs_review",
+        tags=["Generated", "Client follow-up", "Missing approval"],
+        snippet="Follow-up email to Elliot Hargrove chasing the missing approval on the entity structure memo before the 30 June deadline.",
+    ),
+    DocumentRecord(
+        id="doc-2017",
+        client_id="client-coastal",
+        engagement_id="eng-coastal-settlement",
+        name="Supplier_dispute_thread.eml",
+        doc_type="Email",
+        subtype="Inbound correspondence",
+        source="Microsoft 365",
+        source_of_truth="external",
+        source_system="microsoft_365",
+        external_system="microsoft_365",
+        external_id="msg-coastal-supplier-dispute-thread",
+        external_url="https://outlook.office.com/mail/",
+        sync_status="synced",
+        local_editing="disabled",
+        uploaded_at=_ts("08:47"),
+        owner="A. Chen",
+        status="indexed",
+        tags=["Supplier dispute", "Email", "Inbound"],
+        snippet="Three-message email thread between Coastal Holdings and Riverside Linen disputing the March cleaning invoice and remittance amount.",
+    ),
+    DocumentRecord(
+        id="doc-2018",
+        client_id="client-coastal",
+        engagement_id="eng-coastal-settlement",
+        name="Remittance_advice_riverside_linen.pdf",
+        doc_type="Financial",
+        subtype="Remittance advice",
+        source="Xero",
+        source_of_truth="external",
+        source_system="xero",
+        external_system="xero",
+        external_id="xero-remittance-riverside-2026-05",
+        external_url="https://go.xero.com/AccountsPayable/RemittanceAdvice",
+        sync_status="synced",
+        local_editing="disabled",
+        uploaded_at=_ts("08:51"),
+        owner="System",
+        status="indexed",
+        tags=["Remittance advice", "Xero", "Accounts payable"],
+        snippet="Remittance advice to Riverside Linen for $4,820 covering invoices INV-2204 and INV-2218 - excludes the disputed March cleaning charge.",
+    ),
+    DocumentRecord(
+        id="doc-2019",
+        client_id="client-coastal",
+        engagement_id="eng-coastal-settlement",
+        name="BAS_Q3_worksheet_coastal.xlsx",
+        doc_type="Compliance",
+        subtype="GST worksheet",
+        source="Client portal",
+        source_of_truth="shared",
+        source_system="client_portal",
+        external_system="microsoft_365",
+        external_id="portal-bas-q3-worksheet",
+        external_url="https://sharepoint.com/sites/coastal/bas-q3",
+        sync_status="local_changed",
+        local_editing="enabled",
+        approval_status="draft",
+        version=3,
+        uploaded_at=_ts("09:05"),
+        owner="A. Chen",
+        status="needs_review",
+        tags=["BAS lodgement", "GST", "Worksheet"],
+        snippet="Working draft of the Q3 BAS GST worksheet with cleaning-supplier dispute amounts excluded pending resolution.",
+    ),
+    DocumentRecord(
+        id="doc-2020",
+        client_id="client-parker",
+        engagement_id="eng-parker-onboarding",
+        name="Onboarding_checklist_parker.md",
+        doc_type="Form",
+        subtype="Onboarding checklist",
+        source="ReachStack",
+        source_of_truth="reachstack",
+        source_system="reachstack",
+        sync_status="not_synced",
+        local_editing="enabled",
+        approval_status="draft",
+        version=2,
+        generated_by="assistant",
+        based_on_documents=["doc-2006", "doc-2010"],
+        uploaded_at=_ts("08:14"),
+        owner="M. Turner",
+        status="indexed",
+        tags=["Generated", "Onboarding checklist", "Advisory"],
+        snippet="Onboarding checklist covering conflict check, director ID capture, ATO agent link, and Xero connection for Parker Industries.",
+    ),
+    DocumentRecord(
+        id="doc-2021",
+        client_id="client-parker",
+        engagement_id="eng-parker-onboarding",
+        name="Conflict_check_report_parker.pdf",
+        doc_type="Compliance",
+        subtype="Conflict check",
+        source="ReachStack",
+        source_of_truth="reachstack",
+        source_system="reachstack",
+        sync_status="not_synced",
+        local_editing="enabled",
+        approval_status="approved",
+        version=1,
+        generated_by="system",
+        based_on_documents=["doc-2006"],
+        uploaded_at=_ts("08:17"),
+        owner="M. Turner",
+        status="indexed",
+        tags=["Conflict check", "Compliance", "Onboarding"],
+        snippet="Conflict check across existing clients and counterparties - no conflicts identified with Parker Industries or Northbridge Logistics.",
+    ),
+    DocumentRecord(
+        id="doc-2022",
+        client_id="client-parker",
+        engagement_id="eng-parker-onboarding",
+        name="Director_ID_N_Parker.pdf",
+        doc_type="Identity",
+        subtype="Director ID",
+        source="Manual upload",
+        source_of_truth="reachstack",
+        source_system="manual",
+        sync_status="synced",
+        local_editing="enabled",
+        approval_status="approved",
+        uploaded_at=_ts("08:11"),
+        owner="M. Turner",
+        status="indexed",
+        tags=["Director ID", "Identity", "Onboarding"],
+        snippet="Director ID for Nadia Parker captured during onboarding and matched to ASIC register without exception.",
+    ),
+    DocumentRecord(
+        id="doc-2023",
+        client_id="client-parker",
+        engagement_id="eng-parker-onboarding",
+        name="Engagement_letter_parker_signed.pdf",
+        doc_type="Contract",
+        subtype="Engagement letter",
+        source="Manual upload",
+        source_of_truth="reachstack",
+        source_system="manual",
+        sync_status="sync_pending",
+        local_editing="enabled",
+        approval_status="sent",
+        uploaded_at=_ts("08:19"),
+        owner="M. Turner",
+        status="indexed",
+        tags=["Engagement letter", "Signed", "Onboarding"],
+        snippet="Counter-signed engagement letter for Parker Industries advisory and management reporting scope - queued for filing to SharePoint.",
+    ),
+    DocumentRecord(
+        id="doc-2024",
+        client_id="client-northstar",
+        engagement_id="eng-northstar-monthly",
+        name="Q1_board_meeting_minutes.gdoc",
+        doc_type="Meeting Note",
+        subtype="Board minutes",
+        source="Google Drive",
+        source_of_truth="external",
+        source_system="google_drive",
+        external_system="google_drive",
+        external_id="gdrive-northstar-q1-minutes",
+        external_url="https://drive.google.com/file/d/northstar-q1-minutes",
+        sync_status="synced",
+        local_editing="disabled",
+        uploaded_at=_ts("10:55"),
+        owner="System",
+        status="indexed",
+        tags=["Board minutes", "Meeting note", "Governance"],
+        snippet="Q1 board minutes capturing director discussion on payroll variance, chair utilisation, and unanswered board questions for the next pack.",
+    ),
+    DocumentRecord(
+        id="doc-2025",
+        client_id="client-hargrove",
+        engagement_id="eng-hargrove-tax",
+        name="FY26_tax_workpapers.xlsx",
+        doc_type="Supporting File",
+        subtype="Tax workpapers",
+        source="Xero",
+        source_of_truth="external",
+        source_system="xero",
+        external_system="xero",
+        external_id="xero-workpapers-hargrove-fy26",
+        external_url="https://workpapers.xero.com/hargrove-fy26",
+        sync_status="synced",
+        local_editing="disabled",
+        uploaded_at=_ts("09:11"),
+        owner="J. Smith",
+        status="indexed",
+        tags=["Workpapers", "Tax", "Xero"],
+        snippet="FY26 tax workpapers exported from Xero Workpapers - supports the entity-structure memo and missing-approval follow-up.",
+    ),
+    DocumentRecord(
+        id="doc-2026",
+        client_id="client-coastal",
+        engagement_id="eng-coastal-settlement",
+        name="Misc_receipts_April_dump.zip",
+        doc_type="Other",
+        subtype="Receipt bundle",
+        source="Manual upload",
+        source_of_truth="reachstack",
+        source_system="manual",
+        sync_status="not_synced",
+        local_editing="enabled",
+        uploaded_at=_ts("08:39"),
+        owner="A. Chen",
+        status="processing",
+        tags=["Receipts", "Manual upload", "Bookkeeping"],
+        snippet="Client-supplied bundle of April cafe and laundry receipts awaiting OCR and matching against the supplier statement.",
+    ),
 ]
 
 
@@ -879,14 +1218,64 @@ def ops_search_results(query: str | None = None, client_id: str | None = None) -
                 )
             )
 
+    for item in QUEUE_LIST:
+        detail = QUEUE_DETAILS.get(item.id)
+        queue_parts = [
+            "queue",
+            "customer service",
+            "inbound work",
+            item.name,
+            item.type,
+            item.source,
+            item.status,
+            detail.matter_code if detail else "",
+            (detail.alert or "") if detail else "",
+            (detail.alert_detail or "") if detail else "",
+            detail.document_preview_text if detail else "",
+            detail.draft_text if detail else "",
+        ]
+        if include(*queue_parts):
+            results.append(
+                SearchResult(
+                    id=item.id,
+                    type="queue",
+                    title=item.name,
+                    subtitle=f"{item.source} - {item.status} - {item.type}",
+                    snippet=(detail.alert_detail if detail and detail.alert_detail else f"{item.type} from {item.source} needs {item.status} handling."),
+                    score=0.9 if item.status in ("partner", "hold", "review") else 0.8,
+                )
+            )
+
     for doc in DOCUMENTS:
-        if include(doc.name, doc.doc_type, doc.snippet, " ".join(doc.tags), candidate_client_id=doc.client_id):
+        doc_search_parts = [
+            doc.name,
+            doc.doc_type,
+            doc.subtype,
+            doc.source,
+            doc.source_of_truth,
+            doc.source_system,
+            doc.external_system or "",
+            doc.external_id or "",
+            doc.sync_status,
+            doc.sync_status.replace("_", " "),
+            doc.local_editing,
+            doc.approval_status or "",
+            doc.generated_by or "",
+            doc.owner,
+            doc.snippet,
+            " ".join(doc.tags),
+            " ".join(doc.based_on_documents),
+        ]
+        if include(*doc_search_parts, candidate_client_id=doc.client_id):
             results.append(
                 SearchResult(
                     id=doc.id,
                     type="document",
                     title=doc.name,
-                    subtitle=f"{_client_name(doc.client_id)} - {doc.doc_type}",
+                    subtitle=(
+                        f"{_client_name(doc.client_id)} - {doc.doc_type} - {doc.subtype} - "
+                        f"{doc.source_of_truth} - {doc.status} - {doc.sync_status}"
+                    ),
                     snippet=doc.snippet,
                     client_id=doc.client_id,
                     engagement_id=doc.engagement_id,
@@ -901,7 +1290,7 @@ def ops_search_results(query: str | None = None, client_id: str | None = None) -
                     id=booking.id,
                     type="booking",
                     title=booking.title,
-                    subtitle=f"{booking.staff} - {booking.provider}",
+                    subtitle=f"{_client_name(booking.client_id)} - {booking.staff} - {booking.provider} - {booking.status}",
                     snippet=f"{booking.start} to {booking.end}. {booking.notes}",
                     client_id=booking.client_id,
                     engagement_id=booking.engagement_id,
@@ -910,17 +1299,60 @@ def ops_search_results(query: str | None = None, client_id: str | None = None) -
             )
 
     for entry in TIME_ENTRIES:
-        if include(entry.activity, entry.staff, entry.notes, candidate_client_id=entry.client_id):
+        client_name = _client_name(entry.client_id)
+        engagement_name = _engagement_name(entry.engagement_id)
+        billing_label = "billable" if entry.billable else "non-billable"
+        if include(
+            entry.activity,
+            entry.staff,
+            client_name,
+            engagement_name,
+            entry.notes,
+            entry.status,
+            billing_label,
+            f"{entry.hours:.1f} hours",
+            candidate_client_id=entry.client_id,
+        ):
             results.append(
                 SearchResult(
                     id=entry.id,
                     type="time",
                     title=entry.activity,
-                    subtitle=f"{entry.staff} - {entry.hours:.1f}h",
-                    snippet=entry.notes,
+                    subtitle=f"{client_name} - {entry.staff} - {entry.status}",
+                    snippet=(
+                        f"{entry.hours:.1f}h {billing_label} time recorded for {engagement_name}. "
+                        f"Status: {entry.status}. {entry.notes}"
+                    ),
                     client_id=entry.client_id,
                     engagement_id=entry.engagement_id,
                     score=0.72,
+                )
+            )
+
+    for sheet in TIMESHEETS:
+        timesheet_parts = [
+            "timesheet",
+            "submitted timesheet",
+            sheet.staff,
+            sheet.role,
+            sheet.week_start,
+            sheet.status,
+            f"{sheet.submitted_hours} recorded hours",
+            f"{sheet.billable_hours} billable hours",
+            f"{sheet.leave_hours} leave hours",
+        ]
+        if include(*timesheet_parts):
+            results.append(
+                SearchResult(
+                    id=f"timesheet-{sheet.staff.lower().replace(' ', '-').replace('.', '')}",
+                    type="time",
+                    title=f"{sheet.staff} timesheet",
+                    subtitle=f"{sheet.role} - {sheet.status}",
+                    snippet=(
+                        f"Week of {sheet.week_start}: {sheet.submitted_hours:.1f}h recorded, "
+                        f"{sheet.billable_hours:.1f}h billable, {sheet.leave_hours:.1f}h leave."
+                    ),
+                    score=0.82 if sheet.status == "submitted" else 0.74,
                 )
             )
 

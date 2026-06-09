@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Literal
+from typing import Any, Literal
 
 from pydantic import BaseModel, Field
 
@@ -128,9 +128,40 @@ class AssuranceMetric(BaseModel):
     subtext: str
 
 
+ChangeOperation = Literal["create", "update", "delete", "undo"]
+ChangeUndoStatus = Literal["completed", "blocked"]
+
+
+class ChangeRecord(BaseModel):
+    id: str
+    session_id: str
+    time: str
+    title: str
+    summary: str
+    actor: str
+    target_type: str
+    target_id: str
+    operation: ChangeOperation
+    before: dict[str, Any] | None = None
+    after: dict[str, Any] | None = None
+    reversible: bool = False
+    reverted: bool = False
+    undo_of: str | None = None
+    audit_event_id: str | None = None
+
+
+class ChangeUndoResponse(BaseModel):
+    change_id: str
+    status: ChangeUndoStatus
+    message: str
+    change: ChangeRecord | None = None
+
+
 class AuditResponse(BaseModel):
     metrics: list[AssuranceMetric]
     events: list[AuditEvent]
+    session_id: str = ""
+    changes: list[ChangeRecord] = []
 
 
 # ---------- Branding ----------
@@ -180,6 +211,7 @@ RecordType = Literal[
     "client",
     "engagement",
     "document",
+    "queue",
     "booking",
     "time",
     "note",
@@ -267,6 +299,11 @@ class DocumentRecord(BaseModel):
     snippet: str
 
 
+class DocumentUpdateRequest(BaseModel):
+    snippet: str
+    note: str | None = None
+
+
 class TimeEntryRecord(BaseModel):
     id: str
     date: str
@@ -332,12 +369,62 @@ class RetrievalRequest(BaseModel):
 
 
 class RetrievalCitation(BaseModel):
+    id: str
     title: str
     source_type: RecordType
     snippet: str
     score: float
+    client_id: str | None = None
+    engagement_id: str | None = None
+
+
+class RetrievalAnswerItem(BaseModel):
+    title: str
+    detail: str
+    kind: Literal["action", "finding", "risk", "note"] = "finding"
+    priority: Literal["high", "medium", "low"] | None = None
+    source_indexes: list[int] = []
+
+
+AgentActionType = Literal["revise_and_approve_document"]
+AgentActionTargetType = Literal["document"]
+AgentActionExecutionStatus = Literal["completed", "blocked"]
+
+
+class AgentAction(BaseModel):
+    id: str
+    type: AgentActionType
+    label: str
+    description: str
+    target_type: AgentActionTargetType
+    target_id: str
+    target_title: str
+    requires_approval: bool = True
+    button_label: str = "Apply"
+    payload: dict[str, str] = {}
+    warnings: list[str] = []
+
+
+class AgentActionExecuteRequest(BaseModel):
+    action: AgentAction
+
+
+class AgentActionExecuteResponse(BaseModel):
+    action_id: str
+    status: AgentActionExecutionStatus
+    message: str
+    document: DocumentRecord | None = None
+    audit_event_id: str | None = None
+    change_id: str | None = None
+    warnings: list[str] = []
 
 
 class RetrievalResponse(BaseModel):
     answer: str
+    overview: str = ""
+    items: list[RetrievalAnswerItem] = []
+    risks: list[str] = []
     citations: list[RetrievalCitation]
+    mode: Literal["openai", "fallback", "computed"] = "fallback"
+    model: str | None = None
+    actions: list[AgentAction] = []

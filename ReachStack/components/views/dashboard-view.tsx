@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import {
   AlertCircle,
   ArrowRight,
@@ -18,14 +19,19 @@ import { GlassCard } from "@/components/ui/glass-card"
 import { Textarea } from "@/components/ui/textarea"
 import {
   useBookingsQuery,
+  useAgentActionExecuteMutation,
   useDashboardQuery,
   useDocumentsQuery,
   useQueueQuery,
+  useRetrievalMutation,
   useTimeEntriesQuery,
   useTimesheetsQuery,
   type BookingRecord,
   type DocumentRecord,
+  type AgentAction,
+  type RetrievalAnswerItem,
   type QueueListItem,
+  type RetrievalCitation,
 } from "@/lib/api"
 import { formatDateTime, formatTimeShort } from "@/lib/format"
 import { cn } from "@/lib/utils"
@@ -92,7 +98,7 @@ export function DashboardView({ persona, onOpenReview, onNavigate }: DashboardVi
 
       <div className="grid grid-cols-12 gap-4">
         <div className="col-span-8">
-          <AssistantPanel persona={persona} onNavigate={onNavigate} onOpenReview={onOpenReview} />
+          <AssistantPanel persona={persona} onNavigate={onNavigate} />
         </div>
 
         <div className="col-span-4 space-y-4">
@@ -185,36 +191,119 @@ export function DashboardView({ persona, onOpenReview, onNavigate }: DashboardVi
   )
 }
 
+type AssistantMessage = {
+  role: "user" | "assistant"
+  text: string
+  overview?: string
+  items?: RetrievalAnswerItem[]
+  risks?: string[]
+  citations?: RetrievalCitation[]
+  mode?: "openai" | "fallback" | "computed"
+  model?: string | null
+  actions?: AgentAction[]
+}
+
+type AssistantActionState = {
+  status: "running" | "completed" | "blocked" | "failed"
+  message: string
+}
+
 function AssistantPanel({
   persona,
   onNavigate,
-  onOpenReview,
 }: {
   persona: PersonaRole
   onNavigate?: (view: string) => void
-  onOpenReview?: () => void
 }) {
   const isPartner = persona === "partner"
   const prompts = isPartner
     ? [
-        { label: "Show escalated work", action: onOpenReview },
-        { label: "Review drafted documents", action: onOpenReview },
-        { label: "What is on my calendar?", action: () => onNavigate?.("calendar") },
-        { label: "Open time reporting", action: () => onNavigate?.("time") },
-        { label: "Find client context", action: () => onNavigate?.("records") },
-        { label: "Open documents needing review", action: () => onNavigate?.("documents") },
+        "Show escalated work",
+        "Review drafted documents",
+        "What is on my calendar?",
+        "Summarise my billable time",
+        "Find client context",
+        "Show documents needing review",
+        "Revise and approve missing annexures request",
       ]
     : [
-        { label: "Show customer service items", action: () => onNavigate?.("queue") },
-        { label: "Check all calendars", action: () => onNavigate?.("calendar") },
-        { label: "Find client records", action: () => onNavigate?.("records") },
-        { label: "Show documents needing review", action: () => onNavigate?.("documents") },
-        { label: "Check submitted timesheets", action: () => onNavigate?.("timesheets") },
-        { label: "Open client portal uploads", action: () => onNavigate?.("portal") },
+        "Show customer service items",
+        "Check all calendars",
+        "Find client records",
+        "Show documents needing review",
+        "Check submitted timesheets",
+        "Show client portal uploads",
       ]
   const chips = isPartner
     ? ["Reviews", "Clients", "Files", "Calendar", "Billing"]
     : ["Customers", "Files", "Calendars", "Timesheets", "Audit"]
+  const retrieval = useRetrievalMutation()
+  const agentActionExecution = useAgentActionExecuteMutation()
+  const [input, setInput] = useState("")
+  const [messages, setMessages] = useState<AssistantMessage[]>([])
+  const [actionStates, setActionStates] = useState<Record<string, AssistantActionState>>({})
+
+  async function sendAssistant(prompt = input) {
+    const text = prompt.trim()
+    if (!text || retrieval.isPending) return
+
+    setInput("")
+    setActionStates({})
+    setMessages([{ role: "user", text }])
+
+    try {
+      const response = await retrieval.mutateAsync({ query: text })
+      setMessages((current) => [
+        ...current,
+        {
+          role: "assistant",
+          text: response.answer,
+          overview: response.overview,
+          items: response.items,
+          risks: response.risks,
+          citations: response.citations,
+          mode: response.mode,
+          model: response.model,
+          actions: response.actions,
+        },
+      ])
+    } catch (error) {
+      setMessages((current) => [
+        ...current,
+        {
+          role: "assistant",
+          text: error instanceof Error ? error.message : "The assistant could not answer just now.",
+          mode: "fallback",
+        },
+      ])
+    }
+  }
+
+  async function runAgentAction(action: AgentAction) {
+    setActionStates((current) => ({
+      ...current,
+      [action.id]: { status: "running", message: "Applying change..." },
+    }))
+
+    try {
+      const result = await agentActionExecution.mutateAsync(action)
+      setActionStates((current) => ({
+        ...current,
+        [action.id]: {
+          status: result.status,
+          message: result.message,
+        },
+      }))
+    } catch (error) {
+      setActionStates((current) => ({
+        ...current,
+        [action.id]: {
+          status: "failed",
+          message: error instanceof Error ? error.message : "The action could not be completed.",
+        },
+      }))
+    }
+  }
 
   return (
     <div className="rounded-xl border border-primary/30 bg-primary text-primary-foreground shadow-xl shadow-primary/15 overflow-hidden min-h-[560px] flex flex-col">
@@ -240,11 +329,19 @@ function AssistantPanel({
           <div className="p-4">
             <Textarea
               aria-label="Ask the assistant"
+              value={input}
+              onChange={(event) => setInput(event.target.value)}
               placeholder={
                 isPartner
                   ? "Ask about a review, draft, client, booking, or billable time..."
                   : "Ask about a customer, calendar, file, timesheet, or queue item..."
               }
+              onKeyDown={(event) => {
+                if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
+                  event.preventDefault()
+                  void sendAssistant()
+                }
+              }}
               className="min-h-28 resize-none border-0 bg-transparent p-0 text-base shadow-none focus-visible:ring-0"
             />
           </div>
@@ -256,35 +353,307 @@ function AssistantPanel({
             </div>
             <button
               type="button"
-              className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+              onClick={() => void sendAssistant()}
+              disabled={!input.trim() || retrieval.isPending}
+              className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
             >
-              Send
-              <Send className="w-4 h-4" />
+              {retrieval.isPending ? "Thinking" : "Send"}
+              {retrieval.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
             </button>
           </div>
         </div>
 
         <div className="flex flex-wrap gap-2">
           {prompts.map((prompt) => (
-            <PromptButton key={prompt.label} label={prompt.label} onClick={prompt.action} />
+            <PromptButton key={prompt} label={prompt} onClick={() => void sendAssistant(prompt)} />
           ))}
         </div>
       </div>
 
       <div className="flex-1 px-5 pb-5">
-        <div className="h-full min-h-48 rounded-xl border border-white/20 bg-white/10 p-4">
-          <p className="text-sm text-white/85 leading-relaxed">
-            Messages will appear here once the assistant is connected.
-          </p>
-          <p className="text-xs text-white/65 mt-2 leading-relaxed">
-            {isPartner
-              ? "The assistant will help review escalations, draft documents, client context, schedule, and billing."
-              : "The assistant will help coordinate customer service, calendars, documents, timesheets, and audit history."}
-          </p>
+        <div className="h-full min-h-48 rounded-xl border border-white/20 bg-white/10 p-4 overflow-y-auto">
+          {messages.length === 0 ? (
+            <>
+              <p className="text-sm text-white/85 leading-relaxed">
+                Ask a question or use a prompt to query the demo records.
+              </p>
+              <p className="text-xs text-white/65 mt-2 leading-relaxed">
+                {isPartner
+                  ? "The assistant can review escalations, draft documents, client context, schedule, and billing."
+                  : "The assistant can coordinate customer service, calendars, documents, timesheets, and audit history."}
+              </p>
+            </>
+          ) : (
+            <div className="space-y-3">
+              {messages.map((message, index) => (
+                <AssistantMessageBubble
+                  key={`${message.role}-${index}`}
+                  message={message}
+                  onOpenCitation={(citation) => openCitation(citation, onNavigate)}
+                  onExecuteAction={(action) => void runAgentAction(action)}
+                  actionStates={actionStates}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>
   )
+}
+
+function openCitation(
+  citation: RetrievalCitation,
+  onNavigate?: (view: string) => void,
+) {
+  if (citation.source_type === "queue") {
+    onNavigate?.("queue")
+    return
+  }
+
+  const targetByType: Partial<Record<RetrievalCitation["source_type"], string>> = {
+    client: "clients",
+    engagement: "engagements",
+    document: "documents",
+    booking: "calendar",
+    time: "time",
+    audit: "audit",
+    note: "records",
+  }
+  onNavigate?.(targetByType[citation.source_type] ?? "records")
+}
+
+function AssistantMessageBubble({
+  message,
+  onOpenCitation,
+  onExecuteAction,
+  actionStates,
+}: {
+  message: AssistantMessage
+  onOpenCitation?: (citation: RetrievalCitation) => void
+  onExecuteAction?: (action: AgentAction) => void
+  actionStates?: Record<string, AssistantActionState>
+}) {
+  const isUser = message.role === "user"
+  const hasStructuredContent = Boolean(message.overview || message.items?.length || message.risks?.length)
+  return (
+    <div className={cn("flex", isUser ? "justify-end" : "justify-start")}>
+      <div
+        className={cn(
+          "max-w-[86%] rounded-xl px-3 py-2 text-sm leading-relaxed",
+          isUser ? "bg-white text-foreground" : "bg-white/15 text-white border border-white/15",
+        )}
+      >
+        {isUser || !hasStructuredContent ? (
+          <p className="whitespace-pre-line">{message.text}</p>
+        ) : (
+          <StructuredAssistantContent message={message} />
+        )}
+        {!isUser && message.actions && message.actions.length > 0 && (
+          <AgentActionList
+            actions={message.actions}
+            states={actionStates ?? {}}
+            onExecuteAction={onExecuteAction}
+          />
+        )}
+        {!isUser && message.mode && (
+          <p className="mt-2 text-[10px] font-medium uppercase tracking-wide text-white/60">
+            {answerModeLabel(message.mode, message.model)}
+          </p>
+        )}
+        {!isUser && message.citations && message.citations.length > 0 && (
+          <div className="mt-3 space-y-2">
+            <p className="text-[10px] font-semibold uppercase tracking-wide text-white/60">Sources</p>
+            <div className="space-y-1.5">
+              {message.citations.slice(0, 4).map((citation) => (
+                <button
+                  key={`${citation.source_type}-${citation.id}-${citation.title}`}
+                  type="button"
+                  onClick={() => onOpenCitation?.(citation)}
+                  className="block w-full rounded-lg bg-white/10 px-2 py-1.5 text-left hover:bg-white/20"
+                >
+                  <span className="block text-xs font-semibold text-white">{citation.title}</span>
+                  <span className="block text-[11px] text-white/65 line-clamp-2">{citation.snippet}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+function AgentActionList({
+  actions,
+  states,
+  onExecuteAction,
+}: {
+  actions: AgentAction[]
+  states: Record<string, AssistantActionState>
+  onExecuteAction?: (action: AgentAction) => void
+}) {
+  return (
+    <div className="mt-3 space-y-2">
+      <p className="text-[10px] font-semibold uppercase tracking-wide text-white/60">Suggested actions</p>
+      {actions.map((action) => (
+        <AgentActionCard
+          key={action.id}
+          action={action}
+          state={states[action.id]}
+          onExecuteAction={onExecuteAction}
+        />
+      ))}
+    </div>
+  )
+}
+
+function AgentActionCard({
+  action,
+  state,
+  onExecuteAction,
+}: {
+  action: AgentAction
+  state?: AssistantActionState
+  onExecuteAction?: (action: AgentAction) => void
+}) {
+  const isRunning = state?.status === "running"
+  const isFinished = state?.status === "completed" || state?.status === "blocked"
+  const nextSnippet = action.payload.new_snippet
+
+  return (
+    <div className="rounded-lg border border-white/20 bg-white/10 p-3">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className="text-sm font-semibold text-white">{action.label}</p>
+          <p className="mt-1 text-xs leading-relaxed text-white/75">{action.description}</p>
+        </div>
+        <span className="shrink-0 rounded-full bg-white/15 px-2 py-1 text-[10px] font-semibold uppercase text-white/70">
+          Approval
+        </span>
+      </div>
+
+      {nextSnippet && (
+        <div className="mt-3 rounded-md bg-white/10 px-3 py-2">
+          <p className="text-[10px] font-semibold uppercase tracking-wide text-white/60">Change preview</p>
+          <p className="mt-1 text-xs leading-relaxed text-white/80">{nextSnippet}</p>
+        </div>
+      )}
+
+      {action.warnings.length > 0 && (
+        <div className="mt-3 space-y-1">
+          {action.warnings.map((warning) => (
+            <div key={warning} className="flex items-start gap-2 text-xs leading-relaxed text-white/70">
+              <AlertCircle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-white/60" />
+              <span>{warning}</span>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
+        {state ? (
+          <p className={cn(
+            "text-xs font-medium",
+            state.status === "completed" ? "text-emerald-100" : "text-white/75",
+          )}>
+            {state.message}
+          </p>
+        ) : (
+          <p className="text-xs text-white/60">Target: {action.target_title}</p>
+        )}
+        <button
+          type="button"
+          onClick={() => onExecuteAction?.(action)}
+          disabled={isRunning || isFinished}
+          className="inline-flex items-center gap-2 rounded-lg bg-white px-3 py-2 text-xs font-semibold text-primary hover:bg-white/90 disabled:opacity-60"
+        >
+          {isRunning ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : state?.status === "completed" ? (
+            <CheckCircle2 className="h-4 w-4" />
+          ) : (
+            <ArrowRight className="h-4 w-4" />
+          )}
+          {isRunning ? "Applying" : state?.status === "completed" ? "Done" : action.button_label}
+        </button>
+      </div>
+    </div>
+  )
+}
+
+function answerModeLabel(mode: NonNullable<AssistantMessage["mode"]>, model?: string | null) {
+  if (mode === "openai") return `OpenAI${model ? ` - ${model}` : ""}`
+  if (mode === "computed") return "Computed from records"
+  return "Demo fallback"
+}
+
+function StructuredAssistantContent({ message }: { message: AssistantMessage }) {
+  return (
+    <div className="space-y-3">
+      {message.overview && (
+        <div>
+          <p className="text-[10px] font-semibold uppercase tracking-wide text-white/60">Overview</p>
+          <p className="mt-1 text-sm text-white">{message.overview}</p>
+        </div>
+      )}
+
+      {message.items && message.items.length > 0 && (
+        <div className="space-y-2">
+          <p className="text-[10px] font-semibold uppercase tracking-wide text-white/60">Items</p>
+          <div className="space-y-2">
+            {message.items.map((item, index) => (
+              <div
+                key={`${item.title}-${index}`}
+                className="relative overflow-hidden rounded-lg bg-white/10 py-2 pl-4 pr-3"
+                title={item.priority ? `${itemKindLabel(item.kind)} - ${item.priority} priority` : itemKindLabel(item.kind)}
+              >
+                <div className={cn("absolute inset-y-0 left-0 w-1", priorityStripTone(item.priority))} />
+                <div>
+                  <p className="text-sm font-semibold text-white">{item.title}</p>
+                  <p className="mt-1 text-xs leading-relaxed text-white/75">{item.detail}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {message.risks && message.risks.length > 0 && (
+        <div className="rounded-lg border border-white/15 bg-white/10 px-3 py-2">
+          <p className="text-[10px] font-semibold uppercase tracking-wide text-white/60">Watch</p>
+          <ul className="mt-1 space-y-1">
+            {message.risks.map((risk) => (
+              <li key={risk} className="text-xs leading-relaxed text-white/75">
+                {risk}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
+  )
+}
+
+function itemKindLabel(kind: RetrievalAnswerItem["kind"]) {
+  const labels: Record<RetrievalAnswerItem["kind"], string> = {
+    action: "To do",
+    finding: "Finding",
+    risk: "Risk",
+    note: "Note",
+  }
+  return labels[kind]
+}
+
+function priorityStripTone(priority: RetrievalAnswerItem["priority"]) {
+  if (!priority) return "bg-white/25"
+
+  const tones: Record<NonNullable<RetrievalAnswerItem["priority"]>, string> = {
+    high: "bg-red-300",
+    medium: "bg-amber-200",
+    low: "bg-emerald-200",
+  }
+  return tones[priority]
 }
 
 function PromptButton({ label, onClick }: { label: string; onClick?: () => void }) {

@@ -60,15 +60,72 @@ export interface AssuranceMetric {
   subtext: string
 }
 
+export type ChangeOperation = "create" | "update" | "delete" | "undo"
+export type ChangeUndoStatus = "completed" | "blocked"
+
+export interface ChangeRecord {
+  id: string
+  session_id: string
+  time: string
+  title: string
+  summary: string
+  actor: string
+  target_type: string
+  target_id: string
+  operation: ChangeOperation
+  before?: Record<string, unknown> | null
+  after?: Record<string, unknown> | null
+  reversible: boolean
+  reverted: boolean
+  undo_of?: string | null
+  audit_event_id?: string | null
+}
+
+export interface ChangeUndoResponse {
+  change_id: string
+  status: ChangeUndoStatus
+  message: string
+  change?: ChangeRecord | null
+}
+
 export interface AuditResponse {
   metrics: AssuranceMetric[]
   events: AuditEvent[]
+  session_id: string
+  changes: ChangeRecord[]
 }
 
 export function useAuditQuery() {
   return useQuery({
     queryKey: ["audit"],
     queryFn: () => getJson<AuditResponse>("/api/audit"),
+  })
+}
+
+export function useChangeUndoMutation() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (changeId: string): Promise<ChangeUndoResponse> => {
+      const res = await fetch(`${API_BASE}/api/audit/changes/${changeId}/undo`, {
+        method: "POST",
+      })
+      if (!res.ok) {
+        throw new Error(`Undo failed: ${res.status} ${res.statusText}`)
+      }
+      return res.json()
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["audit"] })
+      queryClient.invalidateQueries({ queryKey: ["queue"] })
+      queryClient.invalidateQueries({ queryKey: ["documents"] })
+      queryClient.invalidateQueries({ queryKey: ["bookings"] })
+      queryClient.invalidateQueries({ queryKey: ["time"] })
+      queryClient.invalidateQueries({ queryKey: ["portal"] })
+      queryClient.invalidateQueries({ queryKey: ["branding"] })
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] })
+      queryClient.invalidateQueries({ queryKey: ["client-workspace"] })
+      queryClient.invalidateQueries({ queryKey: ["search"] })
+    },
   })
 }
 
@@ -291,6 +348,7 @@ export type RecordType =
   | "client"
   | "engagement"
   | "document"
+  | "queue"
   | "booking"
   | "time"
   | "note"
@@ -376,6 +434,11 @@ export interface DocumentRecord {
   snippet: string
 }
 
+export interface DocumentUpdate {
+  snippet: string
+  note?: string
+}
+
 export interface TimeEntryRecord {
   id: string
   date: string
@@ -441,15 +504,60 @@ export interface RetrievalRequest {
 }
 
 export interface RetrievalCitation {
+  id: string
   title: string
   source_type: RecordType
   snippet: string
   score: number
+  client_id?: string | null
+  engagement_id?: string | null
+}
+
+export interface RetrievalAnswerItem {
+  title: string
+  detail: string
+  kind: "action" | "finding" | "risk" | "note"
+  priority?: "high" | "medium" | "low" | null
+  source_indexes: number[]
+}
+
+export type AgentActionType = "revise_and_approve_document"
+export type AgentActionTargetType = "document"
+export type AgentActionExecutionStatus = "completed" | "blocked"
+
+export interface AgentAction {
+  id: string
+  type: AgentActionType
+  label: string
+  description: string
+  target_type: AgentActionTargetType
+  target_id: string
+  target_title: string
+  requires_approval: boolean
+  button_label: string
+  payload: Record<string, string>
+  warnings: string[]
+}
+
+export interface AgentActionExecuteResponse {
+  action_id: string
+  status: AgentActionExecutionStatus
+  message: string
+  document?: DocumentRecord | null
+  audit_event_id?: string | null
+  change_id?: string | null
+  warnings: string[]
 }
 
 export interface RetrievalResponse {
   answer: string
+  overview: string
+  items: RetrievalAnswerItem[]
+  risks: string[]
   citations: RetrievalCitation[]
+  mode: "openai" | "fallback" | "computed"
+  model?: string | null
+  actions: AgentAction[]
 }
 
 export function useClientsQuery() {
@@ -510,6 +618,30 @@ export function useDocumentsQuery(clientId?: string) {
     queryKey: ["documents", clientId ?? "all"],
     queryFn: () =>
       getJson<DocumentRecord[]>("/api/documents", clientId ? { client_id: clientId } : undefined),
+  })
+}
+
+export function useDocumentUpdateMutation() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ documentId, update }: { documentId: string; update: DocumentUpdate }): Promise<DocumentRecord> => {
+      const res = await fetch(`${API_BASE}/api/documents/${documentId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(update),
+      })
+      if (!res.ok) {
+        throw new Error(`Document update failed: ${res.status} ${res.statusText}`)
+      }
+      return res.json()
+    },
+    onSuccess: (document) => {
+      queryClient.invalidateQueries({ queryKey: ["documents"] })
+      queryClient.invalidateQueries({ queryKey: ["audit"] })
+      queryClient.invalidateQueries({ queryKey: ["search"] })
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] })
+      queryClient.invalidateQueries({ queryKey: ["client-workspace", document.client_id] })
+    },
   })
 }
 
@@ -577,6 +709,32 @@ export function useRetrievalMutation() {
         throw new Error(`Retrieval failed: ${res.status} ${res.statusText}`)
       }
       return res.json()
+    },
+  })
+}
+
+export function useAgentActionExecuteMutation() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (action: AgentAction): Promise<AgentActionExecuteResponse> => {
+      const res = await fetch(`${API_BASE}/api/agent/actions/execute`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action }),
+      })
+      if (!res.ok) {
+        throw new Error(`Agent action failed: ${res.status} ${res.statusText}`)
+      }
+      return res.json()
+    },
+    onSuccess: (result) => {
+      queryClient.invalidateQueries({ queryKey: ["documents"] })
+      queryClient.invalidateQueries({ queryKey: ["audit"] })
+      queryClient.invalidateQueries({ queryKey: ["search"] })
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] })
+      if (result.document?.client_id) {
+        queryClient.invalidateQueries({ queryKey: ["client-workspace", result.document.client_id] })
+      }
     },
   })
 }

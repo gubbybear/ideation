@@ -2,8 +2,8 @@
 
 import { GlassCard } from "@/components/ui/glass-card"
 import { cn } from "@/lib/utils"
-import { Shield, CheckCircle, AlertTriangle, Download, Loader2, AlertCircle } from "lucide-react"
-import { useAuditQuery, type AuditEvent } from "@/lib/api"
+import { Shield, CheckCircle, AlertTriangle, Download, Loader2, AlertCircle, GitCommitHorizontal, RotateCcw } from "lucide-react"
+import { useAuditQuery, useChangeUndoMutation, type AuditEvent, type ChangeRecord } from "@/lib/api"
 import { formatTimeLong } from "@/lib/format"
 
 function escapeCsv(value: string): string {
@@ -31,10 +31,20 @@ function downloadAuditCsv(events: AuditEvent[]) {
   URL.revokeObjectURL(url)
 }
 
+function changeOperationTone(change: ChangeRecord) {
+  if (change.reverted) return "bg-muted/50 text-muted-foreground border-border/30"
+  if (change.operation === "create") return "bg-success/15 text-success border-success/20"
+  if (change.operation === "update") return "bg-primary/15 text-primary border-primary/20"
+  if (change.operation === "undo") return "bg-warning/15 text-warning border-warning/20"
+  return "bg-muted/50 text-muted-foreground border-border/30"
+}
+
 export function AuditView() {
   const { data, isPending, error } = useAuditQuery()
+  const undo = useChangeUndoMutation()
   const events = data?.events ?? []
   const metrics = data?.metrics ?? []
+  const changes = data?.changes ?? []
 
   return (
     <div className="space-y-6">
@@ -47,6 +57,11 @@ export function AuditView() {
           <h1 className="text-2xl font-semibold text-foreground">
             Full traceability and compliance assurance
           </h1>
+          {data?.session_id && (
+            <p className="mt-1 text-xs text-muted-foreground font-mono">
+              Session {data.session_id}
+            </p>
+          )}
         </div>
         <div className="flex items-center gap-2">
           <button
@@ -95,6 +110,75 @@ export function AuditView() {
           </div>
         ))}
       </div>
+
+      {/* Session changes */}
+      <GlassCard title="Session Changes" badge={`${changes.length}`} badgeVariant="info">
+        <div className="space-y-3">
+          <div className="rounded-lg border border-border/30 bg-muted/10 p-3">
+            <div className="flex items-start gap-2">
+              <GitCommitHorizontal className="mt-0.5 h-4 w-4 text-primary" />
+              <p className="text-xs leading-relaxed text-muted-foreground">
+                This is the reversible change history for the current demo session. Audit events remain immutable; these records keep before/after state so a mock action can be rolled back.
+              </p>
+            </div>
+          </div>
+
+          {isPending && (
+            <div className="py-8 text-center text-sm text-muted-foreground">
+              <Loader2 className="mr-2 inline h-4 w-4 animate-spin" />
+              Loading session changes...
+            </div>
+          )}
+
+          {!isPending && changes.length === 0 && (
+            <div className="rounded-lg border border-border/30 bg-muted/10 py-8 text-center text-sm text-muted-foreground">
+              No reversible changes have been recorded in this session yet.
+            </div>
+          )}
+
+          {!isPending && changes.map((change) => {
+            const undoing = undo.isPending && undo.variables === change.id
+            const canUndo = change.reversible && !change.reverted && change.operation !== "undo"
+            return (
+              <div key={change.id} className="rounded-lg border border-border/30 bg-card/40 p-3">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className={cn("rounded-full border px-2 py-1 text-[10px] font-semibold uppercase", changeOperationTone(change))}>
+                        {change.operation}
+                      </span>
+                      <span className="text-xs text-muted-foreground font-mono">{change.id}</span>
+                      {change.reverted && (
+                        <span className="rounded-full bg-muted px-2 py-1 text-[10px] font-semibold uppercase text-muted-foreground">
+                          reverted
+                        </span>
+                      )}
+                    </div>
+                    <p className="mt-2 text-sm font-semibold text-foreground">{change.title}</p>
+                    <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{change.summary}</p>
+                    <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
+                      <span>{formatTimeLong(change.time)}</span>
+                      <span>{change.actor}</span>
+                      <span className="font-mono">{change.target_type}:{change.target_id}</span>
+                      {change.undo_of && <span className="font-mono">undo of {change.undo_of}</span>}
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => undo.mutate(change.id)}
+                    disabled={!canUndo || undoing}
+                    className="inline-flex shrink-0 items-center gap-2 rounded-lg border border-border/40 bg-background px-3 py-2 text-xs font-medium text-foreground hover:bg-muted/30 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {undoing ? <Loader2 className="h-4 w-4 animate-spin" /> : <RotateCcw className="h-4 w-4" />}
+                    Undo
+                  </button>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      </GlassCard>
 
       {/* Audit log */}
       <GlassCard title="Audit Log" badge="Live" badgeVariant="success">

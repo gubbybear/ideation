@@ -150,6 +150,17 @@
   }
 }
 
+/* Demo branding picker — squares off every rounded surface, including
+   rounded-full pills, when the user toggles "Square" corners. */
+html[data-corners='square'] {
+  --radius: 0px;
+}
+html[data-corners='square'] *,
+html[data-corners='square'] *::before,
+html[data-corners='square'] *::after {
+  border-radius: 0 !important;
+}
+
 /* Glass surface utilities */
 .glass {
   background: var(--glass);

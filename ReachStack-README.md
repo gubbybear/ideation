@@ -72,6 +72,28 @@ The backend API docs are available at:
 http://localhost:8000/docs
 ```
 
+## Optional OpenAI Assistant
+
+The app can use the OpenAI API for assistant answers over the local dummy records.
+Without an API key, the same screens still work with the built-in demo fallback.
+
+To enable OpenAI:
+
+```powershell
+copy backend\.env.example backend\.env
+notepad backend\.env
+```
+
+Set:
+
+```text
+OPENAI_API_KEY=your_api_key_here
+OPENAI_MODEL=gpt-4.1-mini
+```
+
+Then restart the backend. If you use `launch-reachstack.bat`, close the backend
+window and run the launcher again.
+
 ## Manual Launch
 
 Use this if the batch file fails or you want separate terminals.

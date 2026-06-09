@@ -3,6 +3,7 @@
 import { ShieldCheck, Sun, Moon } from "lucide-react"
 import { useTheme } from "next-themes"
 import { useEffect, useState } from "react"
+import { BrandingPicker } from "@/components/branding-picker"
 import { HowToUseModal } from "@/components/how-to-use-modal"
 import { useBrandingQuery } from "@/lib/api"
 import { cn } from "@/lib/utils"
@@ -58,6 +59,7 @@ export function TopBar({ persona, onPersonaChange }: TopBarProps) {
 
       <div className="flex items-center gap-4">
         <HowToUseModal />
+        <BrandingPicker />
 
         <div
           className={cn(

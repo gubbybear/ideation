@@ -13,10 +13,19 @@ import {
   UploadCloud,
 } from "lucide-react"
 import { GlassCard } from "@/components/ui/glass-card"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import {
   useClientsQuery,
+  useDocumentUpdateMutation,
   useDocumentsQuery,
   useRetrievalMutation,
   type DocumentRecord,
@@ -49,28 +58,105 @@ const syncLabel: Record<DocumentSyncStatus, string> = {
   conflict: "conflict",
 }
 
+type OwnershipFilter = "all" | DocumentSourceOfTruth
+type SyncFilter = "all" | DocumentSyncStatus
+
+const ownershipFilters: { value: OwnershipFilter; label: string }[] = [
+  { value: "all", label: "All ownership" },
+  { value: "external", label: "External" },
+  { value: "reachstack", label: "ReachStack" },
+  { value: "shared", label: "Shared" },
+]
+
+const testSearches = [
+  "BAS lodgement",
+  "supplier dispute",
+  "director ID",
+  "lease renewal",
+  "onboarding checklist",
+  "conflict check",
+  "remittance advice",
+]
+
 export function DocumentsView() {
   const { data: documents = [], isPending } = useDocumentsQuery()
   const { data: clients = [] } = useClientsQuery()
   const retrieval = useRetrievalMutation()
+  const documentUpdate = useDocumentUpdateMutation()
   const [query, setQuery] = useState("")
+  const [typeFilter, setTypeFilter] = useState("all")
+  const [ownershipFilter, setOwnershipFilter] = useState<OwnershipFilter>("all")
+  const [syncFilter, setSyncFilter] = useState<SyncFilter>("all")
   const [ask, setAsk] = useState("What document evidence matters most this week?")
+  const [editingDoc, setEditingDoc] = useState<DocumentRecord | null>(null)
+  const [editorText, setEditorText] = useState("")
+  const [editorNote, setEditorNote] = useState("")
 
-  const clientName = (id: string) => clients.find((c) => c.id === id)?.name ?? id
+  const clientById = useMemo(() => new Map(clients.map((client) => [client.id, client.name])), [clients])
+  const clientName = (id: string) => clientById.get(id) ?? id
+  const documentTypes = useMemo(
+    () => Array.from(new Set(documents.map((doc) => doc.doc_type))).sort((a, b) => a.localeCompare(b)),
+    [documents],
+  )
   const filtered = useMemo(() => {
     const needle = query.trim().toLowerCase()
-    if (!needle) return documents
-    return documents.filter((doc) =>
-      [doc.name, doc.doc_type, doc.source, doc.snippet, ...doc.tags]
+    return documents.filter((doc) => {
+      if (typeFilter !== "all" && doc.doc_type !== typeFilter) return false
+      if (ownershipFilter !== "all" && doc.source_of_truth !== ownershipFilter) return false
+      if (syncFilter !== "all" && doc.sync_status !== syncFilter) return false
+      if (!needle) return true
+
+      return [
+        doc.name,
+        doc.doc_type,
+        doc.subtype,
+        doc.source,
+        doc.source_of_truth,
+        doc.source_system,
+        doc.external_system ?? "",
+        doc.external_id ?? "",
+        sourceSystemLabel(doc.external_system ?? doc.source_system),
+        syncLabel[doc.sync_status],
+        doc.sync_status,
+        doc.local_editing,
+        doc.approval_status ?? "",
+        doc.generated_by ?? "",
+        doc.version ? `v${doc.version}` : "",
+        doc.owner,
+        clientById.get(doc.client_id) ?? doc.client_id,
+        doc.snippet,
+        ...doc.tags,
+        ...doc.based_on_documents,
+      ]
         .join(" ")
         .toLowerCase()
-        .includes(needle),
-    )
-  }, [documents, query])
+        .includes(needle)
+    })
+  }, [clientById, documents, ownershipFilter, query, syncFilter, typeFilter])
 
   async function askDocuments() {
     if (!ask.trim()) return
     await retrieval.mutateAsync({ query: ask })
+  }
+
+  function openEditor(doc: DocumentRecord) {
+    setEditingDoc(doc)
+    setEditorText(doc.snippet)
+    setEditorNote("")
+  }
+
+  async function saveEditor() {
+    if (!editingDoc || !editorText.trim()) return
+    await documentUpdate.mutateAsync({
+      documentId: editingDoc.id,
+      update: {
+        snippet: editorText.trim(),
+        note: editorNote.trim() || undefined,
+      },
+    })
+    setEditingDoc(null)
+    setEditorText("")
+    setEditorNote("")
   }
 
   return (
@@ -101,9 +187,66 @@ export function DocumentsView() {
               <Input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search filenames, tags, document types, snippets..."
+                placeholder="Search filenames, document types, source systems, sync states, tags..."
                 className="h-7 border-0 px-0 shadow-none focus-visible:ring-0"
               />
+            </div>
+
+            <div className="mb-4 flex flex-wrap items-center gap-2">
+              <select
+                value={typeFilter}
+                onChange={(e) => setTypeFilter(e.target.value)}
+                className="h-9 rounded-lg border border-border/40 bg-background px-3 text-xs font-medium text-foreground"
+              >
+                <option value="all">All document types</option>
+                {documentTypes.map((type) => (
+                  <option key={type} value={type}>
+                    {type}
+                  </option>
+                ))}
+              </select>
+
+              {ownershipFilters.map((filter) => (
+                <button
+                  key={filter.value}
+                  type="button"
+                  onClick={() => setOwnershipFilter(filter.value)}
+                  className={cn(
+                    "h-9 rounded-full border px-3 text-xs font-medium transition-colors",
+                    ownershipFilter === filter.value
+                      ? "border-primary/40 bg-primary/10 text-primary"
+                      : "border-border/40 bg-card/30 text-muted-foreground hover:text-foreground",
+                  )}
+                >
+                  {filter.label}
+                </button>
+              ))}
+
+              <select
+                value={syncFilter}
+                onChange={(e) => setSyncFilter(e.target.value as SyncFilter)}
+                className="h-9 rounded-lg border border-border/40 bg-background px-3 text-xs font-medium text-foreground"
+              >
+                <option value="all">All sync states</option>
+                {(Object.keys(syncLabel) as DocumentSyncStatus[]).map((status) => (
+                  <option key={status} value={status}>
+                    {syncLabel[status]}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="mb-4 flex flex-wrap items-center gap-2">
+              {testSearches.map((term) => (
+                <button
+                  key={term}
+                  type="button"
+                  onClick={() => setQuery(term)}
+                  className="rounded-full bg-muted/40 px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-primary/10 hover:text-primary"
+                >
+                  {term}
+                </button>
+              ))}
             </div>
 
             {isPending ? (
@@ -111,21 +254,35 @@ export function DocumentsView() {
                 <Loader2 className="w-4 h-4 mr-2 inline animate-spin" />
                 Loading documents...
               </div>
+            ) : filtered.length === 0 ? (
+              <div className="rounded-lg border border-border/30 bg-muted/10 py-12 text-center text-sm text-muted-foreground">
+                No documents match those filters.
+              </div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full">
+                  <colgroup>
+                    <col className="w-[48%]" />
+                    <col className="w-[14%]" />
+                    <col className="w-[24%]" />
+                    <col className="w-[14%]" />
+                  </colgroup>
                   <thead>
                     <tr className="border-b border-border/30">
                       <th className="text-left py-3 px-3 text-[10px] font-semibold text-muted-foreground uppercase">Document</th>
                       <th className="text-left py-3 px-3 text-[10px] font-semibold text-muted-foreground uppercase">Client</th>
-                      <th className="text-left py-3 px-3 text-[10px] font-semibold text-muted-foreground uppercase">Owned By</th>
                       <th className="text-left py-3 px-3 text-[10px] font-semibold text-muted-foreground uppercase">Source</th>
-                      <th className="text-right py-3 px-3 text-[10px] font-semibold text-muted-foreground uppercase">Status</th>
+                      <th className="text-right py-3 px-3 text-[10px] font-semibold text-muted-foreground uppercase">State</th>
                     </tr>
                   </thead>
                   <tbody>
                     {filtered.map((doc) => (
-                      <DocumentRow key={doc.id} doc={doc} clientName={clientName(doc.client_id)} />
+                      <DocumentRow
+                        key={doc.id}
+                        doc={doc}
+                        clientName={clientName(doc.client_id)}
+                        onOpenEditor={openEditor}
+                      />
                     ))}
                   </tbody>
                 </table>
@@ -154,7 +311,7 @@ export function DocumentsView() {
 
               {retrieval.data ? (
                 <div className="rounded-lg border border-primary/20 bg-primary/5 p-3">
-                  <p className="text-sm leading-relaxed text-foreground">{retrieval.data.answer}</p>
+                  <p className="whitespace-pre-line text-sm leading-relaxed text-foreground">{retrieval.data.answer}</p>
                   <div className="mt-3 space-y-2">
                     {retrieval.data.citations.map((citation) => (
                       <div key={`${citation.title}-${citation.score}`} className="rounded-md border border-border/30 bg-card/50 p-2">
@@ -209,13 +366,37 @@ export function DocumentsView() {
           </GlassCard>
         </div>
       </div>
+
+      <DocumentEditorDialog
+        doc={editingDoc}
+        text={editorText}
+        note={editorNote}
+        saving={documentUpdate.isPending}
+        error={documentUpdate.error instanceof Error ? documentUpdate.error.message : null}
+        onTextChange={setEditorText}
+        onNoteChange={setEditorNote}
+        onSave={() => void saveEditor()}
+        onOpenChange={(open) => {
+          if (!open) setEditingDoc(null)
+        }}
+      />
     </div>
   )
 }
 
-function DocumentRow({ doc, clientName }: { doc: DocumentRecord; clientName: string }) {
-  const ownerLabel = doc.source_of_truth === "reachstack" ? "ReachStack" : doc.source_of_truth
+function DocumentRow({
+  doc,
+  clientName,
+  onOpenEditor,
+}: {
+  doc: DocumentRecord
+  clientName: string
+  onOpenEditor?: (doc: DocumentRecord) => void
+}) {
   const systemLabel = doc.external_system ?? doc.source_system
+  const syncIssue = syncIssueLabel(doc.sync_status)
+  const approvalState = approvalStateLabel(doc.approval_status)
+  const canOpenEditor = canOpenWordEditor(doc)
 
   return (
     <tr className="border-b border-border/20 hover:bg-muted/10">
@@ -242,9 +423,7 @@ function DocumentRow({ doc, clientName }: { doc: DocumentRecord; clientName: str
       </td>
       <td className="py-3 px-3 text-sm text-muted-foreground">{clientName}</td>
       <td className="py-3 px-3">
-        <span className={cn("rounded-full border px-2 py-1 text-[10px] font-semibold uppercase", ownerTone[doc.source_of_truth])}>
-          {ownerLabel}
-        </span>
+        <p className="text-sm font-medium text-foreground">{sourceSystemLabel(systemLabel)}</p>
         <div className="mt-2 flex items-center gap-1.5 text-xs text-muted-foreground">
           {doc.local_editing === "enabled" ? (
             <PencilLine className="w-3.5 h-3.5 text-primary" />
@@ -254,12 +433,22 @@ function DocumentRow({ doc, clientName }: { doc: DocumentRecord; clientName: str
           {doc.local_editing === "enabled" ? "Editable here" : "Edit in source"}
         </div>
         {doc.version && (
-          <p className="mt-1 text-xs text-muted-foreground">v{doc.version}</p>
+          <p className="mt-1 text-xs text-muted-foreground">Version {doc.version}</p>
         )}
-      </td>
-      <td className="py-3 px-3">
-        <p className="text-sm text-foreground">{sourceSystemLabel(systemLabel)}</p>
-        <p className="text-xs text-muted-foreground">{syncLabel[doc.sync_status]} - {formatDateTime(doc.uploaded_at)}</p>
+        {canOpenEditor && (
+          <button
+            type="button"
+            onClick={() => onOpenEditor?.(doc)}
+            className="mt-2 inline-flex items-center gap-1.5 rounded-md border border-primary/20 bg-primary/10 px-2 py-1 text-xs font-medium text-primary hover:bg-primary/15"
+          >
+            <PencilLine className="h-3.5 w-3.5" />
+            Open editor
+          </button>
+        )}
+        {syncIssue && (
+          <p className="mt-1 text-xs font-medium text-warning">{syncIssue}</p>
+        )}
+        <p className="mt-1 text-xs text-muted-foreground">{formatDateTime(doc.uploaded_at)}</p>
         {doc.external_url && (
           <a
             href={doc.external_url}
@@ -273,12 +462,141 @@ function DocumentRow({ doc, clientName }: { doc: DocumentRecord; clientName: str
         )}
       </td>
       <td className="py-3 px-3 text-right">
-        <span className={cn("rounded-full border px-2 py-1 text-[10px] font-semibold uppercase", statusTone[doc.status])}>
-          {doc.status.replace("_", " ")}
+        <span className={cn("inline-flex whitespace-nowrap rounded-full border px-2.5 py-1 text-xs font-semibold", statusTone[doc.status])}>
+          {documentStatusLabel(doc.status)}
         </span>
+        {approvalState && (
+          <p className="mt-2 text-xs text-muted-foreground">
+            {approvalState}
+          </p>
+        )}
       </td>
     </tr>
   )
+}
+
+function DocumentEditorDialog({
+  doc,
+  text,
+  note,
+  saving,
+  error,
+  onTextChange,
+  onNoteChange,
+  onSave,
+  onOpenChange,
+}: {
+  doc: DocumentRecord | null
+  text: string
+  note: string
+  saving: boolean
+  error: string | null
+  onTextChange: (value: string) => void
+  onNoteChange: (value: string) => void
+  onSave: () => void
+  onOpenChange: (open: boolean) => void
+}) {
+  const hasChanges = Boolean(doc && text.trim() && text.trim() !== doc.snippet.trim())
+
+  return (
+    <Dialog open={Boolean(doc)} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-3xl">
+        <DialogHeader>
+          <DialogTitle>{doc ? `Editor - ${doc.name}` : "Document editor"}</DialogTitle>
+          <DialogDescription className="sr-only">
+            Edit the selected Word document.
+          </DialogDescription>
+        </DialogHeader>
+
+        {doc && (
+          <div className="space-y-4">
+            <div className="grid grid-cols-3 gap-3 rounded-lg border border-border/40 bg-muted/10 p-3 text-xs">
+              <EditorMeta label="Source" value={sourceSystemLabel(doc.external_system ?? doc.source_system)} />
+              <EditorMeta label="Edit rule" value={doc.local_editing === "enabled" ? "Editable here" : "Edit in source"} />
+              <EditorMeta label="Version" value={doc.version ? `Version ${doc.version}` : "Unversioned"} />
+            </div>
+
+            <Textarea
+              value={text}
+              onChange={(event) => onTextChange(event.target.value)}
+              className="min-h-64 resize-y text-sm leading-relaxed"
+            />
+
+            <Input
+              value={note}
+              onChange={(event) => onNoteChange(event.target.value)}
+              placeholder="Optional edit note"
+              className="text-sm"
+            />
+
+            {error && (
+              <div className="rounded-lg border border-destructive/20 bg-destructive/10 px-3 py-2 text-xs text-destructive">
+                {error}
+              </div>
+            )}
+          </div>
+        )}
+
+        <DialogFooter>
+          <button
+            type="button"
+            onClick={() => onOpenChange(false)}
+            className="rounded-lg border border-border/50 bg-background px-4 py-2 text-sm font-medium text-foreground hover:bg-muted/30"
+          >
+            Close
+          </button>
+          <button
+            type="button"
+            onClick={onSave}
+            disabled={!hasChanges || saving}
+            className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+          >
+            {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <PencilLine className="h-4 w-4" />}
+            Save draft
+          </button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+function EditorMeta({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <p className="font-semibold uppercase tracking-wide text-muted-foreground">{label}</p>
+      <p className="mt-1 text-foreground">{value}</p>
+    </div>
+  )
+}
+
+function canOpenWordEditor(doc: DocumentRecord): boolean {
+  return doc.name.toLowerCase().endsWith(".docx") && doc.local_editing === "enabled"
+}
+
+function documentStatusLabel(status: DocumentStatus): string {
+  const labels: Record<DocumentStatus, string> = {
+    indexed: "Indexed",
+    processing: "Processing",
+    needs_review: "Needs review",
+  }
+  return labels[status]
+}
+
+function approvalStateLabel(status: DocumentRecord["approval_status"]): string | null {
+  if (status === "draft") return "Approval: draft"
+  if (status === "review") return "Approval: review"
+  return null
+}
+
+function syncIssueLabel(status: DocumentSyncStatus): string | null {
+  const labels: Partial<Record<DocumentSyncStatus, string>> = {
+    sync_pending: "Sync pending",
+    sync_failed: "Sync failed",
+    external_changed: "External changed",
+    local_changed: "Local changes",
+    conflict: "Conflict",
+  }
+  return labels[status] ?? null
 }
 
 function sourceSystemLabel(system: string): string {
@@ -290,6 +608,7 @@ function sourceSystemLabel(system: string): string {
     google_drive: "Google Drive",
     client_portal: "Client portal",
     reachstack: "ReachStack",
+    manual: "Manual upload",
     manual_upload: "Manual upload",
   }
   return labels[system] ?? system
